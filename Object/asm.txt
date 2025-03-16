@@ -1,0 +1,66 @@
+
+USER.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+08004000 <_start>:
+    .code 32
+    .align 4
+
+    .global _start
+_start:
+    MOV     R12, #0
+ 8004000:	e3a0c000 	mov	ip, #0
+    LDR     R11, =msg
+ 8004004:	e59fb038 	ldr	fp, [pc, #56]	@ 8004044 <msg+0xc>
+
+08004008 <printchar>:
+
+printchar:
+    LDRB    R10, [R11, R12]
+ 8004008:	e7dba00c 	ldrb	sl, [fp, ip]
+    CMP     R10, #0
+ 800400c:	e35a0000 	cmp	sl, #0
+    BEQ     finish
+ 8004010:	0a000007 	beq	8004034 <finish>
+
+08004014 <printwait>:
+
+printwait:
+    LDR     R9, =0xE000102C
+ 8004014:	e59f902c 	ldr	r9, [pc, #44]	@ 8004048 <msg+0x10>
+    LDR     R9, [R9]
+ 8004018:	e5999000 	ldr	r9, [r9]
+    TST     R9, #0x08
+ 800401c:	e3190008 	tst	r9, #8
+    BEQ     printwait
+ 8004020:	0afffffb 	beq	8004014 <printwait>
+
+
+    LDR     R9, =0xE0001030
+ 8004024:	e59f9020 	ldr	r9, [pc, #32]	@ 800404c <msg+0x14>
+    STR     R10, [R9]
+ 8004028:	e589a000 	str	sl, [r9]
+
+    ADD     R12, R12, #1
+ 800402c:	e28cc001 	add	ip, ip, #1
+    B       printchar
+ 8004030:	eafffff4 	b	8004008 <printchar>
+
+08004034 <finish>:
+
+finish:
+    B       finish
+ 8004034:	eafffffe 	b	8004034 <finish>
+
+08004038 <msg>:
+ 8004038:	6c6c6568 	.word	0x6c6c6568
+ 800403c:	6f77206f 	.word	0x6f77206f
+ 8004040:	00646c72 	.word	0x00646c72
+    LDR     R11, =msg
+ 8004044:	08004038 	.word	0x08004038
+    LDR     R9, =0xE000102C
+ 8004048:	e000102c 	.word	0xe000102c
+    LDR     R9, =0xE0001030
+ 800404c:	e0001030 	.word	0xe0001030

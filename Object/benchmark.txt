@@ -1,0 +1,364 @@
+
+BENCHMARK.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+08004000 <RME_Entry>:
+//Description : The entry of the process.
+//Input       : None.
+//Output      : None.
+//*****************************************************************************/
+RME_Entry:
+                 LDR     R0, =RME_Benchmark
+ 8004000:	e59f0070 	ldr	r0, [pc, #112]	@ 8004078 <__user_setup_stackheap+0x10>
+                 BX      R0
+ 8004004:	e12fff10 	bx	r0
+
+08004008 <RME_Thd_Stub>:
+//Input       : R4 - The entry address.
+//              R5 - The stack address that we are using now.
+//Output      : None.
+//*****************************************************************************/
+RME_Thd_Stub:
+                BLX      R4                 // Branch to the actual entry address
+ 8004008:	e12fff34 	blx	r4
+                //B        RME_Thd_Finish     // Jump to exiting code, should never return.
+                B        .                  // Capture faults.
+ 800400c:	eafffffe 	b	800400c <RME_Thd_Stub+0x4>
+
+08004010 <RME_Inv_Stub>:
+//Input       : R4 - The entry address.
+//              R5 - The stack address that we are using now.
+//Output      : None.
+//*****************************************************************************/
+RME_Inv_Stub:
+                BLX      R4                 // Branch to the actual entry address
+ 8004010:	e12fff34 	blx	r4
+                //BX       RME_Inv_Finish     // Jump to exiting code, should never return.
+                B        .                  // Capture faults.
+ 8004014:	eafffffe 	b	8004014 <RME_Inv_Stub+0x4>
+
+08004018 <RME_Svc>:
+//              R6 - Argument 2.
+//              R7 - Argument 3.
+//Output      : None.
+//*****************************************************************************/
+RME_Svc:
+                PUSH       {R4-R7}  // Manual clobbering
+ 8004018:	e92d00f0 	push	{r4, r5, r6, r7}
+                MOV        R4,R0    // Manually pass the parameters according to ARM calling convention
+ 800401c:	e1a04000 	mov	r4, r0
+                MOV        R5,R1
+ 8004020:	e1a05001 	mov	r5, r1
+                MOV        R6,R2
+ 8004024:	e1a06002 	mov	r6, r2
+                MOV        R7,R3
+ 8004028:	e1a07003 	mov	r7, r3
+                SVC        #0x00   
+ 800402c:	ef000000 	svc	0x00000000
+                MOV        R0,R4    // This is the return value
+ 8004030:	e1a00004 	mov	r0, r4
+                POP        {R4-R7}  // Manual recovering
+ 8004034:	e8bd00f0 	pop	{r4, r5, r6, r7}
+                BX         LR
+ 8004038:	e12fff1e 	bx	lr
+                B          .        // Shouldn't reach here.
+ 800403c:	eafffffe 	b	800403c <RME_Svc+0x24>
+
+08004040 <RME_Inv>:
+//              R6 - The first argument for the invocation.
+//              R7 - Argument 3.
+//Output      : None.
+//*****************************************************************************/
+RME_Inv:
+                PUSH       {R4-R7}  // Manual clobbering
+ 8004040:	e92d00f0 	push	{r4, r5, r6, r7}
+                MOV        R4,R0    // Manually pass the parameters according to ARM calling convention
+ 8004044:	e1a04000 	mov	r4, r0
+                MOV        R5,R1
+ 8004048:	e1a05001 	mov	r5, r1
+                MOV        R6,R2
+ 800404c:	e1a06002 	mov	r6, r2
+                MOV        R7,R3
+ 8004050:	e1a07003 	mov	r7, r3
+                SVC        #0x00   
+ 8004054:	ef000000 	svc	0x00000000
+                MOV        R0,R4    // This is the return value
+ 8004058:	e1a00004 	mov	r0, r4
+                POP        {R4-R7}  // Manual recovering
+ 800405c:	e8bd00f0 	pop	{r4, r5, r6, r7}
+                BX         LR
+ 8004060:	e12fff1e 	bx	lr
+                B          .        // Shouldn't reach here.
+ 8004064:	eafffffe 	b	8004064 <RME_Inv+0x24>
+
+08004068 <__user_setup_stackheap>:
+//Description : We place the function here to shut the SEMIHOSTING up.
+//Input       : None.
+//Output      : None.
+//*****************************************************************************/
+__user_setup_stackheap:
+                MOV      R0,R1     // Stack as where we came in, and definitely no heap
+ 8004068:	e1a00001 	mov	r0, r1
+                MOV      R2,R1
+ 800406c:	e1a02001 	mov	r2, r1
+                BX       LR
+ 8004070:	e12fff1e 	bx	lr
+                B        .         // Capture faults
+ 8004074:	eafffffe 	b	8004074 <__user_setup_stackheap+0xc>
+                 LDR     R0, =RME_Benchmark
+ 8004078:	0800427c 	.word	0x0800427c
+
+0800407c <_RME_Tsc_Init>:
+Input       : None.
+Output      : None.
+Return      : None.
+******************************************************************************/
+void _RME_Tsc_Init(void)
+{
+ 800407c:	e52db004 	push	{fp}		@ (str fp, [sp, #-4]!)
+ 8004080:	e28db000 	add	fp, sp, #0
+//    TIM2_Handle.Init.Period=(ptr_t)(-1);
+//    TIM2_Handle.Init.ClockDivision=TIM_CLOCKDIVISION_DIV1;
+//    HAL_TIM_Base_Init(&TIM2_Handle);
+//    __HAL_RCC_TIM2_CLK_ENABLE();
+//    __HAL_TIM_ENABLE(&TIM2_Handle);
+}
+ 8004084:	e320f000 	nop	{0}
+ 8004088:	e28bd000 	add	sp, fp, #0
+ 800408c:	e49db004 	pop	{fp}		@ (ldr fp, [sp], #4)
+ 8004090:	e12fff1e 	bx	lr
+
+08004094 <_RME_Stack_Init>:
+Input       : None.
+Output      : None.
+Return      : None.
+******************************************************************************/
+ptr_t _RME_Stack_Init(ptr_t Stack, ptr_t Stub, ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4)
+{
+ 8004094:	e52db004 	push	{fp}		@ (str fp, [sp, #-4]!)
+ 8004098:	e28db000 	add	fp, sp, #0
+ 800409c:	e24dd01c 	sub	sp, sp, #28
+ 80040a0:	e50b0010 	str	r0, [fp, #-16]
+ 80040a4:	e50b1014 	str	r1, [fp, #-20]	@ 0xffffffec
+ 80040a8:	e50b2018 	str	r2, [fp, #-24]	@ 0xffffffe8
+ 80040ac:	e50b301c 	str	r3, [fp, #-28]	@ 0xffffffe4
+    struct RME_CMX_Ret_Stack* Stack_Ptr;
+    
+    Stack_Ptr=(struct RME_CMX_Ret_Stack*)(Stack-RME_STACK_SAFE_SIZE-sizeof(struct RME_CMX_Ret_Stack));
+ 80040b0:	e51b3010 	ldr	r3, [fp, #-16]
+ 80040b4:	e2433070 	sub	r3, r3, #112	@ 0x70
+ 80040b8:	e50b3008 	str	r3, [fp, #-8]
+    Stack_Ptr->R0=Param1;
+ 80040bc:	e51b3008 	ldr	r3, [fp, #-8]
+ 80040c0:	e51b2018 	ldr	r2, [fp, #-24]	@ 0xffffffe8
+ 80040c4:	e5832000 	str	r2, [r3]
+    Stack_Ptr->R1=Param2;
+ 80040c8:	e51b3008 	ldr	r3, [fp, #-8]
+ 80040cc:	e51b201c 	ldr	r2, [fp, #-28]	@ 0xffffffe4
+ 80040d0:	e5832004 	str	r2, [r3, #4]
+    Stack_Ptr->R2=Param3;
+ 80040d4:	e51b3008 	ldr	r3, [fp, #-8]
+ 80040d8:	e59b2004 	ldr	r2, [fp, #4]
+ 80040dc:	e5832008 	str	r2, [r3, #8]
+    Stack_Ptr->R3=Param4;
+ 80040e0:	e51b3008 	ldr	r3, [fp, #-8]
+ 80040e4:	e59b2008 	ldr	r2, [fp, #8]
+ 80040e8:	e583200c 	str	r2, [r3, #12]
+    Stack_Ptr->R12=0;
+ 80040ec:	e51b3008 	ldr	r3, [fp, #-8]
+ 80040f0:	e3a02000 	mov	r2, #0
+ 80040f4:	e5832010 	str	r2, [r3, #16]
+    Stack_Ptr->LR=0;
+ 80040f8:	e51b3008 	ldr	r3, [fp, #-8]
+ 80040fc:	e3a02000 	mov	r2, #0
+ 8004100:	e5832014 	str	r2, [r3, #20]
+    Stack_Ptr->PC=Stub;
+ 8004104:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004108:	e51b2014 	ldr	r2, [fp, #-20]	@ 0xffffffec
+ 800410c:	e5832018 	str	r2, [r3, #24]
+    /* Initialize the xPSR to avoid a transition to ARM state */
+    Stack_Ptr->XPSR=0x01000200;
+ 8004110:	e51b2008 	ldr	r2, [fp, #-8]
+ 8004114:	e3a03c02 	mov	r3, #512	@ 0x200
+ 8004118:	e3403100 	movt	r3, #256	@ 0x100
+ 800411c:	e582301c 	str	r3, [r2, #28]
+    
+    return (ptr_t)Stack_Ptr;
+ 8004120:	e51b3008 	ldr	r3, [fp, #-8]
+}
+ 8004124:	e1a00003 	mov	r0, r3
+ 8004128:	e28bd000 	add	sp, fp, #0
+ 800412c:	e49db004 	pop	{fp}		@ (ldr fp, [sp], #4)
+ 8004130:	e12fff1e 	bx	lr
+
+08004134 <RME_Same_Prc_Thd_Switch_Test_Thd>:
+Input       : None.
+Output      : None.
+Return      : None.
+******************************************************************************/
+void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4)
+{
+ 8004134:	e92d4800 	push	{fp, lr}
+ 8004138:	e28db004 	add	fp, sp, #4
+ 800413c:	e24dd018 	sub	sp, sp, #24
+ 8004140:	e50b0010 	str	r0, [fp, #-16]
+ 8004144:	e50b1014 	str	r1, [fp, #-20]	@ 0xffffffec
+ 8004148:	e50b2018 	str	r2, [fp, #-24]	@ 0xffffffe8
+ 800414c:	e50b301c 	str	r3, [fp, #-28]	@ 0xffffffe4
+    ret_t Retval;
+    /* Now we switch back to the init thread, immediately */
+    while(1)
+    {
+        Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+ 8004150:	e3a03000 	mov	r3, #0
+ 8004154:	e3a02000 	mov	r2, #0
+ 8004158:	e3a01004 	mov	r1, #4
+ 800415c:	e3a00809 	mov	r0, #589824	@ 0x90000
+ 8004160:	ebffffac 	bl	8004018 <RME_Svc>
+ 8004164:	e50b0008 	str	r0, [fp, #-8]
+ 8004168:	eafffff8 	b	8004150 <RME_Same_Prc_Thd_Switch_Test_Thd+0x1c>
+
+0800416c <RME_Same_Prc_Thd_Switch_Test>:
+Input       : None.
+Output      : None.
+Return      : None.
+******************************************************************************/
+void RME_Same_Prc_Thd_Switch_Test(void)
+{
+ 800416c:	e92d4800 	push	{fp, lr}
+ 8004170:	e28db004 	add	fp, sp, #4
+ 8004174:	e24dd018 	sub	sp, sp, #24
+    ret_t Retval;
+    cnt_t Count;
+    ptr_t Stack_Addr;
+    ptr_t Temp;
+    /* Initialize the thread's stack before entering it */
+    Stack_Addr=_RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
+ 8004178:	e59f00f8 	ldr	r0, [pc, #248]	@ 8004278 <RME_Same_Prc_Thd_Switch_Test+0x10c>
+ 800417c:	e3041008 	movw	r1, #16392	@ 0x4008
+ 8004180:	e3401800 	movt	r1, #2048	@ 0x800
+ 8004184:	e3a03004 	mov	r3, #4
+ 8004188:	e58d3004 	str	r3, [sp, #4]
+ 800418c:	e3a03003 	mov	r3, #3
+ 8004190:	e58d3000 	str	r3, [sp]
+ 8004194:	e3a03002 	mov	r3, #2
+ 8004198:	e3a02001 	mov	r2, #1
+ 800419c:	ebffffbc 	bl	8004094 <_RME_Stack_Init>
+ 80041a0:	e50b000c 	str	r0, [fp, #-12]
+                               (ptr_t)RME_Thd_Stub,
+                               1, 2, 3, 4);
+    /* There are still many bugs in the kernel. Need a white-box test to guarantee
+     * that it is free of bugs. Find a scheme to do that */
+    Retval=RME_CAP_OP(RME_SVC_THD_CRT,RME_BOOT_INIT_CPT,
+ 80041a4:	e3a03a05 	mov	r3, #20480	@ 0x5000
+ 80041a8:	e3413000 	movt	r3, #4096	@ 0x1000
+ 80041ac:	e3a0201f 	mov	r2, #31
+ 80041b0:	e3402003 	movt	r2, #3
+ 80041b4:	e3a01008 	mov	r1, #8
+ 80041b8:	e3401006 	movt	r1, #6
+ 80041bc:	e3a00819 	mov	r0, #1638400	@ 0x190000
+ 80041c0:	ebffff94 	bl	8004018 <RME_Svc>
+ 80041c4:	e50b0010 	str	r0, [fp, #-16]
+                      RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_D0(RME_BOOT_BENCH_THD),
+                      RME_PARAM_D1(RME_BOOT_INIT_PRC)|RME_PARAM_D0(31),
+                      RME_BOOT_BENCH_KOM_FRONTIER);
+    
+    /* Bind the thread to the processor */
+    Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,0,
+ 80041c8:	e3a03000 	mov	r3, #0
+ 80041cc:	e3a02004 	mov	r2, #4
+ 80041d0:	e3a01008 	mov	r1, #8
+ 80041d4:	e3a0081b 	mov	r0, #1769472	@ 0x1b0000
+ 80041d8:	ebffff8e 	bl	8004018 <RME_Svc>
+ 80041dc:	e50b0010 	str	r0, [fp, #-16]
+                      RME_BOOT_BENCH_THD,
+                      RME_BOOT_INIT_THD,
+                      0);
+    
+    /* Set the execution information */
+    Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,0,
+ 80041e0:	e3042134 	movw	r2, #16692	@ 0x4134
+ 80041e4:	e3402800 	movt	r2, #2048	@ 0x800
+ 80041e8:	e51b300c 	ldr	r3, [fp, #-12]
+ 80041ec:	e3a01008 	mov	r1, #8
+ 80041f0:	e3a00806 	mov	r0, #393216	@ 0x60000
+ 80041f4:	ebffff87 	bl	8004018 <RME_Svc>
+ 80041f8:	e50b0010 	str	r0, [fp, #-16]
+                      RME_BOOT_BENCH_THD,
+                      (ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
+                      Stack_Addr);
+                      
+    /* Delegate some timeslice to it */
+    Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,0,
+ 80041fc:	e3093680 	movw	r3, #38528	@ 0x9680
+ 8004200:	e3403098 	movt	r3, #152	@ 0x98
+ 8004204:	e3a02004 	mov	r2, #4
+ 8004208:	e3a01008 	mov	r1, #8
+ 800420c:	e3a00702 	mov	r0, #524288	@ 0x80000
+ 8004210:	ebffff80 	bl	8004018 <RME_Svc>
+ 8004214:	e50b0010 	str	r0, [fp, #-16]
+                      RME_BOOT_BENCH_THD,
+                      RME_BOOT_INIT_THD,
+                      10000000);
+    
+    /* Try to switch to that thread - should fail */
+    Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+ 8004218:	e3a03000 	mov	r3, #0
+ 800421c:	e3a02000 	mov	r2, #0
+ 8004220:	e3a01008 	mov	r1, #8
+ 8004224:	e3a00809 	mov	r0, #589824	@ 0x90000
+ 8004228:	ebffff7a 	bl	8004018 <RME_Svc>
+ 800422c:	e50b0010 	str	r0, [fp, #-16]
+    * Performance cannot be further optimized anymore without compiler intrinsics.
+    * Something terribly wrong with systick. 38 second wrapwround
+    * This configuration, CPU works at 216MHz, correct, but the 
+    * The TSC is always 8 cycles between reads.
+    */
+    _RME_Tsc_Init();
+ 8004230:	ebffff91 	bl	800407c <_RME_Tsc_Init>
+    for(Count=0;Count<10000;Count++)
+ 8004234:	e3a03000 	mov	r3, #0
+ 8004238:	e50b3008 	str	r3, [fp, #-8]
+ 800423c:	ea000008 	b	8004264 <RME_Same_Prc_Thd_Switch_Test+0xf8>
+    {
+        //Temp=RME_TSC();
+        Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+ 8004240:	e3a03000 	mov	r3, #0
+ 8004244:	e3a02000 	mov	r2, #0
+ 8004248:	e3a01008 	mov	r1, #8
+ 800424c:	e3a00809 	mov	r0, #589824	@ 0x90000
+ 8004250:	ebffff70 	bl	8004018 <RME_Svc>
+ 8004254:	e50b0010 	str	r0, [fp, #-16]
+    for(Count=0;Count<10000;Count++)
+ 8004258:	e51b3008 	ldr	r3, [fp, #-8]
+ 800425c:	e2833001 	add	r3, r3, #1
+ 8004260:	e50b3008 	str	r3, [fp, #-8]
+ 8004264:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004268:	e302270f 	movw	r2, #9999	@ 0x270f
+ 800426c:	e1530002 	cmp	r3, r2
+ 8004270:	dafffff2 	ble	8004240 <RME_Same_Prc_Thd_Switch_Test+0xd4>
+                          0);
+        //Temp=RME_TSC()-Temp;
+       // Time[Count]=Temp-8;
+    }
+    
+    while(1);
+ 8004274:	eafffffe 	b	8004274 <RME_Same_Prc_Thd_Switch_Test+0x108>
+ 8004278:	08006ffc 	.word	0x08006ffc
+
+0800427c <RME_Benchmark>:
+Input       : None.
+Output      : None.
+Return      : None.
+******************************************************************************/
+void RME_Benchmark(void)
+{
+ 800427c:	e92d4800 	push	{fp, lr}
+ 8004280:	e28db004 	add	fp, sp, #4
+    RME_Same_Prc_Thd_Switch_Test();
+ 8004284:	ebffffb8 	bl	800416c <RME_Same_Prc_Thd_Switch_Test>
+}
+ 8004288:	e320f000 	nop	{0}
+ 800428c:	e8bd8800 	pop	{fp, pc}

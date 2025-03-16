@@ -1,0 +1,279 @@
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccX1McsE.s 			page 1
+
+
+   1              		.cpu cortex-a9
+   2              		.arch armv7-a
+   3              		.fpu neon-fp16
+   4              		.arch_extension mp
+   5              		.arch_extension sec
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 6
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "main.c"
+  20              		.section	.rodata.RME_A7A_Pgflg_1M_RME2NAT,"a"
+  21              		.align	2
+  24              	RME_A7A_Pgflg_1M_RME2NAT:
+  25 0000 11880300 		.word	231441
+  26 0004 11880300 		.word	231441
+  27 0008 11080300 		.word	198673
+  28 000c 11080300 		.word	198673
+  29 0010 01880300 		.word	231425
+  30 0014 01880300 		.word	231425
+  31 0018 01080300 		.word	198657
+  32 001c 01080300 		.word	198657
+  33 0020 19880300 		.word	231449
+  34 0024 19880300 		.word	231449
+  35 0028 19080300 		.word	198681
+  36 002c 19080300 		.word	198681
+  37 0030 09880300 		.word	231433
+  38 0034 09880300 		.word	231433
+  39 0038 09080300 		.word	198665
+  40 003c 09080300 		.word	198665
+  41 0040 15880300 		.word	231445
+  42 0044 15880300 		.word	231445
+  43 0048 15080300 		.word	198677
+  44 004c 15080300 		.word	198677
+  45 0050 05880300 		.word	231429
+  46 0054 05880300 		.word	231429
+  47 0058 05080300 		.word	198661
+  48 005c 05080300 		.word	198661
+  49 0060 1D880300 		.word	231453
+  50 0064 1D880300 		.word	231453
+  51 0068 1D080300 		.word	198685
+  52 006c 1D080300 		.word	198685
+  53 0070 0D880300 		.word	231437
+  54 0074 0D880300 		.word	231437
+  55 0078 0D080300 		.word	198669
+  56 007c 0D080300 		.word	198669
+  57              		.section	.rodata.RME_A7A_Pgflg_4K_RME2NAT,"a"
+  58              		.align	2
+  61              	RME_A7A_Pgflg_4K_RME2NAT:
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccX1McsE.s 			page 2
+
+
+  62 0000 230E0000 		.word	3619
+  63 0004 230E0000 		.word	3619
+  64 0008 230C0000 		.word	3107
+  65 000c 230C0000 		.word	3107
+  66 0010 220E0000 		.word	3618
+  67 0014 220E0000 		.word	3618
+  68 0018 220C0000 		.word	3106
+  69 001c 220C0000 		.word	3106
+  70 0020 2B0E0000 		.word	3627
+  71 0024 2B0E0000 		.word	3627
+  72 0028 2B0C0000 		.word	3115
+  73 002c 2B0C0000 		.word	3115
+  74 0030 2A0E0000 		.word	3626
+  75 0034 2A0E0000 		.word	3626
+  76 0038 2A0C0000 		.word	3114
+  77 003c 2A0C0000 		.word	3114
+  78 0040 270E0000 		.word	3623
+  79 0044 270E0000 		.word	3623
+  80 0048 270C0000 		.word	3111
+  81 004c 270C0000 		.word	3111
+  82 0050 260E0000 		.word	3622
+  83 0054 260E0000 		.word	3622
+  84 0058 260C0000 		.word	3110
+  85 005c 260C0000 		.word	3110
+  86 0060 2F0E0000 		.word	3631
+  87 0064 2F0E0000 		.word	3631
+  88 0068 2F0C0000 		.word	3119
+  89 006c 2F0C0000 		.word	3119
+  90 0070 2E0E0000 		.word	3630
+  91 0074 2E0E0000 		.word	3630
+  92 0078 2E0C0000 		.word	3118
+  93 007c 2E0C0000 		.word	3118
+  94              		.section	.rodata.RME_A7A_Pgflg_1M_NAT2RME,"a"
+  95              		.align	2
+  98              	RME_A7A_Pgflg_1M_NAT2RME:
+  99 0000 07000000 		.word	7
+ 100 0004 17000000 		.word	23
+ 101 0008 0F000000 		.word	15
+ 102 000c 1F000000 		.word	31
+ 103 0010 03000000 		.word	3
+ 104 0014 13000000 		.word	19
+ 105 0018 0B000000 		.word	11
+ 106 001c 1B000000 		.word	27
+ 107 0020 05000000 		.word	5
+ 108 0024 15000000 		.word	21
+ 109 0028 0D000000 		.word	13
+ 110 002c 1D000000 		.word	29
+ 111 0030 01000000 		.word	1
+ 112 0034 11000000 		.word	17
+ 113 0038 09000000 		.word	9
+ 114 003c 19000000 		.word	25
+ 115              		.section	.rodata.RME_A7A_Pgflg_4K_NAT2RME,"a"
+ 116              		.align	2
+ 119              	RME_A7A_Pgflg_4K_NAT2RME:
+ 120 0000 07000000 		.word	7
+ 121 0004 03000000 		.word	3
+ 122 0008 17000000 		.word	23
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccX1McsE.s 			page 3
+
+
+ 123 000c 13000000 		.word	19
+ 124 0010 0F000000 		.word	15
+ 125 0014 0B000000 		.word	11
+ 126 0018 1F000000 		.word	31
+ 127 001c 1B000000 		.word	27
+ 128 0020 05000000 		.word	5
+ 129 0024 01000000 		.word	1
+ 130 0028 15000000 		.word	21
+ 131 002c 11000000 		.word	17
+ 132 0030 0D000000 		.word	13
+ 133 0034 09000000 		.word	9
+ 134 0038 1D000000 		.word	29
+ 135 003c 19000000 		.word	25
+ 136              		.global	RME_A7A_Timestamp
+ 137              		.section	.bss.RME_A7A_Timestamp,"aw",%nobits
+ 138              		.align	2
+ 141              	RME_A7A_Timestamp:
+ 142 0000 00000000 		.space	4
+ 143              		.global	RME_A7A_Local
+ 144              		.section	.bss.RME_A7A_Local,"aw",%nobits
+ 145              		.align	2
+ 148              	RME_A7A_Local:
+ 149 0000 00000000 		.space	276
+ 149      00000000 
+ 149      00000000 
+ 149      00000000 
+ 149      00000000 
+ 150              		.global	RME_A7A_Kot
+ 151              		.section	.bss.RME_A7A_Kot,"aw",%nobits
+ 152              		.align	2
+ 155              	RME_A7A_Kot:
+ 156 0000 00000000 		.space	8388608
+ 156      00000000 
+ 156      00000000 
+ 156      00000000 
+ 156      00000000 
+ 157              		.global	RME_A7A_Mem_Info
+ 158              		.section	.rodata.RME_A7A_Mem_Info,"a"
+ 159              		.align	2
+ 162              	RME_A7A_Mem_Info:
+ 163 0000 00000000 		.space	100
+ 163      00000000 
+ 163      00000000 
+ 163      00000000 
+ 163      00000000 
+ 164              		.global	RME_A7A_CPU_Cnt
+ 165              		.section	.bss.RME_A7A_CPU_Cnt,"aw",%nobits
+ 166              		.align	2
+ 169              	RME_A7A_CPU_Cnt:
+ 170 0000 00000000 		.space	4
+ 171              		.section	.rodata
+ 172              		.align	2
+ 173              	.LC0:
+ 174 0000 68656C6C 		.ascii	"hello world\012\000"
+ 174      6F20776F 
+ 174      726C640A 
+ 174      00
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccX1McsE.s 			page 4
+
+
+ 175              		.section	.text.main,"ax",%progbits
+ 176              		.align	2
+ 177              		.global	main
+ 178              		.syntax unified
+ 179              		.arm
+ 181              	main:
+ 182              	.LFB0:
+   1:main.c        **** #define __HDR_DEF__
+   2:main.c        **** #include "Platform/A7A/rme_platform_a7a.h"
+   3:main.c        **** #include "Kernel/rme_kernel.h"
+   4:main.c        **** #undef __HDR_DEF__
+   5:main.c        **** 
+   6:main.c        **** #define __HDR_STRUCT__
+   7:main.c        **** #include "Platform/A7A/rme_platform_a7a.h"
+   8:main.c        **** #include "Kernel/rme_kernel.h"
+   9:main.c        **** #undef __HDR_STRUCT__
+  10:main.c        **** 
+  11:main.c        **** 
+  12:main.c        **** /* Private include */
+  13:main.c        **** #include "Platform/A7A/rme_platform_a7a.h"
+  14:main.c        **** 
+  15:main.c        **** #define __HDR_PUBLIC__
+  16:main.c        **** #include "Kernel/rme_kernel.h"
+  17:main.c        **** #undef __HDR_PUBLIC__
+  18:main.c        **** int main(void)
+  19:main.c        **** {
+ 183              		.loc 1 19 1
+ 184              		.cfi_startproc
+ 185              		@ args = 0, pretend = 0, frame = 0
+ 186              		@ frame_needed = 1, uses_anonymous_args = 0
+ 187 0000 00482DE9 		push	{fp, lr}
+ 188              		.cfi_def_cfa_offset 8
+ 189              		.cfi_offset 11, -8
+ 190              		.cfi_offset 14, -4
+ 191 0004 04B08DE2 		add	fp, sp, #4
+ 192              		.cfi_def_cfa 11, 4
+  20:main.c        **** 
+  21:main.c        **** 
+  22:main.c        ****   RME_DBG_S("hello world\n");
+ 193              		.loc 1 22 3
+ 194 0008 000000E3 		movw	r0, #:lower16:.LC0
+ 195 000c 000040E3 		movt	r0, #:upper16:.LC0
+ 196 0010 FEFFFFEB 		bl	RME_Str_Print
+ 197 0014 0030A0E3 		mov	r3, #0
+  23:main.c        **** 
+  24:main.c        **** }
+ 198              		.loc 1 24 1
+ 199 0018 0300A0E1 		mov	r0, r3
+ 200 001c 0088BDE8 		pop	{fp, pc}
+ 201              		.cfi_endproc
+ 202              	.LFE0:
+ 204              		.text
+ 205              	.Letext0:
+ 206              		.file 2 "../../M7M01_Eukaron/Include/Platform/A7A/rme_platform_a7a.h"
+ 207              		.file 3 "../../M7M01_Eukaron/Include/Kernel/rme_kernel.h"
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccX1McsE.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:21     .rodata.RME_A7A_Pgflg_1M_RME2NAT:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:24     .rodata.RME_A7A_Pgflg_1M_RME2NAT:00000000 RME_A7A_Pgflg_1M_RME2NAT
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:58     .rodata.RME_A7A_Pgflg_4K_RME2NAT:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:61     .rodata.RME_A7A_Pgflg_4K_RME2NAT:00000000 RME_A7A_Pgflg_4K_RME2NAT
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:95     .rodata.RME_A7A_Pgflg_1M_NAT2RME:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:98     .rodata.RME_A7A_Pgflg_1M_NAT2RME:00000000 RME_A7A_Pgflg_1M_NAT2RME
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:116    .rodata.RME_A7A_Pgflg_4K_NAT2RME:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:119    .rodata.RME_A7A_Pgflg_4K_NAT2RME:00000000 RME_A7A_Pgflg_4K_NAT2RME
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:141    .bss.RME_A7A_Timestamp:00000000 RME_A7A_Timestamp
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:138    .bss.RME_A7A_Timestamp:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:148    .bss.RME_A7A_Local:00000000 RME_A7A_Local
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:145    .bss.RME_A7A_Local:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:155    .bss.RME_A7A_Kot:00000000 RME_A7A_Kot
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:152    .bss.RME_A7A_Kot:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:162    .rodata.RME_A7A_Mem_Info:00000000 RME_A7A_Mem_Info
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:159    .rodata.RME_A7A_Mem_Info:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:169    .bss.RME_A7A_CPU_Cnt:00000000 RME_A7A_CPU_Cnt
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:166    .bss.RME_A7A_CPU_Cnt:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:172    .rodata:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:173    .rodata:00000000 .LC0
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:176    .text.main:00000000 $a
+C:\Users\even\AppData\Local\Temp\ccX1McsE.s:181    .text.main:00000000 main
+                           .group:00000000 wm4.0.3b9f63523dc4e8d86e863c7e7e762be7
+                           .group:00000000 wm4.rme_platform_a7a.h.12.f1b47b5cf52f8425e79b8a761d5bd676
+                           .group:00000000 wm4.rme_platform_xc7z020.h.15.c1d90fcf057b7628b5ac2d33951e63ab
+                           .group:00000000 wm4.rme_platform_a7a.h.137.fdc6a038503ac117e4f4f30ba1107f52
+                           .group:00000000 wm4.rme_kernel.h.27.716340edb41bad57d522729bf2b8a38a
+                           .group:00000000 wm4.rme.h.11.105c42759f88404be372052d8d99e5e6
+                           .group:00000000 wm4.rme_kernel.h.185.d02db6497e1a69d04e005d15d216f811
+                           .group:00000000 wm4.rme_platform_a7a.h.390.918e282e9d9d990fe491c99e3e90944b
+                           .group:00000000 wm4.rme_kernel.h.678.0572fdf2012fb48f701f562b23d175bb
+                           .group:00000000 wm4.rme_platform_a7a.h.506.4a48ea2091da768113bc2e603a12de0c
+                           .group:00000000 wm4.rme_kernel.h.930.0bcd107bd9a9b6f5fe5bbd4088ddbec4
+
+UNDEFINED SYMBOLS
+RME_Str_Print
