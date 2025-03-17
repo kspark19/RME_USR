@@ -8,17 +8,17 @@ Description : The benchmark file for RME.
 
 /* Define ********************************************************************/
 /* Types */
-typedef signed int  s32;
-typedef signed short s16;
-typedef signed char  s8;
-typedef unsigned int  u32;
-typedef unsigned short u16;
-typedef unsigned char  u8;
-typedef s32 tid_t;
-typedef u32 ptr_t;
-typedef s32 cnt_t;
-typedef s32 cid_t;
-typedef s32 ret_t;
+typedef signed int                          s32;
+typedef signed short                        s16;
+typedef signed char                         s8;
+typedef unsigned int                        u32;
+typedef unsigned short                      u16;
+typedef unsigned char                       u8;
+typedef s32                                 tid_t;
+typedef u32                       			ptr_t;
+typedef s32                       			cnt_t;
+typedef s32 								cid_t;
+typedef s32                        			ret_t;
 
 #define BENCHMARK_STACK_SIZE 4096
 /* System service stub */
@@ -46,42 +46,40 @@ typedef s32 ret_t;
 
 /* Initial boot capabilities - This should be in accordnace with the kernel settings */
 /* The capability table of the init process */
-#define RME_BOOT_INIT_CPT          0
+#define RME_BOOT_INIT_CPT                 		0
 /* The top-level page table of the init process - always 4GB full range split into 8 pages */
-#define RME_BOOT_INIT_PGT           1
-/* The top-level page table of the init process's SRAM */
-#define RME_BOOT_INIT_PGT_SRAM      2
+#define RME_BOOT_INIT_PGT                 		1
 /* The init process */
-#define RME_BOOT_INIT_PRC           3
+#define RME_BOOT_INIT_PRC                 		2
 /* The init thread */
-#define RME_BOOT_INIT_THD        4
+#define RME_BOOT_INIT_THD                 		3
 /* The initial kernel function capability */
-#define RME_BOOT_INIT_KERN       5
+#define RME_BOOT_INIT_KFN          				4
 /* The initial kernel memory capability */
-#define RME_BOOT_INIT_KOM       6
+#define RME_BOOT_INIT_KOM         				5
 /* The initial timer endpoint */
-#define RME_BOOT_INIT_TIMER      7
-
+#define RME_BOOT_INIT_TIMER      				6
 /* The test objects */
-#define RME_BOOT_BENCH_THD       8
-#define RME_BOOT_BENCH_PGT_TOP   9
-#define RME_BOOT_BENCH_PGT_SRAM  10
-
+#define RME_BOOT_BENCH_THD       				8
+#define RME_BOOT_BENCH_PGT_TOP   				9
+#define RME_BOOT_BENCH_PGT_SRAM  				10
+/* The top-level page table of the init process's SRAM */
+#define RME_BOOT_INIT_PGT_SRAM    				11
 
 /* Power of 2 */
-#define RME_FIELD(VAL,POW)                          (((ptr_t)(VAL))<<(POW))
-#define RME_POW2(POW)                               RME_FIELD(1U,POW)
+#define RME_FIELD(VAL,POW)                      (((ptr_t)(VAL))<<(POW))
+#define RME_POW2(POW)                           RME_FIELD(1U,POW)
 /* The order of bits in one CPU machine word */
-#define RME_WORD_ORDER            (5U)
+#define RME_WORD_ORDER            				(5U)
 /* Word size */
-#define RME_WORD_BIT                                RME_POW2(RME_WORD_ORDER)
+#define RME_WORD_BIT                            RME_POW2(RME_WORD_ORDER)
 /* Need to export the memory frontier! */
 /* Need to export the flags as well ! */
 /* Export the errno too */
-#define RME_BOOT_BENCH_KOM_FRONTIER 0x10005000
-
+#define RME_BOOT_BENCH_KOM_FRONTIER 			0x00008000
+//0x10005000
 /* The stack safe size */
-#define RME_STACK_SAFE_SIZE 16
+#define RME_STACK_SAFE_SIZE 					16
 
 //#define RME_TSC() TIM2->CNT
 
@@ -424,7 +422,7 @@ void RME_Same_Prc_Thd_Switch_Test(void)
                       RME_BOOT_INIT_THD,
                       0);
     USR_DBG_S("\r\nBind the thread to the processor retval= ");
-    USR_DBG_H(Retval);
+    USR_DBG_I(Retval);
     
     /* Set the execution information */
     Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,0,
@@ -433,7 +431,7 @@ void RME_Same_Prc_Thd_Switch_Test(void)
                       Stack_Addr);
 
     USR_DBG_S("\r\nSet the execution information retval= ");
-    USR_DBG_H(Retval);
+    USR_DBG_I(Retval);
 
     /* Delegate some timeslice to it */
     Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,0,
@@ -447,7 +445,7 @@ void RME_Same_Prc_Thd_Switch_Test(void)
                       0,
                       0);
     USR_DBG_S("\r\nTry to switch to that thread - should fail  retval= ");
-    USR_DBG_H(Retval);
+    USR_DBG_I(Retval);
     /* Test result: intra-process ctxsw 358cycles/1.657us, frt w/mpu 163cycles/0.754us,
     * composite 324. opted max:323
     * all:33.0
@@ -475,7 +473,7 @@ void RME_Same_Prc_Thd_Switch_Test(void)
         //Temp=RME_TSC()-Temp;
        // Time[Count]=Temp-8;
         USR_DBG_S("\r\nTry to switch to that thread  retval= ");
-        USR_DBG_H(Retval);
+        USR_DBG_I(Retval);
     }
     
     while(1);
