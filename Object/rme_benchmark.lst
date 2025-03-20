@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 1
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 1
 
 
    1              		.cpu cortex-a9
@@ -54,1669 +54,1699 @@ ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 1
   45              		.arm
   47              	__USR_Putchar:
   48              	.LFB0:
+  49              		.file 2 "Include/benchmark.h"
+   1:Include/benchmark.h **** 
+   2:Include/benchmark.h **** #include"rme.h"
+   3:Include/benchmark.h **** /* UART peripheral address */
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 2
+
+
+   4:Include/benchmark.h **** #define RME_A7A_UART_CONTROL      (*((volatile unsigned int*)(0xE0001000)))
+   5:Include/benchmark.h **** #define RME_A7A_UART_MODE         (*((volatile unsigned int*)(0xE0001004)))
+   6:Include/benchmark.h **** #define RME_A7A_UART_BRGEN        (*((volatile unsigned int*)(0xE0001018)))
+   7:Include/benchmark.h **** #define RME_A7A_UART_STATUS       (*((volatile unsigned int*)(0xE000102C)))
+   8:Include/benchmark.h **** #define RME_A7A_UART_FIFO         (*((volatile unsigned int*)(0xE0001030)))
+   9:Include/benchmark.h **** #define RME_A7A_UART_BRDIV        (*((volatile unsigned int*)(0xE0001034)))
+  10:Include/benchmark.h **** #define RME_A7A_UART_STATUS_TXE   (1U<<3)
+  11:Include/benchmark.h **** //#define RME_DBG_S(STR)                              RME_Str_Print((const signed char*)(STR))
+  12:Include/benchmark.h **** 
+  13:Include/benchmark.h **** 
+  14:Include/benchmark.h **** #define RME_A7A_PUTCHAR(CHAR) \
+  15:Include/benchmark.h **** do \
+  16:Include/benchmark.h **** { \
+  17:Include/benchmark.h ****     while((RME_A7A_UART_STATUS&RME_A7A_UART_STATUS_TXE)==0); \
+  18:Include/benchmark.h **** 	RME_A7A_UART_FIFO=(CHAR); \
+  19:Include/benchmark.h **** } \
+  20:Include/benchmark.h **** while(0)
+  21:Include/benchmark.h **** 
+  22:Include/benchmark.h **** 
+  23:Include/benchmark.h **** /* Define ********************************************************************/
+  24:Include/benchmark.h **** /* Types */
+  25:Include/benchmark.h **** typedef signed int                          s32;
+  26:Include/benchmark.h **** typedef signed short                        s16;
+  27:Include/benchmark.h **** typedef signed char                         s8;
+  28:Include/benchmark.h **** typedef unsigned int                        u32;
+  29:Include/benchmark.h **** typedef unsigned short                      u16;
+  30:Include/benchmark.h **** typedef unsigned char                       u8;
+  31:Include/benchmark.h **** typedef s32                                 tid_t;
+  32:Include/benchmark.h **** typedef u32                       			ptr_t;
+  33:Include/benchmark.h **** typedef s32                       			cnt_t;
+  34:Include/benchmark.h **** typedef s32 								cid_t;
+  35:Include/benchmark.h **** typedef s32                        			ret_t;
+  36:Include/benchmark.h **** 
+  37:Include/benchmark.h **** #define BENCHMARK_STACK_SIZE 4096
+  38:Include/benchmark.h **** /* System service stub */
+  39:Include/benchmark.h **** #define RME_CAP_OP(OP,CAPID,ARG1,ARG2,ARG3) RME_Svc(((OP)<<(sizeof(ptr_t)*4)|(CAPID)),ARG1,ARG2,ARG
+  40:Include/benchmark.h **** #define RME_PARAM_D_MASK                    (((ptr_t)(-1))>>(sizeof(ptr_t)*4))
+  41:Include/benchmark.h **** #define RME_PARAM_Q_MASK                    (((ptr_t)(-1))>>(sizeof(ptr_t)*6))
+  42:Include/benchmark.h **** #define RME_PARAM_O_MASK                    (((ptr_t)(-1))>>(sizeof(ptr_t)*7))
+  43:Include/benchmark.h **** /* The parameter passing - not to be confused with kernel macros. These macros just place the param
+  44:Include/benchmark.h **** #define RME_PARAM_D1(X)                     (((X)&RME_PARAM_D_MASK)<<(sizeof(ptr_t)*4))
+  45:Include/benchmark.h **** #define RME_PARAM_D0(X)                     ((X)&RME_PARAM_D_MASK)
+  46:Include/benchmark.h **** 
+  47:Include/benchmark.h **** #define RME_PARAM_Q3(X)                     (((X)&RME_PARAM_Q_MASK)<<(sizeof(ptr_t)*6))
+  48:Include/benchmark.h **** #define RME_PARAM_Q2(X)                     (((X)&RME_PARAM_Q_MASK)<<(sizeof(ptr_t)*4))
+  49:Include/benchmark.h **** #define RME_PARAM_Q1(X)                     (((X)&RME_PARAM_Q_MASK)<<(sizeof(ptr_t)*2))
+  50:Include/benchmark.h **** #define RME_PARAM_Q0(X)                     ((X)&RME_PARAM_Q_MASK)
+  51:Include/benchmark.h **** 
+  52:Include/benchmark.h **** #define RME_PARAM_O7(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*7))
+  53:Include/benchmark.h **** #define RME_PARAM_O6(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*6))
+  54:Include/benchmark.h **** #define RME_PARAM_O5(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*5))
+  55:Include/benchmark.h **** #define RME_PARAM_O4(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*4))
+  56:Include/benchmark.h **** #define RME_PARAM_O3(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*3))
+  57:Include/benchmark.h **** #define RME_PARAM_O2(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*2))
+  58:Include/benchmark.h **** #define RME_PARAM_O1(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*1))
+  59:Include/benchmark.h **** #define RME_PARAM_O0(X)                     ((X)&RME_PARAM_O_MASK)
+  60:Include/benchmark.h **** 
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 3
+
+
+  61:Include/benchmark.h **** /* Initial boot capabilities - This should be in accordnace with the kernel settings */
+  62:Include/benchmark.h **** /* The capability table of the init process */
+  63:Include/benchmark.h **** #define RME_BOOT_INIT_CPT                 		0
+  64:Include/benchmark.h **** /* The top-level page table of the init process - always 4GB full range split into 8 pages */
+  65:Include/benchmark.h **** #define RME_BOOT_INIT_PGT                 		1
+  66:Include/benchmark.h **** /* The init process */
+  67:Include/benchmark.h **** #define RME_BOOT_INIT_PRC                 		2
+  68:Include/benchmark.h **** /* The init thread */
+  69:Include/benchmark.h **** #define RME_BOOT_INIT_THD                 		3
+  70:Include/benchmark.h **** /* The initial kernel function capability */
+  71:Include/benchmark.h **** #define RME_BOOT_INIT_KFN          				4
+  72:Include/benchmark.h **** /* The initial kernel memory capability */
+  73:Include/benchmark.h **** #define RME_BOOT_INIT_KOM         				5
+  74:Include/benchmark.h **** /* The initial timer endpoint */
+  75:Include/benchmark.h **** #define RME_BOOT_INIT_TIMER      				6
+  76:Include/benchmark.h **** /* The test objects */
+  77:Include/benchmark.h **** #define RME_BOOT_BENCH_THD       				8
+  78:Include/benchmark.h **** #define RME_BOOT_BENCH_PGT_TOP   				9
+  79:Include/benchmark.h **** #define RME_BOOT_BENCH_PGT_SRAM  				10
+  80:Include/benchmark.h **** /* The top-level page table of the init process's SRAM */
+  81:Include/benchmark.h **** #define RME_BOOT_INIT_PGT_SRAM    				11
+  82:Include/benchmark.h **** 
+  83:Include/benchmark.h **** /* Power of 2 */
+  84:Include/benchmark.h **** #define RME_FIELD(VAL,POW)                      (((ptr_t)(VAL))<<(POW))
+  85:Include/benchmark.h **** #define RME_POW2(POW)                           RME_FIELD(1U,POW)
+  86:Include/benchmark.h **** /* The order of bits in one CPU machine word */
+  87:Include/benchmark.h **** #define RME_WORD_ORDER            				(5U)
+  88:Include/benchmark.h **** /* Word size */
+  89:Include/benchmark.h **** #define RME_WORD_BIT                            RME_POW2(RME_WORD_ORDER)
+  90:Include/benchmark.h **** /* Need to export the memory frontier! */
+  91:Include/benchmark.h **** /* Need to export the flags as well ! */
+  92:Include/benchmark.h **** /* Export the errno too */
+  93:Include/benchmark.h **** #define RME_BOOT_BENCH_KOM_FRONTIER 			0x00009000
+  94:Include/benchmark.h **** //0x10005000
+  95:Include/benchmark.h **** /* The stack safe size */
+  96:Include/benchmark.h **** #define RME_STACK_SAFE_SIZE 					16
+  97:Include/benchmark.h **** /* Doesn't want to receive the scheduler signal for the thread */
+  98:Include/benchmark.h **** #define RME_CID_NULL   							0x8000
+  99:Include/benchmark.h **** 
+ 100:Include/benchmark.h **** //#define RME_TSC() TIM2->CNT
+ 101:Include/benchmark.h **** 
+ 102:Include/benchmark.h **** /* Need to export the system priority limit! */
+ 103:Include/benchmark.h **** struct RME_CMX_Ret_Stack
+ 104:Include/benchmark.h **** {
+ 105:Include/benchmark.h ****     /* Normal registers */
+ 106:Include/benchmark.h ****     ptr_t R0;
+ 107:Include/benchmark.h ****     ptr_t R1;
+ 108:Include/benchmark.h ****     ptr_t R2;
+ 109:Include/benchmark.h ****     ptr_t R3;
+ 110:Include/benchmark.h ****     ptr_t R12;
+ 111:Include/benchmark.h ****     ptr_t LR;
+ 112:Include/benchmark.h ****     ptr_t PC;
+ 113:Include/benchmark.h ****     ptr_t XPSR;
+ 114:Include/benchmark.h ****     /* FPU registers follow - no matter they are used or not, we reserve the space
+ 115:Include/benchmark.h ****      * in stack creation */
+ 116:Include/benchmark.h ****     ptr_t S0;
+ 117:Include/benchmark.h ****     ptr_t S1;
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 4
+
+
+ 118:Include/benchmark.h ****     ptr_t S2;
+ 119:Include/benchmark.h ****     ptr_t S3;
+ 120:Include/benchmark.h ****     ptr_t S4;
+ 121:Include/benchmark.h ****     ptr_t S5;
+ 122:Include/benchmark.h ****     ptr_t S6;
+ 123:Include/benchmark.h ****     ptr_t S7;
+ 124:Include/benchmark.h ****     ptr_t S8;
+ 125:Include/benchmark.h ****     ptr_t S9;
+ 126:Include/benchmark.h ****     ptr_t S10;
+ 127:Include/benchmark.h ****     ptr_t S11;
+ 128:Include/benchmark.h ****     ptr_t S12;
+ 129:Include/benchmark.h ****     ptr_t S13;
+ 130:Include/benchmark.h ****     ptr_t S14;
+ 131:Include/benchmark.h ****     ptr_t S15;
+ 132:Include/benchmark.h **** };
+ 133:Include/benchmark.h **** /* End Define ****************************************************************/
+ 134:Include/benchmark.h **** 
+ 135:Include/benchmark.h **** 
+ 136:Include/benchmark.h **** 
+ 137:Include/benchmark.h **** /* Private Variables *********************************************************/
+ 138:Include/benchmark.h **** /* The stack of the threads - enough for 4 threads */
+ 139:Include/benchmark.h **** ptr_t RME_Stack[2048];
+ 140:Include/benchmark.h **** u16 Time[10000];
+ 141:Include/benchmark.h **** s8 RME_Bench_Buf[1024];
+ 142:Include/benchmark.h **** /* End Private Variables *****************************************************/
+ 143:Include/benchmark.h **** 
+ 144:Include/benchmark.h **** /* Function Prototypes *******************************************************/
+ 145:Include/benchmark.h **** extern ret_t RME_Svc(ptr_t Svc_Capid,ptr_t Param1, ptr_t Param2, ptr_t Param3);
+ 146:Include/benchmark.h **** extern cnt_t RME_Sprint_Uint(s8* Buffer,u32 Arg_Int);
+ 147:Include/benchmark.h **** extern void RME_Thd_Stub(void);
+ 148:Include/benchmark.h **** extern void RME_Inv_Stub(void);
+ 149:Include/benchmark.h **** ptr_t _RME_Stack_Init(ptr_t Stack, ptr_t Stub, ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Para
+ 150:Include/benchmark.h **** void RME_Benchmark(void);
+ 151:Include/benchmark.h **** void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4);
+ 152:Include/benchmark.h **** void RME_Same_Prc_Thd_Switch_Test(void);
+ 153:Include/benchmark.h **** /* End Function Prototypes ***************************************************/
+ 154:Include/benchmark.h **** 
+ 155:Include/benchmark.h **** /* Function:__USR_Putchar *****************************************************
+ 156:Include/benchmark.h **** Description : Output a character to console. In Cortex-M, under most circumstances,
+ 157:Include/benchmark.h ****               we should use the ITM for such outputs.
+ 158:Include/benchmark.h **** Input       : char Char - The character to print.
+ 159:Include/benchmark.h **** Output      : None.
+ 160:Include/benchmark.h **** Return      : rme_ptr_t - Always 0.
+ 161:Include/benchmark.h **** ******************************************************************************/
+ 162:Include/benchmark.h **** ptr_t __USR_Putchar(char Char)
+ 163:Include/benchmark.h **** {
+  50              		.loc 2 163 1
+  51              		.cfi_startproc
+  52              		@ args = 0, pretend = 0, frame = 8
+  53              		@ frame_needed = 1, uses_anonymous_args = 0
+  54              		@ link register save eliminated.
+  55 0000 04B02DE5 		str	fp, [sp, #-4]!
+  56              		.cfi_def_cfa_offset 4
+  57              		.cfi_offset 11, -4
+  58 0004 00B08DE2 		add	fp, sp, #0
+  59              		.cfi_def_cfa_register 11
+  60 0008 0CD04DE2 		sub	sp, sp, #12
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 5
+
+
+  61 000c 0030A0E1 		mov	r3, r0
+  62 0010 05304BE5 		strb	r3, [fp, #-5]
+  63              	.L2:
+ 164:Include/benchmark.h ****     RME_A7A_PUTCHAR(Char);
+  64              		.loc 2 164 5 discriminator 1
+  65 0014 2C3001E3 		movw	r3, #4140
+  66 0018 00304EE3 		movt	r3, 57344
+  67 001c 003093E5 		ldr	r3, [r3]
+  68 0020 083003E2 		and	r3, r3, #8
+  69 0024 000053E3 		cmp	r3, #0
+  70 0028 F9FFFF0A 		beq	.L2
+  71              		.loc 2 164 5 is_stmt 0 discriminator 2
+  72 002c 303001E3 		movw	r3, #4144
+  73 0030 00304EE3 		movt	r3, 57344
+  74 0034 D5205BE1 		ldrsb	r2, [fp, #-5]
+  75 0038 002083E5 		str	r2, [r3]
+ 165:Include/benchmark.h ****     return 0;
+  76              		.loc 2 165 12 is_stmt 1
+  77 003c 0030A0E3 		mov	r3, #0
+ 166:Include/benchmark.h **** }
+  78              		.loc 2 166 1
+  79 0040 0300A0E1 		mov	r0, r3
+  80 0044 00D08BE2 		add	sp, fp, #0
+  81              		.cfi_def_cfa_register 13
+  82              		@ sp needed
+  83 0048 04B09DE4 		ldr	fp, [sp], #4
+  84              		.cfi_restore 11
+  85              		.cfi_def_cfa_offset 0
+  86 004c 1EFF2FE1 		bx	lr
+  87              		.cfi_endproc
+  88              	.LFE0:
+  90              		.section	.text.USR_DBG_I,"ax",%progbits
+  91              		.align	2
+  92              		.global	USR_DBG_I
+  93              		.syntax unified
+  94              		.arm
+  96              	USR_DBG_I:
+  97              	.LFB1:
+ 167:Include/benchmark.h **** /* End Function __USR_Putchar ***************************************************/
+ 168:Include/benchmark.h **** 
+ 169:Include/benchmark.h **** 
+ 170:Include/benchmark.h **** /* Function:USR_DBG_I *****************************************************
+ 171:Include/benchmark.h **** Description : Print a signed integer on the debugging console. This integer is
+ 172:Include/benchmark.h ****               printed as decimal with sign.
+ 173:Include/benchmark.h **** Input       : rme_cnt_t Int - The integer to print.
+ 174:Include/benchmark.h **** Output      : None.
+ 175:Include/benchmark.h **** Return      : rme_cnt_t - The length of the string printed.
+ 176:Include/benchmark.h **** ******************************************************************************/
+ 177:Include/benchmark.h **** cnt_t USR_DBG_I(cnt_t Int)
+ 178:Include/benchmark.h **** {
+  98              		.loc 2 178 1
+  99              		.cfi_startproc
+ 100              		@ args = 0, pretend = 0, frame = 32
+ 101              		@ frame_needed = 1, uses_anonymous_args = 0
+ 102 0000 00482DE9 		push	{fp, lr}
+ 103              		.cfi_def_cfa_offset 8
+ 104              		.cfi_offset 11, -8
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 6
+
+
+ 105              		.cfi_offset 14, -4
+ 106 0004 04B08DE2 		add	fp, sp, #4
+ 107              		.cfi_def_cfa 11, 4
+ 108 0008 20D04DE2 		sub	sp, sp, #32
+ 109 000c 20000BE5 		str	r0, [fp, #-32]
+ 179:Include/benchmark.h ****     cnt_t Num;
+ 180:Include/benchmark.h ****     cnt_t Abs;
+ 181:Include/benchmark.h ****     cnt_t Iter;
+ 182:Include/benchmark.h ****     cnt_t Count;
+ 183:Include/benchmark.h ****     cnt_t Div;
+ 184:Include/benchmark.h **** 
+ 185:Include/benchmark.h ****     /* Exit on zero */
+ 186:Include/benchmark.h ****     if(Int==0)
+ 110              		.loc 2 186 7
+ 111 0010 20301BE5 		ldr	r3, [fp, #-32]
+ 112 0014 000053E3 		cmp	r3, #0
+ 113 0018 0300001A 		bne	.L5
+ 187:Include/benchmark.h ****     {
+ 188:Include/benchmark.h **** 
+ 189:Include/benchmark.h **** 
+ 190:Include/benchmark.h ****         __USR_Putchar('0');
+ 114              		.loc 2 190 9
+ 115 001c 3000A0E3 		mov	r0, #48
+ 116 0020 FEFFFFEB 		bl	__USR_Putchar
+ 191:Include/benchmark.h ****         return 1;
+ 117              		.loc 2 191 16
+ 118 0024 0130A0E3 		mov	r3, #1
+ 119 0028 500000EA 		b	.L6
+ 120              	.L5:
+ 192:Include/benchmark.h ****     }
+ 193:Include/benchmark.h ****     else
+ 194:Include/benchmark.h ****     {
+ 195:Include/benchmark.h **** 
+ 196:Include/benchmark.h ****         /* No action required */
+ 197:Include/benchmark.h ****     }
+ 198:Include/benchmark.h **** 
+ 199:Include/benchmark.h **** 
+ 200:Include/benchmark.h ****     /* Correct all negatives into positives */
+ 201:Include/benchmark.h ****     if(Int<0)
+ 121              		.loc 2 201 7
+ 122 002c 20301BE5 		ldr	r3, [fp, #-32]
+ 123 0030 000053E3 		cmp	r3, #0
+ 124 0034 070000AA 		bge	.L7
+ 202:Include/benchmark.h ****     {
+ 203:Include/benchmark.h **** 
+ 204:Include/benchmark.h **** 
+ 205:Include/benchmark.h ****         __USR_Putchar('-');
+ 125              		.loc 2 205 9
+ 126 0038 2D00A0E3 		mov	r0, #45
+ 127 003c FEFFFFEB 		bl	__USR_Putchar
+ 206:Include/benchmark.h ****         Abs=-Int;
+ 128              		.loc 2 206 12
+ 129 0040 20301BE5 		ldr	r3, [fp, #-32]
+ 130 0044 003063E2 		rsb	r3, r3, #0
+ 131 0048 0C300BE5 		str	r3, [fp, #-12]
+ 207:Include/benchmark.h ****         Num=1;
+ 132              		.loc 2 207 12
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 7
+
+
+ 133 004c 0130A0E3 		mov	r3, #1
+ 134 0050 08300BE5 		str	r3, [fp, #-8]
+ 135 0054 030000EA 		b	.L8
+ 136              	.L7:
+ 208:Include/benchmark.h ****     }
+ 209:Include/benchmark.h ****     else
+ 210:Include/benchmark.h ****     {
+ 211:Include/benchmark.h **** 
+ 212:Include/benchmark.h **** 
+ 213:Include/benchmark.h ****         Abs=Int;
+ 137              		.loc 2 213 12
+ 138 0058 20301BE5 		ldr	r3, [fp, #-32]
+ 139 005c 0C300BE5 		str	r3, [fp, #-12]
+ 214:Include/benchmark.h ****         Num=0;
+ 140              		.loc 2 214 12
+ 141 0060 0030A0E3 		mov	r3, #0
+ 142 0064 08300BE5 		str	r3, [fp, #-8]
+ 143              	.L8:
+ 215:Include/benchmark.h ****     }
+ 216:Include/benchmark.h **** 
+ 217:Include/benchmark.h ****     /* How many digits are there? */
+ 218:Include/benchmark.h ****     Count=0;
+ 144              		.loc 2 218 10
+ 145 0068 0030A0E3 		mov	r3, #0
+ 146 006c 14300BE5 		str	r3, [fp, #-20]
+ 219:Include/benchmark.h ****     Div=1;
+ 147              		.loc 2 219 8
+ 148 0070 0130A0E3 		mov	r3, #1
+ 149 0074 18300BE5 		str	r3, [fp, #-24]
+ 220:Include/benchmark.h ****     Iter=Abs;
+ 150              		.loc 2 220 9
+ 151 0078 0C301BE5 		ldr	r3, [fp, #-12]
+ 152 007c 10300BE5 		str	r3, [fp, #-16]
+ 153              	.L12:
+ 221:Include/benchmark.h ****     while(1U)
+ 222:Include/benchmark.h ****     {
+ 223:Include/benchmark.h ****         Iter/=10;
+ 154              		.loc 2 223 13
+ 155 0080 10201BE5 		ldr	r2, [fp, #-16]
+ 156 0084 673606E3 		movw	r3, #26215
+ 157 0088 663646E3 		movt	r3, 26214
+ 158 008c 9312C3E0 		smull	r1, r3, r3, r2
+ 159 0090 4311A0E1 		asr	r1, r3, #2
+ 160 0094 C23FA0E1 		asr	r3, r2, #31
+ 161 0098 033041E0 		sub	r3, r1, r3
+ 162 009c 10300BE5 		str	r3, [fp, #-16]
+ 224:Include/benchmark.h ****         Count++;
+ 163              		.loc 2 224 14
+ 164 00a0 14301BE5 		ldr	r3, [fp, #-20]
+ 165 00a4 013083E2 		add	r3, r3, #1
+ 166 00a8 14300BE5 		str	r3, [fp, #-20]
+ 225:Include/benchmark.h ****         if(Iter!=0)
+ 167              		.loc 2 225 11
+ 168 00ac 10301BE5 		ldr	r3, [fp, #-16]
+ 169 00b0 000053E3 		cmp	r3, #0
+ 170 00b4 0600000A 		beq	.L15
+ 226:Include/benchmark.h ****         {
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 8
+
+
+ 227:Include/benchmark.h **** 
+ 228:Include/benchmark.h **** 
+ 229:Include/benchmark.h ****             Div*=10;
+ 171              		.loc 2 229 16
+ 172 00b8 18201BE5 		ldr	r2, [fp, #-24]
+ 173 00bc 0230A0E1 		mov	r3, r2
+ 174 00c0 0331A0E1 		lsl	r3, r3, #2
+ 175 00c4 023083E0 		add	r3, r3, r2
+ 176 00c8 8330A0E1 		lsl	r3, r3, #1
+ 177 00cc 18300BE5 		str	r3, [fp, #-24]
+ 223:Include/benchmark.h ****         Count++;
+ 178              		.loc 2 223 13
+ 179 00d0 EAFFFFEA 		b	.L12
+ 180              	.L15:
+ 230:Include/benchmark.h ****         }
+ 231:Include/benchmark.h ****         else
+ 232:Include/benchmark.h ****         {
+ 233:Include/benchmark.h **** 
+ 234:Include/benchmark.h **** 
+ 235:Include/benchmark.h ****             break;
+ 181              		.loc 2 235 13
+ 182 00d4 00F020E3 		nop
+ 236:Include/benchmark.h ****         }
+ 237:Include/benchmark.h ****     }
+ 238:Include/benchmark.h ****     Num+=Count;
+ 183              		.loc 2 238 8
+ 184 00d8 08201BE5 		ldr	r2, [fp, #-8]
+ 185 00dc 14301BE5 		ldr	r3, [fp, #-20]
+ 186 00e0 033082E0 		add	r3, r2, r3
+ 187 00e4 08300BE5 		str	r3, [fp, #-8]
+ 239:Include/benchmark.h **** 
+ 240:Include/benchmark.h ****     /* Print the integer */
+ 241:Include/benchmark.h ****     Iter=Abs;
+ 188              		.loc 2 241 9
+ 189 00e8 0C301BE5 		ldr	r3, [fp, #-12]
+ 190 00ec 10300BE5 		str	r3, [fp, #-16]
+ 242:Include/benchmark.h **** 
+ 243:Include/benchmark.h ****     while(Count>0)
+ 191              		.loc 2 243 10
+ 192 00f0 1A0000EA 		b	.L13
+ 193              	.L14:
+ 244:Include/benchmark.h ****     {
+ 245:Include/benchmark.h ****         Count--;
+ 194              		.loc 2 245 14
+ 195 00f4 14301BE5 		ldr	r3, [fp, #-20]
+ 196 00f8 013043E2 		sub	r3, r3, #1
+ 197 00fc 14300BE5 		str	r3, [fp, #-20]
+ 246:Include/benchmark.h ****         __USR_Putchar((s8)(Iter/Div)+'0');
+ 198              		.loc 2 246 32
+ 199 0100 18101BE5 		ldr	r1, [fp, #-24]
+ 200 0104 10001BE5 		ldr	r0, [fp, #-16]
+ 201 0108 FEFFFFEB 		bl	__aeabi_idiv
+ 202 010c 0030A0E1 		mov	r3, r0
+ 203              		.loc 2 246 23
+ 204 0110 7330EFE6 		uxtb	r3, r3
+ 205              		.loc 2 246 37
+ 206 0114 303083E2 		add	r3, r3, #48
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 9
+
+
+ 207 0118 7330EFE6 		uxtb	r3, r3
+ 208              		.loc 2 246 9
+ 209 011c 7330AFE6 		sxtb	r3, r3
+ 210 0120 0300A0E1 		mov	r0, r3
+ 211 0124 FEFFFFEB 		bl	__USR_Putchar
+ 247:Include/benchmark.h ****         Iter=Iter%Div;
+ 212              		.loc 2 247 13
+ 213 0128 10301BE5 		ldr	r3, [fp, #-16]
+ 214 012c 18101BE5 		ldr	r1, [fp, #-24]
+ 215 0130 0300A0E1 		mov	r0, r3
+ 216 0134 FEFFFFEB 		bl	__aeabi_idivmod
+ 217 0138 0130A0E1 		mov	r3, r1
+ 218 013c 10300BE5 		str	r3, [fp, #-16]
+ 248:Include/benchmark.h ****         Div/=10;
+ 219              		.loc 2 248 12
+ 220 0140 18201BE5 		ldr	r2, [fp, #-24]
+ 221 0144 673606E3 		movw	r3, #26215
+ 222 0148 663646E3 		movt	r3, 26214
+ 223 014c 9312C3E0 		smull	r1, r3, r3, r2
+ 224 0150 4311A0E1 		asr	r1, r3, #2
+ 225 0154 C23FA0E1 		asr	r3, r2, #31
+ 226 0158 033041E0 		sub	r3, r1, r3
+ 227 015c 18300BE5 		str	r3, [fp, #-24]
+ 228              	.L13:
+ 243:Include/benchmark.h ****     {
+ 229              		.loc 2 243 16
+ 230 0160 14301BE5 		ldr	r3, [fp, #-20]
+ 231 0164 000053E3 		cmp	r3, #0
+ 232 0168 E1FFFFCA 		bgt	.L14
+ 249:Include/benchmark.h ****     }
+ 250:Include/benchmark.h **** 
+ 251:Include/benchmark.h ****     return Num;
+ 233              		.loc 2 251 12
+ 234 016c 08301BE5 		ldr	r3, [fp, #-8]
+ 235              	.L6:
+ 252:Include/benchmark.h **** }
+ 236              		.loc 2 252 1
+ 237 0170 0300A0E1 		mov	r0, r3
+ 238 0174 04D04BE2 		sub	sp, fp, #4
+ 239              		.cfi_def_cfa 13, 8
+ 240              		@ sp needed
+ 241 0178 0088BDE8 		pop	{fp, pc}
+ 242              		.cfi_endproc
+ 243              	.LFE1:
+ 245              		.section	.text.USR_DBG_H,"ax",%progbits
+ 246              		.align	2
+ 247              		.global	USR_DBG_H
+ 248              		.syntax unified
+ 249              		.arm
+ 251              	USR_DBG_H:
+ 252              	.LFB2:
+ 253:Include/benchmark.h **** /* End Function:USR_DBG_I ************************************************/
+ 254:Include/benchmark.h **** 
+ 255:Include/benchmark.h **** /* Function:USR_DBG_H *****************************************************
+ 256:Include/benchmark.h **** Description : Print a unsigned integer on the debugging console. This integer is
+ 257:Include/benchmark.h ****               printed as hexadecimal.
+ 258:Include/benchmark.h **** Input       : rme_ptr_t Uint - The unsigned integer to print.
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 10
+
+
+ 259:Include/benchmark.h **** Output      : None.
+ 260:Include/benchmark.h **** Return      : rme_cnt_t - The length of the string printed.
+ 261:Include/benchmark.h **** ******************************************************************************/
+ 262:Include/benchmark.h **** cnt_t USR_DBG_H(ptr_t Uint)
+ 263:Include/benchmark.h **** {
+ 253              		.loc 2 263 1
+ 254              		.cfi_startproc
+ 255              		@ args = 0, pretend = 0, frame = 24
+ 256              		@ frame_needed = 1, uses_anonymous_args = 0
+ 257 0000 00482DE9 		push	{fp, lr}
+ 258              		.cfi_def_cfa_offset 8
+ 259              		.cfi_offset 11, -8
+ 260              		.cfi_offset 14, -4
+ 261 0004 04B08DE2 		add	fp, sp, #4
+ 262              		.cfi_def_cfa 11, 4
+ 263 0008 18D04DE2 		sub	sp, sp, #24
+ 264 000c 18000BE5 		str	r0, [fp, #-24]
+ 264:Include/benchmark.h ****     ptr_t Iter;
+ 265:Include/benchmark.h ****     ptr_t Count;
+ 266:Include/benchmark.h ****     ptr_t Num;
+ 267:Include/benchmark.h **** 
+ 268:Include/benchmark.h ****     /* Exit on zero */
+ 269:Include/benchmark.h ****     if(Uint==0U)
+ 265              		.loc 2 269 7
+ 266 0010 18301BE5 		ldr	r3, [fp, #-24]
+ 267 0014 000053E3 		cmp	r3, #0
+ 268 0018 0300001A 		bne	.L17
+ 270:Include/benchmark.h ****     {
+ 271:Include/benchmark.h ****         __USR_Putchar('0');
+ 269              		.loc 2 271 9
+ 270 001c 3000A0E3 		mov	r0, #48
+ 271 0020 FEFFFFEB 		bl	__USR_Putchar
+ 272:Include/benchmark.h ****         return 1;
+ 272              		.loc 2 272 16
+ 273 0024 0130A0E3 		mov	r3, #1
+ 274 0028 330000EA 		b	.L18
+ 275              	.L17:
+ 273:Include/benchmark.h ****     }
+ 274:Include/benchmark.h ****     else
+ 275:Include/benchmark.h ****     {
+ 276:Include/benchmark.h ****         /* No action required */
+ 277:Include/benchmark.h ****     }
+ 278:Include/benchmark.h **** 
+ 279:Include/benchmark.h ****     /* Filter out all the zeroes */
+ 280:Include/benchmark.h ****     Count=0U;
+ 276              		.loc 2 280 10
+ 277 002c 0030A0E3 		mov	r3, #0
+ 278 0030 0C300BE5 		str	r3, [fp, #-12]
+ 281:Include/benchmark.h ****     Iter=Uint;
+ 279              		.loc 2 281 9
+ 280 0034 18301BE5 		ldr	r3, [fp, #-24]
+ 281 0038 08300BE5 		str	r3, [fp, #-8]
+ 282:Include/benchmark.h ****     while((Iter>>(RME_WORD_BIT-4U))==0U)
+ 282              		.loc 2 282 10
+ 283 003c 050000EA 		b	.L19
+ 284              	.L20:
+ 283:Include/benchmark.h ****     {
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 11
+
+
+ 284:Include/benchmark.h ****         Iter<<=4;
+ 285              		.loc 2 284 13
+ 286 0040 08301BE5 		ldr	r3, [fp, #-8]
+ 287 0044 0332A0E1 		lsl	r3, r3, #4
+ 288 0048 08300BE5 		str	r3, [fp, #-8]
+ 285:Include/benchmark.h ****         Count++;
+ 289              		.loc 2 285 14
+ 290 004c 0C301BE5 		ldr	r3, [fp, #-12]
+ 291 0050 013083E2 		add	r3, r3, #1
+ 292 0054 0C300BE5 		str	r3, [fp, #-12]
+ 293              	.L19:
+ 282:Include/benchmark.h ****     while((Iter>>(RME_WORD_BIT-4U))==0U)
+ 294              		.loc 2 282 16
+ 295 0058 08301BE5 		ldr	r3, [fp, #-8]
+ 296 005c 233EA0E1 		lsr	r3, r3, #28
+ 282:Include/benchmark.h ****     while((Iter>>(RME_WORD_BIT-4U))==0U)
+ 297              		.loc 2 282 36
+ 298 0060 000053E3 		cmp	r3, #0
+ 299 0064 F5FFFF0A 		beq	.L20
+ 286:Include/benchmark.h ****     }
+ 287:Include/benchmark.h **** 
+ 288:Include/benchmark.h ****     /* Count is the number of pts to print */
+ 289:Include/benchmark.h ****     Count=RME_POW2(RME_WORD_ORDER-2U)-Count;
+ 300              		.loc 2 289 10
+ 301 0068 0C301BE5 		ldr	r3, [fp, #-12]
+ 302 006c 083063E2 		rsb	r3, r3, #8
+ 303 0070 0C300BE5 		str	r3, [fp, #-12]
+ 290:Include/benchmark.h ****     Num=Count;
+ 304              		.loc 2 290 8
+ 305 0074 0C301BE5 		ldr	r3, [fp, #-12]
+ 306 0078 10300BE5 		str	r3, [fp, #-16]
+ 291:Include/benchmark.h ****     while(Count>0U)
+ 307              		.loc 2 291 10
+ 308 007c 1A0000EA 		b	.L21
+ 309              	.L23:
+ 292:Include/benchmark.h ****     {
+ 293:Include/benchmark.h ****         Count--;
+ 310              		.loc 2 293 14
+ 311 0080 0C301BE5 		ldr	r3, [fp, #-12]
+ 312 0084 013043E2 		sub	r3, r3, #1
+ 313 0088 0C300BE5 		str	r3, [fp, #-12]
+ 294:Include/benchmark.h ****         Iter=(Uint>>(Count<<2U))&0x0FU;
+ 314              		.loc 2 294 27
+ 315 008c 0C301BE5 		ldr	r3, [fp, #-12]
+ 316 0090 0331A0E1 		lsl	r3, r3, #2
+ 317              		.loc 2 294 19
+ 318 0094 18201BE5 		ldr	r2, [fp, #-24]
+ 319 0098 3233A0E1 		lsr	r3, r2, r3
+ 320              		.loc 2 294 13
+ 321 009c 0F3003E2 		and	r3, r3, #15
+ 322 00a0 08300BE5 		str	r3, [fp, #-8]
+ 295:Include/benchmark.h ****         if(Iter<10U)
+ 323              		.loc 2 295 11
+ 324 00a4 08301BE5 		ldr	r3, [fp, #-8]
+ 325 00a8 090053E3 		cmp	r3, #9
+ 326 00ac 0700008A 		bhi	.L22
+ 296:Include/benchmark.h ****         {
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 12
+
+
+ 297:Include/benchmark.h **** 
+ 298:Include/benchmark.h ****             __USR_Putchar((s8)Iter+'0');
+ 327              		.loc 2 298 27
+ 328 00b0 08301BE5 		ldr	r3, [fp, #-8]
+ 329 00b4 7330EFE6 		uxtb	r3, r3
+ 330              		.loc 2 298 35
+ 331 00b8 303083E2 		add	r3, r3, #48
+ 332 00bc 7330EFE6 		uxtb	r3, r3
+ 333              		.loc 2 298 13
+ 334 00c0 7330AFE6 		sxtb	r3, r3
+ 335 00c4 0300A0E1 		mov	r0, r3
+ 336 00c8 FEFFFFEB 		bl	__USR_Putchar
+ 337 00cc 060000EA 		b	.L21
+ 338              	.L22:
+ 299:Include/benchmark.h ****         }
+ 300:Include/benchmark.h ****         else
+ 301:Include/benchmark.h ****         {
+ 302:Include/benchmark.h **** 
+ 303:Include/benchmark.h ****             __USR_Putchar((s8)Iter+'A'-10);
+ 339              		.loc 2 303 27
+ 340 00d0 08301BE5 		ldr	r3, [fp, #-8]
+ 341 00d4 7330EFE6 		uxtb	r3, r3
+ 342              		.loc 2 303 39
+ 343 00d8 373083E2 		add	r3, r3, #55
+ 344 00dc 7330EFE6 		uxtb	r3, r3
+ 345              		.loc 2 303 13
+ 346 00e0 7330AFE6 		sxtb	r3, r3
+ 347 00e4 0300A0E1 		mov	r0, r3
+ 348 00e8 FEFFFFEB 		bl	__USR_Putchar
+ 349              	.L21:
+ 291:Include/benchmark.h ****     {
+ 350              		.loc 2 291 16
+ 351 00ec 0C301BE5 		ldr	r3, [fp, #-12]
+ 352 00f0 000053E3 		cmp	r3, #0
+ 353 00f4 E1FFFF1A 		bne	.L23
+ 304:Include/benchmark.h ****         }
+ 305:Include/benchmark.h ****     }
+ 306:Include/benchmark.h **** 
+ 307:Include/benchmark.h ****     return (cnt_t)Num;
+ 354              		.loc 2 307 12
+ 355 00f8 10301BE5 		ldr	r3, [fp, #-16]
+ 356              	.L18:
+ 308:Include/benchmark.h **** }
+ 357              		.loc 2 308 1
+ 358 00fc 0300A0E1 		mov	r0, r3
+ 359 0100 04D04BE2 		sub	sp, fp, #4
+ 360              		.cfi_def_cfa 13, 8
+ 361              		@ sp needed
+ 362 0104 0088BDE8 		pop	{fp, pc}
+ 363              		.cfi_endproc
+ 364              	.LFE2:
+ 366              		.section	.text.USR_DBG_S,"ax",%progbits
+ 367              		.align	2
+ 368              		.global	USR_DBG_S
+ 369              		.syntax unified
+ 370              		.arm
+ 372              	USR_DBG_S:
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 13
+
+
+ 373              	.LFB3:
+ 309:Include/benchmark.h **** /* End Function:USR_DBG_H ************************************************/
+ 310:Include/benchmark.h **** cnt_t USR_DBG_S(const s8* String)
+ 311:Include/benchmark.h **** {
+ 374              		.loc 2 311 1
+ 375              		.cfi_startproc
+ 376              		@ args = 0, pretend = 0, frame = 16
+ 377              		@ frame_needed = 1, uses_anonymous_args = 0
+ 378 0000 00482DE9 		push	{fp, lr}
+ 379              		.cfi_def_cfa_offset 8
+ 380              		.cfi_offset 11, -8
+ 381              		.cfi_offset 14, -4
+ 382 0004 04B08DE2 		add	fp, sp, #4
+ 383              		.cfi_def_cfa 11, 4
+ 384 0008 10D04DE2 		sub	sp, sp, #16
+ 385 000c 10000BE5 		str	r0, [fp, #-16]
+ 312:Include/benchmark.h ****     ptr_t Count;
+ 313:Include/benchmark.h **** 
+ 314:Include/benchmark.h ****     for(Count=0U;Count<255;Count++)
+ 386              		.loc 2 314 14
+ 387 0010 0030A0E3 		mov	r3, #0
+ 388 0014 08300BE5 		str	r3, [fp, #-8]
+ 389              		.loc 2 314 5
+ 390 0018 0E0000EA 		b	.L25
+ 391              	.L28:
+ 315:Include/benchmark.h ****     {
+ 316:Include/benchmark.h ****         if(String[Count]==(s8)'\0')
+ 392              		.loc 2 316 18
+ 393 001c 10201BE5 		ldr	r2, [fp, #-16]
+ 394 0020 08301BE5 		ldr	r3, [fp, #-8]
+ 395 0024 033082E0 		add	r3, r2, r3
+ 396 0028 D030D3E1 		ldrsb	r3, [r3]
+ 397              		.loc 2 316 11
+ 398 002c 000053E3 		cmp	r3, #0
+ 399 0030 0C00000A 		beq	.L30
+ 317:Include/benchmark.h ****         {
+ 318:Include/benchmark.h **** 
+ 319:Include/benchmark.h ****             break;
+ 320:Include/benchmark.h ****         }
+ 321:Include/benchmark.h ****         else
+ 322:Include/benchmark.h ****         {
+ 323:Include/benchmark.h ****             /* No action required */
+ 324:Include/benchmark.h ****         }
+ 325:Include/benchmark.h **** 
+ 326:Include/benchmark.h ****         __USR_Putchar(String[Count]);
+ 400              		.loc 2 326 29
+ 401 0034 10201BE5 		ldr	r2, [fp, #-16]
+ 402 0038 08301BE5 		ldr	r3, [fp, #-8]
+ 403 003c 033082E0 		add	r3, r2, r3
+ 404              		.loc 2 326 9
+ 405 0040 D030D3E1 		ldrsb	r3, [r3]
+ 406 0044 0300A0E1 		mov	r0, r3
+ 407 0048 FEFFFFEB 		bl	__USR_Putchar
+ 314:Include/benchmark.h ****     {
+ 408              		.loc 2 314 33 discriminator 2
+ 409 004c 08301BE5 		ldr	r3, [fp, #-8]
+ 410 0050 013083E2 		add	r3, r3, #1
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 14
+
+
+ 411 0054 08300BE5 		str	r3, [fp, #-8]
+ 412              	.L25:
+ 314:Include/benchmark.h ****     {
+ 413              		.loc 2 314 23 discriminator 1
+ 414 0058 08301BE5 		ldr	r3, [fp, #-8]
+ 415 005c FE0053E3 		cmp	r3, #254
+ 416 0060 EDFFFF9A 		bls	.L28
+ 417 0064 000000EA 		b	.L27
+ 418              	.L30:
+ 319:Include/benchmark.h ****         }
+ 419              		.loc 2 319 13
+ 420 0068 00F020E3 		nop
+ 421              	.L27:
+ 327:Include/benchmark.h ****     }
+ 328:Include/benchmark.h **** 
+ 329:Include/benchmark.h ****     return (cnt_t)Count;
+ 422              		.loc 2 329 12
+ 423 006c 08301BE5 		ldr	r3, [fp, #-8]
+ 330:Include/benchmark.h **** }
+ 424              		.loc 2 330 1
+ 425 0070 0300A0E1 		mov	r0, r3
+ 426 0074 04D04BE2 		sub	sp, fp, #4
+ 427              		.cfi_def_cfa 13, 8
+ 428              		@ sp needed
+ 429 0078 0088BDE8 		pop	{fp, pc}
+ 430              		.cfi_endproc
+ 431              	.LFE3:
+ 433              		.section	.text._RME_Tsc_Init,"ax",%progbits
+ 434              		.align	2
+ 435              		.global	_RME_Tsc_Init
+ 436              		.syntax unified
+ 437              		.arm
+ 439              	_RME_Tsc_Init:
+ 440              	.LFB4:
    1:Source/rme_benchmark.c **** /******************************************************************************
    2:Source/rme_benchmark.c **** Filename    : benchmark.c
    3:Source/rme_benchmark.c **** Author      : pry
    4:Source/rme_benchmark.c **** Date        : 04/09/2017
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 2
-
-
    5:Source/rme_benchmark.c **** Licence     : The Unlicense; see LICENSE for details.
    6:Source/rme_benchmark.c **** Description : The benchmark file for RME.
    7:Source/rme_benchmark.c **** ******************************************************************************/
    8:Source/rme_benchmark.c **** 
-   9:Source/rme_benchmark.c **** /* Define ********************************************************************/
-  10:Source/rme_benchmark.c **** /* Types */
-  11:Source/rme_benchmark.c **** typedef signed int                          s32;
-  12:Source/rme_benchmark.c **** typedef signed short                        s16;
-  13:Source/rme_benchmark.c **** typedef signed char                         s8;
-  14:Source/rme_benchmark.c **** typedef unsigned int                        u32;
-  15:Source/rme_benchmark.c **** typedef unsigned short                      u16;
-  16:Source/rme_benchmark.c **** typedef unsigned char                       u8;
-  17:Source/rme_benchmark.c **** typedef s32                                 tid_t;
-  18:Source/rme_benchmark.c **** typedef u32                       			ptr_t;
-  19:Source/rme_benchmark.c **** typedef s32                       			cnt_t;
-  20:Source/rme_benchmark.c **** typedef s32 								cid_t;
-  21:Source/rme_benchmark.c **** typedef s32                        			ret_t;
-  22:Source/rme_benchmark.c **** 
-  23:Source/rme_benchmark.c **** #define BENCHMARK_STACK_SIZE 4096
-  24:Source/rme_benchmark.c **** /* System service stub */
-  25:Source/rme_benchmark.c **** #define RME_CAP_OP(OP,CAPID,ARG1,ARG2,ARG3) RME_Svc(((OP)<<(sizeof(ptr_t)*4)|(CAPID)),ARG1,ARG2,ARG
-  26:Source/rme_benchmark.c **** #define RME_PARAM_D_MASK                    (((ptr_t)(-1))>>(sizeof(ptr_t)*4))
-  27:Source/rme_benchmark.c **** #define RME_PARAM_Q_MASK                    (((ptr_t)(-1))>>(sizeof(ptr_t)*6))
-  28:Source/rme_benchmark.c **** #define RME_PARAM_O_MASK                    (((ptr_t)(-1))>>(sizeof(ptr_t)*7))
-  29:Source/rme_benchmark.c **** /* The parameter passing - not to be confused with kernel macros. These macros just place the param
-  30:Source/rme_benchmark.c **** #define RME_PARAM_D1(X)                     (((X)&RME_PARAM_D_MASK)<<(sizeof(ptr_t)*4))
-  31:Source/rme_benchmark.c **** #define RME_PARAM_D0(X)                     ((X)&RME_PARAM_D_MASK)
-  32:Source/rme_benchmark.c **** 
-  33:Source/rme_benchmark.c **** #define RME_PARAM_Q3(X)                     (((X)&RME_PARAM_Q_MASK)<<(sizeof(ptr_t)*6))
-  34:Source/rme_benchmark.c **** #define RME_PARAM_Q2(X)                     (((X)&RME_PARAM_Q_MASK)<<(sizeof(ptr_t)*4))
-  35:Source/rme_benchmark.c **** #define RME_PARAM_Q1(X)                     (((X)&RME_PARAM_Q_MASK)<<(sizeof(ptr_t)*2))
-  36:Source/rme_benchmark.c **** #define RME_PARAM_Q0(X)                     ((X)&RME_PARAM_Q_MASK)
-  37:Source/rme_benchmark.c **** 
-  38:Source/rme_benchmark.c **** #define RME_PARAM_O7(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*7))
-  39:Source/rme_benchmark.c **** #define RME_PARAM_O6(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*6))
-  40:Source/rme_benchmark.c **** #define RME_PARAM_O5(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*5))
-  41:Source/rme_benchmark.c **** #define RME_PARAM_O4(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*4))
-  42:Source/rme_benchmark.c **** #define RME_PARAM_O3(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*3))
-  43:Source/rme_benchmark.c **** #define RME_PARAM_O2(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*2))
-  44:Source/rme_benchmark.c **** #define RME_PARAM_O1(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*1))
-  45:Source/rme_benchmark.c **** #define RME_PARAM_O0(X)                     ((X)&RME_PARAM_O_MASK)
-  46:Source/rme_benchmark.c **** 
-  47:Source/rme_benchmark.c **** /* Initial boot capabilities - This should be in accordnace with the kernel settings */
-  48:Source/rme_benchmark.c **** /* The capability table of the init process */
-  49:Source/rme_benchmark.c **** #define RME_BOOT_INIT_CPT                 		0
-  50:Source/rme_benchmark.c **** /* The top-level page table of the init process - always 4GB full range split into 8 pages */
-  51:Source/rme_benchmark.c **** #define RME_BOOT_INIT_PGT                 		1
-  52:Source/rme_benchmark.c **** /* The init process */
-  53:Source/rme_benchmark.c **** #define RME_BOOT_INIT_PRC                 		2
-  54:Source/rme_benchmark.c **** /* The init thread */
-  55:Source/rme_benchmark.c **** #define RME_BOOT_INIT_THD                 		3
-  56:Source/rme_benchmark.c **** /* The initial kernel function capability */
-  57:Source/rme_benchmark.c **** #define RME_BOOT_INIT_KFN          				4
-  58:Source/rme_benchmark.c **** /* The initial kernel memory capability */
-  59:Source/rme_benchmark.c **** #define RME_BOOT_INIT_KOM         				5
-  60:Source/rme_benchmark.c **** /* The initial timer endpoint */
-  61:Source/rme_benchmark.c **** #define RME_BOOT_INIT_TIMER      				6
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 3
+   9:Source/rme_benchmark.c **** /* Include *******************************************************************/
+  10:Source/rme_benchmark.c **** #include"benchmark.h"
+  11:Source/rme_benchmark.c **** /* Need to export error codes, and size of each object, in words! */
+  12:Source/rme_benchmark.c **** /* End Include ***************************************************************/
+  13:Source/rme_benchmark.c **** 
+  14:Source/rme_benchmark.c **** /* Function:_RME_Tsc_Init *****************************************************
+  15:Source/rme_benchmark.c **** Description : The initialization of timestamp counter. 19 secs before overflowing.
+  16:Source/rme_benchmark.c **** Input       : None.
+  17:Source/rme_benchmark.c **** Output      : None.
+  18:Source/rme_benchmark.c **** Return      : None.
+  19:Source/rme_benchmark.c **** ******************************************************************************/
+  20:Source/rme_benchmark.c **** void _RME_Tsc_Init(void)
+  21:Source/rme_benchmark.c **** {
+ 441              		.loc 1 21 1
+ 442              		.cfi_startproc
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 15
 
 
-  62:Source/rme_benchmark.c **** /* The test objects */
-  63:Source/rme_benchmark.c **** #define RME_BOOT_BENCH_THD       				8
-  64:Source/rme_benchmark.c **** #define RME_BOOT_BENCH_PGT_TOP   				9
-  65:Source/rme_benchmark.c **** #define RME_BOOT_BENCH_PGT_SRAM  				10
-  66:Source/rme_benchmark.c **** /* The top-level page table of the init process's SRAM */
-  67:Source/rme_benchmark.c **** #define RME_BOOT_INIT_PGT_SRAM    				11
-  68:Source/rme_benchmark.c **** 
-  69:Source/rme_benchmark.c **** /* Power of 2 */
-  70:Source/rme_benchmark.c **** #define RME_FIELD(VAL,POW)                      (((ptr_t)(VAL))<<(POW))
-  71:Source/rme_benchmark.c **** #define RME_POW2(POW)                           RME_FIELD(1U,POW)
-  72:Source/rme_benchmark.c **** /* The order of bits in one CPU machine word */
-  73:Source/rme_benchmark.c **** #define RME_WORD_ORDER            				(5U)
-  74:Source/rme_benchmark.c **** /* Word size */
-  75:Source/rme_benchmark.c **** #define RME_WORD_BIT                            RME_POW2(RME_WORD_ORDER)
-  76:Source/rme_benchmark.c **** /* Need to export the memory frontier! */
-  77:Source/rme_benchmark.c **** /* Need to export the flags as well ! */
-  78:Source/rme_benchmark.c **** /* Export the errno too */
-  79:Source/rme_benchmark.c **** #define RME_BOOT_BENCH_KOM_FRONTIER 			0x00008000
-  80:Source/rme_benchmark.c **** //0x10005000
-  81:Source/rme_benchmark.c **** /* The stack safe size */
-  82:Source/rme_benchmark.c **** #define RME_STACK_SAFE_SIZE 					16
-  83:Source/rme_benchmark.c **** 
-  84:Source/rme_benchmark.c **** //#define RME_TSC() TIM2->CNT
-  85:Source/rme_benchmark.c **** 
-  86:Source/rme_benchmark.c **** /* Need to export the system priority limit! */
-  87:Source/rme_benchmark.c **** struct RME_CMX_Ret_Stack
+ 443              		@ args = 0, pretend = 0, frame = 0
+ 444              		@ frame_needed = 1, uses_anonymous_args = 0
+ 445              		@ link register save eliminated.
+ 446 0000 04B02DE5 		str	fp, [sp, #-4]!
+ 447              		.cfi_def_cfa_offset 4
+ 448              		.cfi_offset 11, -4
+ 449 0004 00B08DE2 		add	fp, sp, #0
+ 450              		.cfi_def_cfa_register 11
+  22:Source/rme_benchmark.c **** //    TIM_HandleTypeDef TIM2_Handle;
+  23:Source/rme_benchmark.c **** //    
+  24:Source/rme_benchmark.c **** //    /* Initialize timer 2 to run at the same speed as the CPU */
+  25:Source/rme_benchmark.c **** //    TIM2_Handle.Instance=TIM2;
+  26:Source/rme_benchmark.c **** //    TIM2_Handle.Init.Prescaler=0;
+  27:Source/rme_benchmark.c **** //    TIM2_Handle.Init.CounterMode=TIM_COUNTERMODE_UP;
+  28:Source/rme_benchmark.c **** //    TIM2_Handle.Init.Period=(ptr_t)(-1);
+  29:Source/rme_benchmark.c **** //    TIM2_Handle.Init.ClockDivision=TIM_CLOCKDIVISION_DIV1;
+  30:Source/rme_benchmark.c **** //    HAL_TIM_Base_Init(&TIM2_Handle);
+  31:Source/rme_benchmark.c **** //    __HAL_RCC_TIM2_CLK_ENABLE();
+  32:Source/rme_benchmark.c **** //    __HAL_TIM_ENABLE(&TIM2_Handle);
+  33:Source/rme_benchmark.c **** }
+ 451              		.loc 1 33 1
+ 452 0008 00F020E3 		nop
+ 453 000c 00D08BE2 		add	sp, fp, #0
+ 454              		.cfi_def_cfa_register 13
+ 455              		@ sp needed
+ 456 0010 04B09DE4 		ldr	fp, [sp], #4
+ 457              		.cfi_restore 11
+ 458              		.cfi_def_cfa_offset 0
+ 459 0014 1EFF2FE1 		bx	lr
+ 460              		.cfi_endproc
+ 461              	.LFE4:
+ 463              		.section	.text._RME_Stack_Init,"ax",%progbits
+ 464              		.align	2
+ 465              		.global	_RME_Stack_Init
+ 466              		.syntax unified
+ 467              		.arm
+ 469              	_RME_Stack_Init:
+ 470              	.LFB5:
+  34:Source/rme_benchmark.c **** /* End Function:_RME_Tsc_Init ************************************************/
+  35:Source/rme_benchmark.c **** 
+  36:Source/rme_benchmark.c **** /* Function:_RME_Stack_Init ***************************************************
+  37:Source/rme_benchmark.c **** Description : The thread's stack initializer, initializes the thread's stack.
+  38:Source/rme_benchmark.c **** Input       : None.
+  39:Source/rme_benchmark.c **** Output      : None.
+  40:Source/rme_benchmark.c **** Return      : None.
+  41:Source/rme_benchmark.c **** ******************************************************************************/
+  42:Source/rme_benchmark.c **** ptr_t _RME_Stack_Init(ptr_t Stack, ptr_t Stub, ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Para
+  43:Source/rme_benchmark.c **** {
+ 471              		.loc 1 43 1
+ 472              		.cfi_startproc
+ 473              		@ args = 8, pretend = 0, frame = 24
+ 474              		@ frame_needed = 1, uses_anonymous_args = 0
+ 475              		@ link register save eliminated.
+ 476 0000 04B02DE5 		str	fp, [sp, #-4]!
+ 477              		.cfi_def_cfa_offset 4
+ 478              		.cfi_offset 11, -4
+ 479 0004 00B08DE2 		add	fp, sp, #0
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 16
+
+
+ 480              		.cfi_def_cfa_register 11
+ 481 0008 1CD04DE2 		sub	sp, sp, #28
+ 482 000c 10000BE5 		str	r0, [fp, #-16]
+ 483 0010 14100BE5 		str	r1, [fp, #-20]
+ 484 0014 18200BE5 		str	r2, [fp, #-24]
+ 485 0018 1C300BE5 		str	r3, [fp, #-28]
+  44:Source/rme_benchmark.c ****     struct RME_CMX_Ret_Stack* Stack_Ptr;
+  45:Source/rme_benchmark.c ****     
+  46:Source/rme_benchmark.c ****     Stack_Ptr=(struct RME_CMX_Ret_Stack*)(Stack-RME_STACK_SAFE_SIZE-sizeof(struct RME_CMX_Ret_Stack
+ 486              		.loc 1 46 68
+ 487 001c 10301BE5 		ldr	r3, [fp, #-16]
+ 488 0020 703043E2 		sub	r3, r3, #112
+ 489              		.loc 1 46 14
+ 490 0024 08300BE5 		str	r3, [fp, #-8]
+  47:Source/rme_benchmark.c ****     Stack_Ptr->R0=Param1;
+ 491              		.loc 1 47 18
+ 492 0028 08301BE5 		ldr	r3, [fp, #-8]
+ 493 002c 18201BE5 		ldr	r2, [fp, #-24]
+ 494 0030 002083E5 		str	r2, [r3]
+  48:Source/rme_benchmark.c ****     Stack_Ptr->R1=Param2;
+ 495              		.loc 1 48 18
+ 496 0034 08301BE5 		ldr	r3, [fp, #-8]
+ 497 0038 1C201BE5 		ldr	r2, [fp, #-28]
+ 498 003c 042083E5 		str	r2, [r3, #4]
+  49:Source/rme_benchmark.c ****     Stack_Ptr->R2=Param3;
+ 499              		.loc 1 49 18
+ 500 0040 08301BE5 		ldr	r3, [fp, #-8]
+ 501 0044 04209BE5 		ldr	r2, [fp, #4]
+ 502 0048 082083E5 		str	r2, [r3, #8]
+  50:Source/rme_benchmark.c ****     Stack_Ptr->R3=Param4;
+ 503              		.loc 1 50 18
+ 504 004c 08301BE5 		ldr	r3, [fp, #-8]
+ 505 0050 08209BE5 		ldr	r2, [fp, #8]
+ 506 0054 0C2083E5 		str	r2, [r3, #12]
+  51:Source/rme_benchmark.c ****     Stack_Ptr->R12=0;
+ 507              		.loc 1 51 19
+ 508 0058 08301BE5 		ldr	r3, [fp, #-8]
+ 509 005c 0020A0E3 		mov	r2, #0
+ 510 0060 102083E5 		str	r2, [r3, #16]
+  52:Source/rme_benchmark.c ****     Stack_Ptr->LR=0;
+ 511              		.loc 1 52 18
+ 512 0064 08301BE5 		ldr	r3, [fp, #-8]
+ 513 0068 0020A0E3 		mov	r2, #0
+ 514 006c 142083E5 		str	r2, [r3, #20]
+  53:Source/rme_benchmark.c ****     Stack_Ptr->PC=Stub;
+ 515              		.loc 1 53 18
+ 516 0070 08301BE5 		ldr	r3, [fp, #-8]
+ 517 0074 14201BE5 		ldr	r2, [fp, #-20]
+ 518 0078 182083E5 		str	r2, [r3, #24]
+  54:Source/rme_benchmark.c ****     /* Initialize the xPSR to avoid a transition to ARM state */
+  55:Source/rme_benchmark.c ****     Stack_Ptr->XPSR=0x01000200;
+ 519              		.loc 1 55 20
+ 520 007c 08201BE5 		ldr	r2, [fp, #-8]
+ 521 0080 023CA0E3 		mov	r3, #512
+ 522 0084 003140E3 		movt	r3, 256
+ 523 0088 1C3082E5 		str	r3, [r2, #28]
+  56:Source/rme_benchmark.c ****     
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 17
+
+
+  57:Source/rme_benchmark.c ****     return (ptr_t)Stack_Ptr;
+ 524              		.loc 1 57 12
+ 525 008c 08301BE5 		ldr	r3, [fp, #-8]
+  58:Source/rme_benchmark.c **** }
+ 526              		.loc 1 58 1
+ 527 0090 0300A0E1 		mov	r0, r3
+ 528 0094 00D08BE2 		add	sp, fp, #0
+ 529              		.cfi_def_cfa_register 13
+ 530              		@ sp needed
+ 531 0098 04B09DE4 		ldr	fp, [sp], #4
+ 532              		.cfi_restore 11
+ 533              		.cfi_def_cfa_offset 0
+ 534 009c 1EFF2FE1 		bx	lr
+ 535              		.cfi_endproc
+ 536              	.LFE5:
+ 538              		.section	.text.RME_Same_Prc_Thd_Switch_Test_Thd,"ax",%progbits
+ 539              		.align	2
+ 540              		.global	RME_Same_Prc_Thd_Switch_Test_Thd
+ 541              		.syntax unified
+ 542              		.arm
+ 544              	RME_Same_Prc_Thd_Switch_Test_Thd:
+ 545              	.LFB6:
+  59:Source/rme_benchmark.c **** /* End Function:_RME_Stack_Init **********************************************/
+  60:Source/rme_benchmark.c **** 
+  61:Source/rme_benchmark.c **** /* Function:RME_Same_Prc_Thd_Switch_Test_Thd *********************************
+  62:Source/rme_benchmark.c **** Description : The thread for testing same-process thread switching performance.
+  63:Source/rme_benchmark.c **** Input       : None.
+  64:Source/rme_benchmark.c **** Output      : None.
+  65:Source/rme_benchmark.c **** Return      : None.
+  66:Source/rme_benchmark.c **** ******************************************************************************/
+  67:Source/rme_benchmark.c **** void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4)
+  68:Source/rme_benchmark.c **** {
+ 546              		.loc 1 68 1
+ 547              		.cfi_startproc
+ 548              		@ args = 0, pretend = 0, frame = 24
+ 549              		@ frame_needed = 1, uses_anonymous_args = 0
+ 550 0000 00482DE9 		push	{fp, lr}
+ 551              		.cfi_def_cfa_offset 8
+ 552              		.cfi_offset 11, -8
+ 553              		.cfi_offset 14, -4
+ 554 0004 04B08DE2 		add	fp, sp, #4
+ 555              		.cfi_def_cfa 11, 4
+ 556 0008 18D04DE2 		sub	sp, sp, #24
+ 557 000c 10000BE5 		str	r0, [fp, #-16]
+ 558 0010 14100BE5 		str	r1, [fp, #-20]
+ 559 0014 18200BE5 		str	r2, [fp, #-24]
+ 560 0018 1C300BE5 		str	r3, [fp, #-28]
+ 561              	.L35:
+  69:Source/rme_benchmark.c ****     ret_t Retval;
+  70:Source/rme_benchmark.c ****     /* Now we switch back to the init thread, immediately */
+  71:Source/rme_benchmark.c ****     while(1)
+  72:Source/rme_benchmark.c ****     {
+  73:Source/rme_benchmark.c ****         Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+ 562              		.loc 1 73 16 discriminator 1
+ 563 001c 0030A0E3 		mov	r3, #0
+ 564 0020 0020A0E3 		mov	r2, #0
+ 565 0024 0310A0E3 		mov	r1, #3
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 18
+
+
+ 566 0028 0908A0E3 		mov	r0, #589824
+ 567 002c FEFFFFEB 		bl	RME_Svc
+ 568 0030 08000BE5 		str	r0, [fp, #-8]
+ 569              		.loc 1 73 15
+ 570 0034 F8FFFFEA 		b	.L35
+ 571              		.cfi_endproc
+ 572              	.LFE6:
+ 574              		.section	.rodata
+ 575              		.align	2
+ 576              	.LC0:
+ 577 0000 0D0A2870 		.ascii	"\015\012(ptr_t)(&RME_Stack[2047])= \000"
+ 577      74725F74 
+ 577      29282652 
+ 577      4D455F53 
+ 577      7461636B 
+ 578 001e 0000     		.align	2
+ 579              	.LC1:
+ 580 0020 0D0A496E 		.ascii	"\015\012Initialize the thread's stack Stack_Addr= \000"
+ 580      69746961 
+ 580      6C697A65 
+ 580      20746865 
+ 580      20746872 
+ 581 004d 000000   		.align	2
+ 582              	.LC2:
+ 583 0050 0D0A6372 		.ascii	"\015\012create a thread      retval= \000"
+ 583      65617465 
+ 583      20612074 
+ 583      68726561 
+ 583      64202020 
+ 584              		.align	2
+ 585              	.LC3:
+ 586 0070 0D0A4269 		.ascii	"\015\012Bind the thread to the processor retval= \000"
+ 586      6E642074 
+ 586      68652074 
+ 586      68726561 
+ 586      6420746F 
+ 587              		.align	2
+ 588              	.LC4:
+ 589 009c 0D0A5365 		.ascii	"\015\012Set the execution information retval= \000"
+ 589      74207468 
+ 589      65206578 
+ 589      65637574 
+ 589      696F6E20 
+ 590 00c5 000000   		.align	2
+ 591              	.LC5:
+ 592 00c8 0D0A5472 		.ascii	"\015\012Try to switch to that thread - should fail "
+ 592      7920746F 
+ 592      20737769 
+ 592      74636820 
+ 592      746F2074 
+ 593 00f5 20726574 		.ascii	" retval= \000"
+ 593      76616C3D 
+ 593      2000
+ 594 00ff 00       		.align	2
+ 595              	.LC6:
+ 596 0100 0D0A5472 		.ascii	"\015\012Try to switch to that thread  retval= \000"
+ 596      7920746F 
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 19
+
+
+ 596      20737769 
+ 596      74636820 
+ 596      746F2074 
+ 597              		.section	.text.RME_Same_Prc_Thd_Switch_Test,"ax",%progbits
+ 598              		.align	2
+ 599              		.global	RME_Same_Prc_Thd_Switch_Test
+ 600              		.syntax unified
+ 601              		.arm
+ 603              	RME_Same_Prc_Thd_Switch_Test:
+ 604              	.LFB7:
+  74:Source/rme_benchmark.c ****                           RME_BOOT_INIT_THD,
+  75:Source/rme_benchmark.c ****                           0,
+  76:Source/rme_benchmark.c ****                           0);
+  77:Source/rme_benchmark.c ****     }
+  78:Source/rme_benchmark.c **** }
+  79:Source/rme_benchmark.c **** /* End Function:RME_Same_Prc_Thd_Switch_Test_Thd ****************************/
+  80:Source/rme_benchmark.c **** 
+  81:Source/rme_benchmark.c **** /* Function:RME_Same_Prc_Thd_Switch_Test *************************************
+  82:Source/rme_benchmark.c **** Description : The same-process thread switch test code.
+  83:Source/rme_benchmark.c **** Input       : None.
+  84:Source/rme_benchmark.c **** Output      : None.
+  85:Source/rme_benchmark.c **** Return      : None.
+  86:Source/rme_benchmark.c **** ******************************************************************************/
+  87:Source/rme_benchmark.c **** void RME_Same_Prc_Thd_Switch_Test(void)
   88:Source/rme_benchmark.c **** {
-  89:Source/rme_benchmark.c ****     /* Normal registers */
-  90:Source/rme_benchmark.c ****     ptr_t R0;
-  91:Source/rme_benchmark.c ****     ptr_t R1;
-  92:Source/rme_benchmark.c ****     ptr_t R2;
-  93:Source/rme_benchmark.c ****     ptr_t R3;
-  94:Source/rme_benchmark.c ****     ptr_t R12;
-  95:Source/rme_benchmark.c ****     ptr_t LR;
-  96:Source/rme_benchmark.c ****     ptr_t PC;
-  97:Source/rme_benchmark.c ****     ptr_t XPSR;
-  98:Source/rme_benchmark.c ****     /* FPU registers follow - no matter they are used or not, we reserve the space
-  99:Source/rme_benchmark.c ****      * in stack creation */
- 100:Source/rme_benchmark.c ****     ptr_t S0;
- 101:Source/rme_benchmark.c ****     ptr_t S1;
- 102:Source/rme_benchmark.c ****     ptr_t S2;
- 103:Source/rme_benchmark.c ****     ptr_t S3;
- 104:Source/rme_benchmark.c ****     ptr_t S4;
- 105:Source/rme_benchmark.c ****     ptr_t S5;
- 106:Source/rme_benchmark.c ****     ptr_t S6;
- 107:Source/rme_benchmark.c ****     ptr_t S7;
- 108:Source/rme_benchmark.c ****     ptr_t S8;
- 109:Source/rme_benchmark.c ****     ptr_t S9;
- 110:Source/rme_benchmark.c ****     ptr_t S10;
- 111:Source/rme_benchmark.c ****     ptr_t S11;
- 112:Source/rme_benchmark.c ****     ptr_t S12;
- 113:Source/rme_benchmark.c ****     ptr_t S13;
- 114:Source/rme_benchmark.c ****     ptr_t S14;
- 115:Source/rme_benchmark.c ****     ptr_t S15;
- 116:Source/rme_benchmark.c **** };
- 117:Source/rme_benchmark.c **** /* End Define ****************************************************************/
- 118:Source/rme_benchmark.c **** 
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 4
+ 605              		.loc 1 88 1
+ 606              		.cfi_startproc
+ 607              		@ args = 0, pretend = 0, frame = 16
+ 608              		@ frame_needed = 1, uses_anonymous_args = 0
+ 609 0000 00482DE9 		push	{fp, lr}
+ 610              		.cfi_def_cfa_offset 8
+ 611              		.cfi_offset 11, -8
+ 612              		.cfi_offset 14, -4
+ 613 0004 04B08DE2 		add	fp, sp, #4
+ 614              		.cfi_def_cfa 11, 4
+ 615 0008 18D04DE2 		sub	sp, sp, #24
+  89:Source/rme_benchmark.c ****     /* Intra-process thread switching time */
+  90:Source/rme_benchmark.c ****     ret_t Retval;
+  91:Source/rme_benchmark.c ****     cnt_t Count;
+  92:Source/rme_benchmark.c ****     ptr_t Stack_Addr;
+  93:Source/rme_benchmark.c ****     ptr_t Temp;
+  94:Source/rme_benchmark.c ****     /* Initialize the thread's stack before entering it */
+  95:Source/rme_benchmark.c ****     Stack_Addr=_RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
+ 616              		.loc 1 95 16
+ 617 000c 88019FE5 		ldr	r0, .L40
+ 618 0010 001000E3 		movw	r1, #:lower16:RME_Thd_Stub
+ 619 0014 001040E3 		movt	r1, #:upper16:RME_Thd_Stub
+ 620 0018 0430A0E3 		mov	r3, #4
+ 621 001c 04308DE5 		str	r3, [sp, #4]
+ 622 0020 0330A0E3 		mov	r3, #3
+ 623 0024 00308DE5 		str	r3, [sp]
+ 624 0028 0230A0E3 		mov	r3, #2
+ 625 002c 0120A0E3 		mov	r2, #1
+ 626 0030 FEFFFFEB 		bl	_RME_Stack_Init
+ 627 0034 0C000BE5 		str	r0, [fp, #-12]
+  96:Source/rme_benchmark.c ****                                (ptr_t)RME_Thd_Stub,
+  97:Source/rme_benchmark.c ****                                1, 2, 3, 4);
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 20
 
 
- 119:Source/rme_benchmark.c **** /* Include *******************************************************************/
- 120:Source/rme_benchmark.c **** #include"benchmark.h"
- 121:Source/rme_benchmark.c **** #include"rme.h"
- 122:Source/rme_benchmark.c **** /* Need to export error codes, and size of each object, in words! */
- 123:Source/rme_benchmark.c **** /* End Include ***************************************************************/
- 124:Source/rme_benchmark.c **** 
- 125:Source/rme_benchmark.c **** /* Private Variables *********************************************************/
- 126:Source/rme_benchmark.c **** /* The stack of the threads - enough for 4 threads */
- 127:Source/rme_benchmark.c **** ptr_t RME_Stack[2048];
- 128:Source/rme_benchmark.c **** u16 Time[10000];
- 129:Source/rme_benchmark.c **** s8 RME_Bench_Buf[1024];
- 130:Source/rme_benchmark.c **** /* End Private Variables *****************************************************/
- 131:Source/rme_benchmark.c **** 
- 132:Source/rme_benchmark.c **** /* Function Prototypes *******************************************************/
- 133:Source/rme_benchmark.c **** extern ret_t RME_Svc(ptr_t Svc_Capid,ptr_t Param1, ptr_t Param2, ptr_t Param3);
- 134:Source/rme_benchmark.c **** extern cnt_t RME_Sprint_Uint(s8* Buffer,u32 Arg_Int);
- 135:Source/rme_benchmark.c **** extern void RME_Thd_Stub(void);
- 136:Source/rme_benchmark.c **** extern void RME_Inv_Stub(void);
- 137:Source/rme_benchmark.c **** ptr_t _RME_Stack_Init(ptr_t Stack, ptr_t Stub, ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Para
- 138:Source/rme_benchmark.c **** void RME_Benchmark(void);
- 139:Source/rme_benchmark.c **** void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4);
- 140:Source/rme_benchmark.c **** void RME_Same_Prc_Thd_Switch_Test(void);
- 141:Source/rme_benchmark.c **** /* End Function Prototypes ***************************************************/
- 142:Source/rme_benchmark.c **** 
- 143:Source/rme_benchmark.c **** /* Function:__USR_Putchar *****************************************************
- 144:Source/rme_benchmark.c **** Description : Output a character to console. In Cortex-M, under most circumstances,
- 145:Source/rme_benchmark.c ****               we should use the ITM for such outputs.
- 146:Source/rme_benchmark.c **** Input       : char Char - The character to print.
- 147:Source/rme_benchmark.c **** Output      : None.
- 148:Source/rme_benchmark.c **** Return      : rme_ptr_t - Always 0.
- 149:Source/rme_benchmark.c **** ******************************************************************************/
- 150:Source/rme_benchmark.c **** ptr_t __USR_Putchar(char Char)
- 151:Source/rme_benchmark.c **** {
-  49              		.loc 1 151 1
-  50              		.cfi_startproc
-  51              		@ args = 0, pretend = 0, frame = 8
-  52              		@ frame_needed = 1, uses_anonymous_args = 0
-  53              		@ link register save eliminated.
-  54 0000 04B02DE5 		str	fp, [sp, #-4]!
-  55              		.cfi_def_cfa_offset 4
-  56              		.cfi_offset 11, -4
-  57 0004 00B08DE2 		add	fp, sp, #0
-  58              		.cfi_def_cfa_register 11
-  59 0008 0CD04DE2 		sub	sp, sp, #12
-  60 000c 0030A0E1 		mov	r3, r0
-  61 0010 05304BE5 		strb	r3, [fp, #-5]
-  62              	.L2:
- 152:Source/rme_benchmark.c ****     RME_A7A_PUTCHAR(Char);
-  63              		.loc 1 152 5 discriminator 1
-  64 0014 2C3001E3 		movw	r3, #4140
-  65 0018 00304EE3 		movt	r3, 57344
-  66 001c 003093E5 		ldr	r3, [r3]
-  67 0020 083003E2 		and	r3, r3, #8
-  68 0024 000053E3 		cmp	r3, #0
-  69 0028 F9FFFF0A 		beq	.L2
-  70              		.loc 1 152 5 is_stmt 0 discriminator 2
-  71 002c 303001E3 		movw	r3, #4144
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 5
+  98:Source/rme_benchmark.c **** 
+  99:Source/rme_benchmark.c ****     USR_DBG_S("\r\n(ptr_t)(&RME_Stack[2047])= ");
+ 628              		.loc 1 99 5
+ 629 0038 000000E3 		movw	r0, #:lower16:.LC0
+ 630 003c 000040E3 		movt	r0, #:upper16:.LC0
+ 631 0040 FEFFFFEB 		bl	USR_DBG_S
+ 100:Source/rme_benchmark.c ****         USR_DBG_H((ptr_t)(&RME_Stack[2047]));
+ 632              		.loc 1 100 9
+ 633 0044 50319FE5 		ldr	r3, .L40
+ 634 0048 0300A0E1 		mov	r0, r3
+ 635 004c FEFFFFEB 		bl	USR_DBG_H
+ 101:Source/rme_benchmark.c ****     USR_DBG_S("\r\nInitialize the thread's stack Stack_Addr= ");
+ 636              		.loc 1 101 5
+ 637 0050 000000E3 		movw	r0, #:lower16:.LC1
+ 638 0054 000040E3 		movt	r0, #:upper16:.LC1
+ 639 0058 FEFFFFEB 		bl	USR_DBG_S
+ 102:Source/rme_benchmark.c ****     USR_DBG_H(Stack_Addr);
+ 640              		.loc 1 102 5
+ 641 005c 0C001BE5 		ldr	r0, [fp, #-12]
+ 642 0060 FEFFFFEB 		bl	USR_DBG_H
+ 103:Source/rme_benchmark.c **** 
+ 104:Source/rme_benchmark.c ****     /* There are still many bugs in the kernel. Need a white-box test to guarantee
+ 105:Source/rme_benchmark.c ****      * that it is free of bugs. Find a scheme to do that */
+ 106:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_CRT,RME_BOOT_INIT_CPT,
+ 643              		.loc 1 106 12
+ 644 0064 093AA0E3 		mov	r3, #36864
+ 645 0068 1F20A0E3 		mov	r2, #31
+ 646 006c 022040E3 		movt	r2, 2
+ 647 0070 0810A0E3 		mov	r1, #8
+ 648 0074 051040E3 		movt	r1, 5
+ 649 0078 1908A0E3 		mov	r0, #1638400
+ 650 007c FEFFFFEB 		bl	RME_Svc
+ 651 0080 10000BE5 		str	r0, [fp, #-16]
+ 107:Source/rme_benchmark.c ****                       RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_D0(RME_BOOT_BENCH_THD),
+ 108:Source/rme_benchmark.c ****                       RME_PARAM_D1(RME_BOOT_INIT_PRC)|RME_PARAM_D0(31),
+ 109:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_KOM_FRONTIER);
+ 110:Source/rme_benchmark.c ****     USR_DBG_S("\r\ncreate a thread      retval= ");
+ 652              		.loc 1 110 5
+ 653 0084 000000E3 		movw	r0, #:lower16:.LC2
+ 654 0088 000040E3 		movt	r0, #:upper16:.LC2
+ 655 008c FEFFFFEB 		bl	USR_DBG_S
+ 111:Source/rme_benchmark.c ****     USR_DBG_I(Retval);
+ 656              		.loc 1 111 5
+ 657 0090 10001BE5 		ldr	r0, [fp, #-16]
+ 658 0094 FEFFFFEB 		bl	USR_DBG_I
+ 112:Source/rme_benchmark.c **** 
+ 113:Source/rme_benchmark.c ****     /* Bind the thread to the processor */
+ 114:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,RME_BOOT_BENCH_THD,
+ 659              		.loc 1 114 12
+ 660 0098 0030A0E3 		mov	r3, #0
+ 661 009c 0220A0E3 		mov	r2, #2
+ 662 00a0 0B2040E3 		movt	r2, 11
+ 663 00a4 0E19A0E3 		mov	r1, #229376
+ 664 00a8 0800A0E3 		mov	r0, #8
+ 665 00ac 1B0040E3 		movt	r0, 27
+ 666 00b0 FEFFFFEB 		bl	RME_Svc
+ 667 00b4 10000BE5 		str	r0, [fp, #-16]
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 21
 
 
-  72 0030 00304EE3 		movt	r3, 57344
-  73 0034 D5205BE1 		ldrsb	r2, [fp, #-5]
-  74 0038 002083E5 		str	r2, [r3]
- 153:Source/rme_benchmark.c ****     return 0;
-  75              		.loc 1 153 12 is_stmt 1
-  76 003c 0030A0E3 		mov	r3, #0
- 154:Source/rme_benchmark.c **** }
-  77              		.loc 1 154 1
-  78 0040 0300A0E1 		mov	r0, r3
-  79 0044 00D08BE2 		add	sp, fp, #0
-  80              		.cfi_def_cfa_register 13
-  81              		@ sp needed
-  82 0048 04B09DE4 		ldr	fp, [sp], #4
-  83              		.cfi_restore 11
-  84              		.cfi_def_cfa_offset 0
-  85 004c 1EFF2FE1 		bx	lr
-  86              		.cfi_endproc
-  87              	.LFE0:
-  89              		.section	.text.USR_DBG_I,"ax",%progbits
-  90              		.align	2
-  91              		.global	USR_DBG_I
-  92              		.syntax unified
-  93              		.arm
-  95              	USR_DBG_I:
-  96              	.LFB1:
- 155:Source/rme_benchmark.c **** /* End Function __USR_Putchar ***************************************************/
- 156:Source/rme_benchmark.c **** 
- 157:Source/rme_benchmark.c **** 
- 158:Source/rme_benchmark.c **** /* Function:USR_DBG_I *****************************************************
- 159:Source/rme_benchmark.c **** Description : Print a signed integer on the debugging console. This integer is
- 160:Source/rme_benchmark.c ****               printed as decimal with sign.
- 161:Source/rme_benchmark.c **** Input       : rme_cnt_t Int - The integer to print.
- 162:Source/rme_benchmark.c **** Output      : None.
- 163:Source/rme_benchmark.c **** Return      : rme_cnt_t - The length of the string printed.
- 164:Source/rme_benchmark.c **** ******************************************************************************/
- 165:Source/rme_benchmark.c **** cnt_t USR_DBG_I(cnt_t Int)
- 166:Source/rme_benchmark.c **** {
-  97              		.loc 1 166 1
-  98              		.cfi_startproc
-  99              		@ args = 0, pretend = 0, frame = 32
- 100              		@ frame_needed = 1, uses_anonymous_args = 0
- 101 0000 00482DE9 		push	{fp, lr}
- 102              		.cfi_def_cfa_offset 8
- 103              		.cfi_offset 11, -8
- 104              		.cfi_offset 14, -4
- 105 0004 04B08DE2 		add	fp, sp, #4
- 106              		.cfi_def_cfa 11, 4
- 107 0008 20D04DE2 		sub	sp, sp, #32
- 108 000c 20000BE5 		str	r0, [fp, #-32]
- 167:Source/rme_benchmark.c ****     cnt_t Num;
- 168:Source/rme_benchmark.c ****     cnt_t Abs;
- 169:Source/rme_benchmark.c ****     cnt_t Iter;
- 170:Source/rme_benchmark.c ****     cnt_t Count;
- 171:Source/rme_benchmark.c ****     cnt_t Div;
- 172:Source/rme_benchmark.c **** 
- 173:Source/rme_benchmark.c ****     /* Exit on zero */
- 174:Source/rme_benchmark.c ****     if(Int==0)
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 6
+ 115:Source/rme_benchmark.c ****     		          RME_PARAM_D1(RME_BOOT_INIT_THD)|RME_PARAM_D0(RME_CID_NULL),
+ 116:Source/rme_benchmark.c **** 					  RME_PARAM_D1(11)|RME_PARAM_D0(RME_BOOT_INIT_PRC),
+ 117:Source/rme_benchmark.c ****                       0);
+ 118:Source/rme_benchmark.c ****     USR_DBG_S("\r\nBind the thread to the processor retval= ");
+ 668              		.loc 1 118 5
+ 669 00b8 000000E3 		movw	r0, #:lower16:.LC3
+ 670 00bc 000040E3 		movt	r0, #:upper16:.LC3
+ 671 00c0 FEFFFFEB 		bl	USR_DBG_S
+ 119:Source/rme_benchmark.c ****     USR_DBG_I(Retval);
+ 672              		.loc 1 119 5
+ 673 00c4 10001BE5 		ldr	r0, [fp, #-16]
+ 674 00c8 FEFFFFEB 		bl	USR_DBG_I
+ 120:Source/rme_benchmark.c ****     
+ 121:Source/rme_benchmark.c ****     /* Set the execution information */
+ 122:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,0,
+ 675              		.loc 1 122 12
+ 676 00cc 002000E3 		movw	r2, #:lower16:RME_Same_Prc_Thd_Switch_Test_Thd
+ 677 00d0 002040E3 		movt	r2, #:upper16:RME_Same_Prc_Thd_Switch_Test_Thd
+ 678 00d4 0C301BE5 		ldr	r3, [fp, #-12]
+ 679 00d8 0810A0E3 		mov	r1, #8
+ 680 00dc 0608A0E3 		mov	r0, #393216
+ 681 00e0 FEFFFFEB 		bl	RME_Svc
+ 682 00e4 10000BE5 		str	r0, [fp, #-16]
+ 123:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
+ 124:Source/rme_benchmark.c ****                       (ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
+ 125:Source/rme_benchmark.c ****                       Stack_Addr);
+ 126:Source/rme_benchmark.c **** 
+ 127:Source/rme_benchmark.c ****     USR_DBG_S("\r\nSet the execution information retval= ");
+ 683              		.loc 1 127 5
+ 684 00e8 000000E3 		movw	r0, #:lower16:.LC4
+ 685 00ec 000040E3 		movt	r0, #:upper16:.LC4
+ 686 00f0 FEFFFFEB 		bl	USR_DBG_S
+ 128:Source/rme_benchmark.c ****     USR_DBG_I(Retval);
+ 687              		.loc 1 128 5
+ 688 00f4 10001BE5 		ldr	r0, [fp, #-16]
+ 689 00f8 FEFFFFEB 		bl	USR_DBG_I
+ 129:Source/rme_benchmark.c **** 
+ 130:Source/rme_benchmark.c ****     /* Delegate some timeslice to it */
+ 131:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,0,
+ 690              		.loc 1 131 12
+ 691 00fc 803609E3 		movw	r3, #38528
+ 692 0100 983040E3 		movt	r3, 152
+ 693 0104 0320A0E3 		mov	r2, #3
+ 694 0108 0810A0E3 		mov	r1, #8
+ 695 010c 0207A0E3 		mov	r0, #524288
+ 696 0110 FEFFFFEB 		bl	RME_Svc
+ 697 0114 10000BE5 		str	r0, [fp, #-16]
+ 132:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
+ 133:Source/rme_benchmark.c ****                       RME_BOOT_INIT_THD,
+ 134:Source/rme_benchmark.c ****                       10000000);
+ 135:Source/rme_benchmark.c ****     
+ 136:Source/rme_benchmark.c ****     /* Try to switch to that thread - should fail */
+ 137:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+ 698              		.loc 1 137 12
+ 699 0118 0030A0E3 		mov	r3, #0
+ 700 011c 0020A0E3 		mov	r2, #0
+ 701 0120 0810A0E3 		mov	r1, #8
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 22
 
 
- 109              		.loc 1 174 7
- 110 0010 20301BE5 		ldr	r3, [fp, #-32]
- 111 0014 000053E3 		cmp	r3, #0
- 112 0018 0300001A 		bne	.L5
- 175:Source/rme_benchmark.c ****     {
+ 702 0124 0908A0E3 		mov	r0, #589824
+ 703 0128 FEFFFFEB 		bl	RME_Svc
+ 704 012c 10000BE5 		str	r0, [fp, #-16]
+ 138:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
+ 139:Source/rme_benchmark.c ****                       0,
+ 140:Source/rme_benchmark.c ****                       0);
+ 141:Source/rme_benchmark.c ****     USR_DBG_S("\r\nTry to switch to that thread - should fail  retval= ");
+ 705              		.loc 1 141 5
+ 706 0130 000000E3 		movw	r0, #:lower16:.LC5
+ 707 0134 000040E3 		movt	r0, #:upper16:.LC5
+ 708 0138 FEFFFFEB 		bl	USR_DBG_S
+ 142:Source/rme_benchmark.c ****     USR_DBG_I(Retval);
+ 709              		.loc 1 142 5
+ 710 013c 10001BE5 		ldr	r0, [fp, #-16]
+ 711 0140 FEFFFFEB 		bl	USR_DBG_I
+ 143:Source/rme_benchmark.c ****     /* Test result: intra-process ctxsw 358cycles/1.657us, frt w/mpu 163cycles/0.754us,
+ 144:Source/rme_benchmark.c ****     * composite 324. opted max:323
+ 145:Source/rme_benchmark.c ****     * all:33.0
+ 146:Source/rme_benchmark.c ****     * empty: 4.09 - 0.409us, most time spent on internals
+ 147:Source/rme_benchmark.c ****     * w/selections: 7.15 - maybe no need to check frozen cap from the proc.
+ 148:Source/rme_benchmark.c ****     * w/checkings:10.926 - 317us.
+ 149:Source/rme_benchmark.c ****     * total:16.57
+ 150:Source/rme_benchmark.c ****     * 16.2us now, after cleaning up two bad things
+ 151:Source/rme_benchmark.c ****     * 14.7us after CPUID optimizations. The quiescence hardly worked.
+ 152:Source/rme_benchmark.c ****     * no cache - 3 times slower, mainly due to the flash. ART does not really help.
+ 153:Source/rme_benchmark.c ****     * Performance cannot be further optimized anymore without compiler intrinsics.
+ 154:Source/rme_benchmark.c ****     * Something terribly wrong with systick. 38 second wrapwround
+ 155:Source/rme_benchmark.c ****     * This configuration, CPU works at 216MHz, correct, but the 
+ 156:Source/rme_benchmark.c ****     * The TSC is always 8 cycles between reads.
+ 157:Source/rme_benchmark.c ****     */
+ 158:Source/rme_benchmark.c ****     _RME_Tsc_Init();
+ 712              		.loc 1 158 5
+ 713 0144 FEFFFFEB 		bl	_RME_Tsc_Init
+ 159:Source/rme_benchmark.c ****     //for(Count=0;Count<10000;Count++)
+ 160:Source/rme_benchmark.c ****     for(Count=0;Count<10;Count++)
+ 714              		.loc 1 160 14
+ 715 0148 0030A0E3 		mov	r3, #0
+ 716 014c 08300BE5 		str	r3, [fp, #-8]
+ 717              		.loc 1 160 5
+ 718 0150 0D0000EA 		b	.L37
+ 719              	.L38:
+ 161:Source/rme_benchmark.c ****     {
+ 162:Source/rme_benchmark.c ****         //Temp=RME_TSC();
+ 163:Source/rme_benchmark.c ****         Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+ 720              		.loc 1 163 16
+ 721 0154 0030A0E3 		mov	r3, #0
+ 722 0158 0020A0E3 		mov	r2, #0
+ 723 015c 0810A0E3 		mov	r1, #8
+ 724 0160 0908A0E3 		mov	r0, #589824
+ 725 0164 FEFFFFEB 		bl	RME_Svc
+ 726 0168 10000BE5 		str	r0, [fp, #-16]
+ 164:Source/rme_benchmark.c ****                           RME_BOOT_BENCH_THD,
+ 165:Source/rme_benchmark.c ****                           0,
+ 166:Source/rme_benchmark.c ****                           0);
+ 167:Source/rme_benchmark.c ****         //Temp=RME_TSC()-Temp;
+ 168:Source/rme_benchmark.c ****        // Time[Count]=Temp-8;
+ 169:Source/rme_benchmark.c ****         USR_DBG_S("\r\nTry to switch to that thread  retval= ");
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 23
+
+
+ 727              		.loc 1 169 9
+ 728 016c 000000E3 		movw	r0, #:lower16:.LC6
+ 729 0170 000040E3 		movt	r0, #:upper16:.LC6
+ 730 0174 FEFFFFEB 		bl	USR_DBG_S
+ 170:Source/rme_benchmark.c ****         USR_DBG_I(Retval);
+ 731              		.loc 1 170 9
+ 732 0178 10001BE5 		ldr	r0, [fp, #-16]
+ 733 017c FEFFFFEB 		bl	USR_DBG_I
+ 160:Source/rme_benchmark.c ****     {
+ 734              		.loc 1 160 31 discriminator 3
+ 735 0180 08301BE5 		ldr	r3, [fp, #-8]
+ 736 0184 013083E2 		add	r3, r3, #1
+ 737 0188 08300BE5 		str	r3, [fp, #-8]
+ 738              	.L37:
+ 160:Source/rme_benchmark.c ****     {
+ 739              		.loc 1 160 22 discriminator 1
+ 740 018c 08301BE5 		ldr	r3, [fp, #-8]
+ 741 0190 090053E3 		cmp	r3, #9
+ 742 0194 EEFFFFDA 		ble	.L38
+ 743              	.L39:
+ 171:Source/rme_benchmark.c ****     }
+ 172:Source/rme_benchmark.c ****     
+ 173:Source/rme_benchmark.c ****     while(1);
+ 744              		.loc 1 173 10
+ 745 0198 FEFFFFEA 		b	.L39
+ 746              	.L41:
+ 747              		.align	2
+ 748              	.L40:
+ 749 019c FC1F0000 		.word	RME_Stack+8188
+ 750              		.cfi_endproc
+ 751              	.LFE7:
+ 753              		.section	.text.RME_Diff_Prc_Thd_Switch_Test_Thd,"ax",%progbits
+ 754              		.align	2
+ 755              		.global	RME_Diff_Prc_Thd_Switch_Test_Thd
+ 756              		.syntax unified
+ 757              		.arm
+ 759              	RME_Diff_Prc_Thd_Switch_Test_Thd:
+ 760              	.LFB8:
+ 174:Source/rme_benchmark.c **** }
+ 175:Source/rme_benchmark.c **** /* End Function:RME_Same_Prc_Thd_Switch_Test ********************************/
  176:Source/rme_benchmark.c **** 
- 177:Source/rme_benchmark.c **** 
- 178:Source/rme_benchmark.c ****         __USR_Putchar('0');
- 113              		.loc 1 178 9
- 114 001c 3000A0E3 		mov	r0, #48
- 115 0020 FEFFFFEB 		bl	__USR_Putchar
- 179:Source/rme_benchmark.c ****         return 1;
- 116              		.loc 1 179 16
- 117 0024 0130A0E3 		mov	r3, #1
- 118 0028 500000EA 		b	.L6
- 119              	.L5:
- 180:Source/rme_benchmark.c ****     }
- 181:Source/rme_benchmark.c ****     else
- 182:Source/rme_benchmark.c ****     {
- 183:Source/rme_benchmark.c **** 
- 184:Source/rme_benchmark.c ****         /* No action required */
- 185:Source/rme_benchmark.c ****     }
- 186:Source/rme_benchmark.c **** 
- 187:Source/rme_benchmark.c **** 
- 188:Source/rme_benchmark.c ****     /* Correct all negatives into positives */
- 189:Source/rme_benchmark.c ****     if(Int<0)
- 120              		.loc 1 189 7
- 121 002c 20301BE5 		ldr	r3, [fp, #-32]
- 122 0030 000053E3 		cmp	r3, #0
- 123 0034 070000AA 		bge	.L7
- 190:Source/rme_benchmark.c ****     {
- 191:Source/rme_benchmark.c **** 
- 192:Source/rme_benchmark.c **** 
- 193:Source/rme_benchmark.c ****         __USR_Putchar('-');
- 124              		.loc 1 193 9
- 125 0038 2D00A0E3 		mov	r0, #45
- 126 003c FEFFFFEB 		bl	__USR_Putchar
- 194:Source/rme_benchmark.c ****         Abs=-Int;
- 127              		.loc 1 194 12
- 128 0040 20301BE5 		ldr	r3, [fp, #-32]
- 129 0044 003063E2 		rsb	r3, r3, #0
- 130 0048 0C300BE5 		str	r3, [fp, #-12]
- 195:Source/rme_benchmark.c ****         Num=1;
- 131              		.loc 1 195 12
- 132 004c 0130A0E3 		mov	r3, #1
- 133 0050 08300BE5 		str	r3, [fp, #-8]
- 134 0054 030000EA 		b	.L8
- 135              	.L7:
- 196:Source/rme_benchmark.c ****     }
- 197:Source/rme_benchmark.c ****     else
- 198:Source/rme_benchmark.c ****     {
- 199:Source/rme_benchmark.c **** 
- 200:Source/rme_benchmark.c **** 
- 201:Source/rme_benchmark.c ****         Abs=Int;
- 136              		.loc 1 201 12
- 137 0058 20301BE5 		ldr	r3, [fp, #-32]
- 138 005c 0C300BE5 		str	r3, [fp, #-12]
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 7
+ 177:Source/rme_benchmark.c **** /* Function:RME_Diff_Prc_Thd_Switch_Test_Thd *********************************
+ 178:Source/rme_benchmark.c **** Description : The thread for testing same-process thread switching performance.
+ 179:Source/rme_benchmark.c **** Input       : None.
+ 180:Source/rme_benchmark.c **** Output      : None.
+ 181:Source/rme_benchmark.c **** Return      : None.
+ 182:Source/rme_benchmark.c **** ******************************************************************************/
+ 183:Source/rme_benchmark.c **** void RME_Diff_Prc_Thd_Switch_Test_Thd(ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4)
+ 184:Source/rme_benchmark.c **** {
+ 761              		.loc 1 184 1
+ 762              		.cfi_startproc
+ 763              		@ args = 0, pretend = 0, frame = 24
+ 764              		@ frame_needed = 1, uses_anonymous_args = 0
+ 765 0000 00482DE9 		push	{fp, lr}
+ 766              		.cfi_def_cfa_offset 8
+ 767              		.cfi_offset 11, -8
+ 768              		.cfi_offset 14, -4
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 24
 
 
- 202:Source/rme_benchmark.c ****         Num=0;
- 139              		.loc 1 202 12
- 140 0060 0030A0E3 		mov	r3, #0
- 141 0064 08300BE5 		str	r3, [fp, #-8]
- 142              	.L8:
- 203:Source/rme_benchmark.c ****     }
- 204:Source/rme_benchmark.c **** 
- 205:Source/rme_benchmark.c ****     /* How many digits are there? */
- 206:Source/rme_benchmark.c ****     Count=0;
- 143              		.loc 1 206 10
- 144 0068 0030A0E3 		mov	r3, #0
- 145 006c 14300BE5 		str	r3, [fp, #-20]
- 207:Source/rme_benchmark.c ****     Div=1;
- 146              		.loc 1 207 8
- 147 0070 0130A0E3 		mov	r3, #1
- 148 0074 18300BE5 		str	r3, [fp, #-24]
- 208:Source/rme_benchmark.c ****     Iter=Abs;
- 149              		.loc 1 208 9
- 150 0078 0C301BE5 		ldr	r3, [fp, #-12]
- 151 007c 10300BE5 		str	r3, [fp, #-16]
- 152              	.L12:
- 209:Source/rme_benchmark.c ****     while(1U)
- 210:Source/rme_benchmark.c ****     {
- 211:Source/rme_benchmark.c ****         Iter/=10;
- 153              		.loc 1 211 13
- 154 0080 10201BE5 		ldr	r2, [fp, #-16]
- 155 0084 673606E3 		movw	r3, #26215
- 156 0088 663646E3 		movt	r3, 26214
- 157 008c 9312C3E0 		smull	r1, r3, r3, r2
- 158 0090 4311A0E1 		asr	r1, r3, #2
- 159 0094 C23FA0E1 		asr	r3, r2, #31
- 160 0098 033041E0 		sub	r3, r1, r3
- 161 009c 10300BE5 		str	r3, [fp, #-16]
- 212:Source/rme_benchmark.c ****         Count++;
- 162              		.loc 1 212 14
- 163 00a0 14301BE5 		ldr	r3, [fp, #-20]
- 164 00a4 013083E2 		add	r3, r3, #1
- 165 00a8 14300BE5 		str	r3, [fp, #-20]
- 213:Source/rme_benchmark.c ****         if(Iter!=0)
- 166              		.loc 1 213 11
- 167 00ac 10301BE5 		ldr	r3, [fp, #-16]
- 168 00b0 000053E3 		cmp	r3, #0
- 169 00b4 0600000A 		beq	.L15
- 214:Source/rme_benchmark.c ****         {
- 215:Source/rme_benchmark.c **** 
- 216:Source/rme_benchmark.c **** 
- 217:Source/rme_benchmark.c ****             Div*=10;
- 170              		.loc 1 217 16
- 171 00b8 18201BE5 		ldr	r2, [fp, #-24]
- 172 00bc 0230A0E1 		mov	r3, r2
- 173 00c0 0331A0E1 		lsl	r3, r3, #2
- 174 00c4 023083E0 		add	r3, r3, r2
- 175 00c8 8330A0E1 		lsl	r3, r3, #1
- 176 00cc 18300BE5 		str	r3, [fp, #-24]
- 211:Source/rme_benchmark.c ****         Count++;
- 177              		.loc 1 211 13
- 178 00d0 EAFFFFEA 		b	.L12
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 8
+ 769 0004 04B08DE2 		add	fp, sp, #4
+ 770              		.cfi_def_cfa 11, 4
+ 771 0008 18D04DE2 		sub	sp, sp, #24
+ 772 000c 10000BE5 		str	r0, [fp, #-16]
+ 773 0010 14100BE5 		str	r1, [fp, #-20]
+ 774 0014 18200BE5 		str	r2, [fp, #-24]
+ 775 0018 1C300BE5 		str	r3, [fp, #-28]
+ 776              	.L43:
+ 185:Source/rme_benchmark.c ****     ret_t Retval;
+ 186:Source/rme_benchmark.c ****     /* Now we switch back to the init thread, immediately */
+ 187:Source/rme_benchmark.c ****     while(1)
+ 188:Source/rme_benchmark.c ****     {
+ 189:Source/rme_benchmark.c ****         Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+ 777              		.loc 1 189 16 discriminator 1
+ 778 001c 0030A0E3 		mov	r3, #0
+ 779 0020 0020A0E3 		mov	r2, #0
+ 780 0024 0310A0E3 		mov	r1, #3
+ 781 0028 0908A0E3 		mov	r0, #589824
+ 782 002c FEFFFFEB 		bl	RME_Svc
+ 783 0030 08000BE5 		str	r0, [fp, #-8]
+ 784              		.loc 1 189 15
+ 785 0034 F8FFFFEA 		b	.L43
+ 786              		.cfi_endproc
+ 787              	.LFE8:
+ 789              		.section	.text.RME_Diff_Prc_Thd_Switch_Test,"ax",%progbits
+ 790              		.align	2
+ 791              		.global	RME_Diff_Prc_Thd_Switch_Test
+ 792              		.syntax unified
+ 793              		.arm
+ 795              	RME_Diff_Prc_Thd_Switch_Test:
+ 796              	.LFB9:
+ 190:Source/rme_benchmark.c ****                           RME_BOOT_INIT_THD,
+ 191:Source/rme_benchmark.c ****                           0,
+ 192:Source/rme_benchmark.c ****                           0);
+ 193:Source/rme_benchmark.c ****     }
+ 194:Source/rme_benchmark.c **** }
+ 195:Source/rme_benchmark.c **** /* End Function:RME_Diff_Prc_Thd_Switch_Test_Thd ****************************/
+ 196:Source/rme_benchmark.c **** 
+ 197:Source/rme_benchmark.c **** /* Function:RME_Diff_Prc_Thd_Switch_Test *************************************
+ 198:Source/rme_benchmark.c **** Description : The same-process thread switch test code.
+ 199:Source/rme_benchmark.c **** Input       : None.
+ 200:Source/rme_benchmark.c **** Output      : None.
+ 201:Source/rme_benchmark.c **** Return      : None.
+ 202:Source/rme_benchmark.c **** ******************************************************************************/
+ 203:Source/rme_benchmark.c **** void RME_Diff_Prc_Thd_Switch_Test(void)
+ 204:Source/rme_benchmark.c **** {
+ 797              		.loc 1 204 1
+ 798              		.cfi_startproc
+ 799              		@ args = 0, pretend = 0, frame = 16
+ 800              		@ frame_needed = 1, uses_anonymous_args = 0
+ 801 0000 00482DE9 		push	{fp, lr}
+ 802              		.cfi_def_cfa_offset 8
+ 803              		.cfi_offset 11, -8
+ 804              		.cfi_offset 14, -4
+ 805 0004 04B08DE2 		add	fp, sp, #4
+ 806              		.cfi_def_cfa 11, 4
+ 807 0008 18D04DE2 		sub	sp, sp, #24
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 25
 
 
- 179              	.L15:
- 218:Source/rme_benchmark.c ****         }
- 219:Source/rme_benchmark.c ****         else
- 220:Source/rme_benchmark.c ****         {
- 221:Source/rme_benchmark.c **** 
- 222:Source/rme_benchmark.c **** 
- 223:Source/rme_benchmark.c ****             break;
- 180              		.loc 1 223 13
- 181 00d4 00F020E3 		nop
- 224:Source/rme_benchmark.c ****         }
- 225:Source/rme_benchmark.c ****     }
- 226:Source/rme_benchmark.c ****     Num+=Count;
- 182              		.loc 1 226 8
- 183 00d8 08201BE5 		ldr	r2, [fp, #-8]
- 184 00dc 14301BE5 		ldr	r3, [fp, #-20]
- 185 00e0 033082E0 		add	r3, r2, r3
- 186 00e4 08300BE5 		str	r3, [fp, #-8]
- 227:Source/rme_benchmark.c **** 
- 228:Source/rme_benchmark.c ****     /* Print the integer */
- 229:Source/rme_benchmark.c ****     Iter=Abs;
- 187              		.loc 1 229 9
- 188 00e8 0C301BE5 		ldr	r3, [fp, #-12]
- 189 00ec 10300BE5 		str	r3, [fp, #-16]
- 230:Source/rme_benchmark.c **** 
- 231:Source/rme_benchmark.c ****     while(Count>0)
- 190              		.loc 1 231 10
- 191 00f0 1A0000EA 		b	.L13
- 192              	.L14:
- 232:Source/rme_benchmark.c ****     {
- 233:Source/rme_benchmark.c ****         Count--;
- 193              		.loc 1 233 14
- 194 00f4 14301BE5 		ldr	r3, [fp, #-20]
- 195 00f8 013043E2 		sub	r3, r3, #1
- 196 00fc 14300BE5 		str	r3, [fp, #-20]
- 234:Source/rme_benchmark.c ****         __USR_Putchar((s8)(Iter/Div)+'0');
- 197              		.loc 1 234 32
- 198 0100 18101BE5 		ldr	r1, [fp, #-24]
- 199 0104 10001BE5 		ldr	r0, [fp, #-16]
- 200 0108 FEFFFFEB 		bl	__aeabi_idiv
- 201 010c 0030A0E1 		mov	r3, r0
- 202              		.loc 1 234 23
- 203 0110 7330EFE6 		uxtb	r3, r3
- 204              		.loc 1 234 37
- 205 0114 303083E2 		add	r3, r3, #48
- 206 0118 7330EFE6 		uxtb	r3, r3
- 207              		.loc 1 234 9
- 208 011c 7330AFE6 		sxtb	r3, r3
- 209 0120 0300A0E1 		mov	r0, r3
- 210 0124 FEFFFFEB 		bl	__USR_Putchar
- 235:Source/rme_benchmark.c ****         Iter=Iter%Div;
- 211              		.loc 1 235 13
- 212 0128 10301BE5 		ldr	r3, [fp, #-16]
- 213 012c 18101BE5 		ldr	r1, [fp, #-24]
- 214 0130 0300A0E1 		mov	r0, r3
- 215 0134 FEFFFFEB 		bl	__aeabi_idivmod
- 216 0138 0130A0E1 		mov	r3, r1
- 217 013c 10300BE5 		str	r3, [fp, #-16]
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 9
+ 205:Source/rme_benchmark.c ****     /* Intra-process thread switching time */
+ 206:Source/rme_benchmark.c ****     ret_t Retval;
+ 207:Source/rme_benchmark.c ****     cnt_t Count;
+ 208:Source/rme_benchmark.c ****     ptr_t Stack_Addr;
+ 209:Source/rme_benchmark.c ****     ptr_t Temp;
+ 210:Source/rme_benchmark.c ****     ptr_t Frontier;
+ 211:Source/rme_benchmark.c ****     
+ 212:Source/rme_benchmark.c ****     Frontier=RME_BOOT_BENCH_KOM_FRONTIER;
+ 808              		.loc 1 212 13
+ 809 000c 093AA0E3 		mov	r3, #36864
+ 810 0010 0C300BE5 		str	r3, [fp, #-12]
+ 213:Source/rme_benchmark.c ****     /* Initialize the thread's stack before entering it */
+ 214:Source/rme_benchmark.c ****     Stack_Addr=_RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
+ 811              		.loc 1 214 16
+ 812 0014 10019FE5 		ldr	r0, .L48
+ 813 0018 001000E3 		movw	r1, #:lower16:RME_Thd_Stub
+ 814 001c 001040E3 		movt	r1, #:upper16:RME_Thd_Stub
+ 815 0020 0430A0E3 		mov	r3, #4
+ 816 0024 04308DE5 		str	r3, [sp, #4]
+ 817 0028 0330A0E3 		mov	r3, #3
+ 818 002c 00308DE5 		str	r3, [sp]
+ 819 0030 0230A0E3 		mov	r3, #2
+ 820 0034 0120A0E3 		mov	r2, #1
+ 821 0038 FEFFFFEB 		bl	_RME_Stack_Init
+ 822 003c 10000BE5 		str	r0, [fp, #-16]
+ 215:Source/rme_benchmark.c ****                                (ptr_t)RME_Thd_Stub,
+ 216:Source/rme_benchmark.c ****                                1, 2, 3, 4);
+ 217:Source/rme_benchmark.c ****     
+ 218:Source/rme_benchmark.c ****     /* Create the page table for the whole address space range */
+ 219:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_PGT_CRT,RME_BOOT_INIT_CPT,
+ 823              		.loc 1 219 12
+ 824 0040 0130A0E3 		mov	r3, #1
+ 825 0044 0C201BE5 		ldr	r2, [fp, #-12]
+ 826 0048 D31900E3 		movw	r1, #2515
+ 827 004c 051040E3 		movt	r1, 5
+ 828 0050 0F08A0E3 		mov	r0, #983040
+ 829 0054 FEFFFFEB 		bl	RME_Svc
+ 830 0058 14000BE5 		str	r0, [fp, #-20]
+ 220:Source/rme_benchmark.c ****                       RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_Q1(RME_BOOT_BENCH_PGT_TOP)|
+ 221:Source/rme_benchmark.c ****                       RME_PARAM_O1(29)|RME_PARAM_O0(3),
+ 222:Source/rme_benchmark.c ****                       Frontier,
+ 223:Source/rme_benchmark.c ****                       1);
+ 224:Source/rme_benchmark.c **** //    Frontier+=;
+ 225:Source/rme_benchmark.c **** //    /* Create the page table for the SRAM range */
+ 226:Source/rme_benchmark.c **** //    Retval=RME_CAP_OP(RME_SVC_PGT_CRT,RME_BOOT_INIT_CPT,
+ 227:Source/rme_benchmark.c **** //                      RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_Q1(RME_BOOT_BENCH_PGT_SRAM)|
+ 228:Source/rme_benchmark.c **** //                      RME_PARAM_O1(16)|RME_PARAM_O0(3),
+ 229:Source/rme_benchmark.c **** //                      Frontier,
+ 230:Source/rme_benchmark.c **** //                      0x20000001);
+ 231:Source/rme_benchmark.c **** //    Frontier+=;
+ 232:Source/rme_benchmark.c **** //    /* Map the pages into the top-level and the second-level */
+ 233:Source/rme_benchmark.c **** //    RME_CAP_OP(RME_SVC_PGT_ADD,0,
+ 234:Source/rme_benchmark.c **** //               RME_PARAM_Q1(RME_BOOT_BENCH_PGT_TOP)|0,
+ 235:Source/rme_benchmark.c **** //               RME_PARAM_D1(RME_BOOT_INIT_PGT)|0,
+ 236:Source/rme_benchmark.c **** //               |0)
+ 237:Source/rme_benchmark.c ****                       
+ 238:Source/rme_benchmark.c ****                   
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 26
 
 
- 236:Source/rme_benchmark.c ****         Div/=10;
- 218              		.loc 1 236 12
- 219 0140 18201BE5 		ldr	r2, [fp, #-24]
- 220 0144 673606E3 		movw	r3, #26215
- 221 0148 663646E3 		movt	r3, 26214
- 222 014c 9312C3E0 		smull	r1, r3, r3, r2
- 223 0150 4311A0E1 		asr	r1, r3, #2
- 224 0154 C23FA0E1 		asr	r3, r2, #31
- 225 0158 033041E0 		sub	r3, r1, r3
- 226 015c 18300BE5 		str	r3, [fp, #-24]
- 227              	.L13:
- 231:Source/rme_benchmark.c ****     {
- 228              		.loc 1 231 16
- 229 0160 14301BE5 		ldr	r3, [fp, #-20]
- 230 0164 000053E3 		cmp	r3, #0
- 231 0168 E1FFFFCA 		bgt	.L14
- 237:Source/rme_benchmark.c ****     }
- 238:Source/rme_benchmark.c **** 
- 239:Source/rme_benchmark.c ****     return Num;
- 232              		.loc 1 239 12
- 233 016c 08301BE5 		ldr	r3, [fp, #-8]
- 234              	.L6:
- 240:Source/rme_benchmark.c **** }
- 235              		.loc 1 240 1
- 236 0170 0300A0E1 		mov	r0, r3
- 237 0174 04D04BE2 		sub	sp, fp, #4
- 238              		.cfi_def_cfa 13, 8
- 239              		@ sp needed
- 240 0178 0088BDE8 		pop	{fp, pc}
- 241              		.cfi_endproc
- 242              	.LFE1:
- 244              		.section	.text.USR_DBG_H,"ax",%progbits
- 245              		.align	2
- 246              		.global	USR_DBG_H
- 247              		.syntax unified
- 248              		.arm
- 250              	USR_DBG_H:
- 251              	.LFB2:
- 241:Source/rme_benchmark.c **** /* End Function:USR_DBG_I ************************************************/
- 242:Source/rme_benchmark.c **** 
- 243:Source/rme_benchmark.c **** /* Function:USR_DBG_H *****************************************************
- 244:Source/rme_benchmark.c **** Description : Print a unsigned integer on the debugging console. This integer is
- 245:Source/rme_benchmark.c ****               printed as hexadecimal.
- 246:Source/rme_benchmark.c **** Input       : rme_ptr_t Uint - The unsigned integer to print.
- 247:Source/rme_benchmark.c **** Output      : None.
- 248:Source/rme_benchmark.c **** Return      : rme_cnt_t - The length of the string printed.
- 249:Source/rme_benchmark.c **** ******************************************************************************/
- 250:Source/rme_benchmark.c **** cnt_t USR_DBG_H(ptr_t Uint)
- 251:Source/rme_benchmark.c **** {
- 252              		.loc 1 251 1
- 253              		.cfi_startproc
- 254              		@ args = 0, pretend = 0, frame = 24
- 255              		@ frame_needed = 1, uses_anonymous_args = 0
- 256 0000 00482DE9 		push	{fp, lr}
- 257              		.cfi_def_cfa_offset 8
- 258              		.cfi_offset 11, -8
- 259              		.cfi_offset 14, -4
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 10
+ 239:Source/rme_benchmark.c ****     
+ 240:Source/rme_benchmark.c ****     
+ 241:Source/rme_benchmark.c ****     
+ 242:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_CRT,RME_BOOT_INIT_CPT,
+ 831              		.loc 1 242 12
+ 832 005c 093AA0E3 		mov	r3, #36864
+ 833 0060 1F20A0E3 		mov	r2, #31
+ 834 0064 022040E3 		movt	r2, 2
+ 835 0068 0810A0E3 		mov	r1, #8
+ 836 006c 051040E3 		movt	r1, 5
+ 837 0070 1908A0E3 		mov	r0, #1638400
+ 838 0074 FEFFFFEB 		bl	RME_Svc
+ 839 0078 14000BE5 		str	r0, [fp, #-20]
+ 243:Source/rme_benchmark.c ****                       RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_D0(RME_BOOT_BENCH_THD),
+ 244:Source/rme_benchmark.c ****                       RME_PARAM_D1(RME_BOOT_INIT_PRC)|RME_PARAM_D0(31),
+ 245:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_KOM_FRONTIER);
+ 246:Source/rme_benchmark.c ****     
+ 247:Source/rme_benchmark.c ****     /* Bind the thread to the processor */
+ 248:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,0,
+ 840              		.loc 1 248 12
+ 841 007c 0030A0E3 		mov	r3, #0
+ 842 0080 0320A0E3 		mov	r2, #3
+ 843 0084 0810A0E3 		mov	r1, #8
+ 844 0088 1B08A0E3 		mov	r0, #1769472
+ 845 008c FEFFFFEB 		bl	RME_Svc
+ 846 0090 14000BE5 		str	r0, [fp, #-20]
+ 249:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
+ 250:Source/rme_benchmark.c ****                       RME_BOOT_INIT_THD,
+ 251:Source/rme_benchmark.c ****                       0);
+ 252:Source/rme_benchmark.c ****     
+ 253:Source/rme_benchmark.c ****     /* Set the execution information */
+ 254:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,0,
+ 847              		.loc 1 254 12
+ 848 0094 002000E3 		movw	r2, #:lower16:RME_Same_Prc_Thd_Switch_Test_Thd
+ 849 0098 002040E3 		movt	r2, #:upper16:RME_Same_Prc_Thd_Switch_Test_Thd
+ 850 009c 10301BE5 		ldr	r3, [fp, #-16]
+ 851 00a0 0810A0E3 		mov	r1, #8
+ 852 00a4 0608A0E3 		mov	r0, #393216
+ 853 00a8 FEFFFFEB 		bl	RME_Svc
+ 854 00ac 14000BE5 		str	r0, [fp, #-20]
+ 255:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
+ 256:Source/rme_benchmark.c ****                       (ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
+ 257:Source/rme_benchmark.c ****                       Stack_Addr);
+ 258:Source/rme_benchmark.c ****                       
+ 259:Source/rme_benchmark.c ****     /* Delegate some timeslice to it */
+ 260:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,0,
+ 855              		.loc 1 260 12
+ 856 00b0 803609E3 		movw	r3, #38528
+ 857 00b4 983040E3 		movt	r3, 152
+ 858 00b8 0320A0E3 		mov	r2, #3
+ 859 00bc 0810A0E3 		mov	r1, #8
+ 860 00c0 0207A0E3 		mov	r0, #524288
+ 861 00c4 FEFFFFEB 		bl	RME_Svc
+ 862 00c8 14000BE5 		str	r0, [fp, #-20]
+ 261:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
+ 262:Source/rme_benchmark.c ****                       RME_BOOT_INIT_THD,
+ 263:Source/rme_benchmark.c ****                       10000000);
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 27
 
 
- 260 0004 04B08DE2 		add	fp, sp, #4
- 261              		.cfi_def_cfa 11, 4
- 262 0008 18D04DE2 		sub	sp, sp, #24
- 263 000c 18000BE5 		str	r0, [fp, #-24]
- 252:Source/rme_benchmark.c ****     ptr_t Iter;
- 253:Source/rme_benchmark.c ****     ptr_t Count;
- 254:Source/rme_benchmark.c ****     ptr_t Num;
- 255:Source/rme_benchmark.c **** 
- 256:Source/rme_benchmark.c ****     /* Exit on zero */
- 257:Source/rme_benchmark.c ****     if(Uint==0U)
- 264              		.loc 1 257 7
- 265 0010 18301BE5 		ldr	r3, [fp, #-24]
- 266 0014 000053E3 		cmp	r3, #0
- 267 0018 0300001A 		bne	.L17
- 258:Source/rme_benchmark.c ****     {
- 259:Source/rme_benchmark.c ****         __USR_Putchar('0');
- 268              		.loc 1 259 9
- 269 001c 3000A0E3 		mov	r0, #48
- 270 0020 FEFFFFEB 		bl	__USR_Putchar
- 260:Source/rme_benchmark.c ****         return 1;
- 271              		.loc 1 260 16
- 272 0024 0130A0E3 		mov	r3, #1
- 273 0028 330000EA 		b	.L18
- 274              	.L17:
- 261:Source/rme_benchmark.c ****     }
- 262:Source/rme_benchmark.c ****     else
- 263:Source/rme_benchmark.c ****     {
- 264:Source/rme_benchmark.c ****         /* No action required */
- 265:Source/rme_benchmark.c ****     }
- 266:Source/rme_benchmark.c **** 
- 267:Source/rme_benchmark.c ****     /* Filter out all the zeroes */
- 268:Source/rme_benchmark.c ****     Count=0U;
- 275              		.loc 1 268 10
- 276 002c 0030A0E3 		mov	r3, #0
- 277 0030 0C300BE5 		str	r3, [fp, #-12]
- 269:Source/rme_benchmark.c ****     Iter=Uint;
- 278              		.loc 1 269 9
- 279 0034 18301BE5 		ldr	r3, [fp, #-24]
- 280 0038 08300BE5 		str	r3, [fp, #-8]
- 270:Source/rme_benchmark.c ****     while((Iter>>(RME_WORD_BIT-4U))==0U)
- 281              		.loc 1 270 10
- 282 003c 050000EA 		b	.L19
- 283              	.L20:
- 271:Source/rme_benchmark.c ****     {
- 272:Source/rme_benchmark.c ****         Iter<<=4;
- 284              		.loc 1 272 13
- 285 0040 08301BE5 		ldr	r3, [fp, #-8]
- 286 0044 0332A0E1 		lsl	r3, r3, #4
- 287 0048 08300BE5 		str	r3, [fp, #-8]
- 273:Source/rme_benchmark.c ****         Count++;
- 288              		.loc 1 273 14
- 289 004c 0C301BE5 		ldr	r3, [fp, #-12]
- 290 0050 013083E2 		add	r3, r3, #1
- 291 0054 0C300BE5 		str	r3, [fp, #-12]
- 292              	.L19:
- 270:Source/rme_benchmark.c ****     while((Iter>>(RME_WORD_BIT-4U))==0U)
- 293              		.loc 1 270 16
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 11
+ 264:Source/rme_benchmark.c ****     
+ 265:Source/rme_benchmark.c ****     /* Try to switch to that thread - should fail */
+ 266:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+ 863              		.loc 1 266 12
+ 864 00cc 0030A0E3 		mov	r3, #0
+ 865 00d0 0020A0E3 		mov	r2, #0
+ 866 00d4 0810A0E3 		mov	r1, #8
+ 867 00d8 0908A0E3 		mov	r0, #589824
+ 868 00dc FEFFFFEB 		bl	RME_Svc
+ 869 00e0 14000BE5 		str	r0, [fp, #-20]
+ 267:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
+ 268:Source/rme_benchmark.c ****                       0,
+ 269:Source/rme_benchmark.c ****                       0);
+ 270:Source/rme_benchmark.c ****     /* Test result: intra-process ctxsw 358cycles/1.657us, frt w/mpu 163cycles/0.754us,
+ 271:Source/rme_benchmark.c ****     * composite 324. opted max:323
+ 272:Source/rme_benchmark.c ****     * all:33.0
+ 273:Source/rme_benchmark.c ****     * empty: 4.09 - 0.409us, most time spent on internals
+ 274:Source/rme_benchmark.c ****     * w/selections: 7.15 - maybe no need to check frozen cap from the proc.
+ 275:Source/rme_benchmark.c ****     * w/checkings:10.926 - 317us.
+ 276:Source/rme_benchmark.c ****     * total:16.57
+ 277:Source/rme_benchmark.c ****     * 16.2us now, after cleaning up two bad things
+ 278:Source/rme_benchmark.c ****     * 14.7us after CPUID optimizations. The quiescence hardly worked.
+ 279:Source/rme_benchmark.c ****     * no cache - 3 times slower, mainly due to the flash. ART does not really help.
+ 280:Source/rme_benchmark.c ****     * Performance cannot be further optimized anymore without compiler intrinsics.
+ 281:Source/rme_benchmark.c ****     * Something terribly wrong with systick. 38 second wrapwround
+ 282:Source/rme_benchmark.c ****     * This configuration, CPU works at 216MHz, correct, but the 
+ 283:Source/rme_benchmark.c ****     * The TSC is always 8 cycles between reads.
+ 284:Source/rme_benchmark.c ****     */
+ 285:Source/rme_benchmark.c ****     _RME_Tsc_Init();
+ 870              		.loc 1 285 5
+ 871 00e4 FEFFFFEB 		bl	_RME_Tsc_Init
+ 286:Source/rme_benchmark.c ****     for(Count=0;Count<10000;Count++)
+ 872              		.loc 1 286 14
+ 873 00e8 0030A0E3 		mov	r3, #0
+ 874 00ec 08300BE5 		str	r3, [fp, #-8]
+ 875              		.loc 1 286 5
+ 876 00f0 080000EA 		b	.L45
+ 877              	.L46:
+ 287:Source/rme_benchmark.c ****     {
+ 288:Source/rme_benchmark.c ****         //Temp=RME_TSC();
+ 289:Source/rme_benchmark.c ****         Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+ 878              		.loc 1 289 16
+ 879 00f4 0030A0E3 		mov	r3, #0
+ 880 00f8 0020A0E3 		mov	r2, #0
+ 881 00fc 0810A0E3 		mov	r1, #8
+ 882 0100 0908A0E3 		mov	r0, #589824
+ 883 0104 FEFFFFEB 		bl	RME_Svc
+ 884 0108 14000BE5 		str	r0, [fp, #-20]
+ 286:Source/rme_benchmark.c ****     for(Count=0;Count<10000;Count++)
+ 885              		.loc 1 286 34 discriminator 3
+ 886 010c 08301BE5 		ldr	r3, [fp, #-8]
+ 887 0110 013083E2 		add	r3, r3, #1
+ 888 0114 08300BE5 		str	r3, [fp, #-8]
+ 889              	.L45:
+ 286:Source/rme_benchmark.c ****     for(Count=0;Count<10000;Count++)
+ 890              		.loc 1 286 22 discriminator 1
+ 891 0118 08301BE5 		ldr	r3, [fp, #-8]
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 28
 
 
- 294 0058 08301BE5 		ldr	r3, [fp, #-8]
- 295 005c 233EA0E1 		lsr	r3, r3, #28
- 270:Source/rme_benchmark.c ****     while((Iter>>(RME_WORD_BIT-4U))==0U)
- 296              		.loc 1 270 36
- 297 0060 000053E3 		cmp	r3, #0
- 298 0064 F5FFFF0A 		beq	.L20
- 274:Source/rme_benchmark.c ****     }
- 275:Source/rme_benchmark.c **** 
- 276:Source/rme_benchmark.c ****     /* Count is the number of pts to print */
- 277:Source/rme_benchmark.c ****     Count=RME_POW2(RME_WORD_ORDER-2U)-Count;
- 299              		.loc 1 277 10
- 300 0068 0C301BE5 		ldr	r3, [fp, #-12]
- 301 006c 083063E2 		rsb	r3, r3, #8
- 302 0070 0C300BE5 		str	r3, [fp, #-12]
- 278:Source/rme_benchmark.c ****     Num=Count;
- 303              		.loc 1 278 8
- 304 0074 0C301BE5 		ldr	r3, [fp, #-12]
- 305 0078 10300BE5 		str	r3, [fp, #-16]
- 279:Source/rme_benchmark.c ****     while(Count>0U)
- 306              		.loc 1 279 10
- 307 007c 1A0000EA 		b	.L21
- 308              	.L23:
- 280:Source/rme_benchmark.c ****     {
- 281:Source/rme_benchmark.c ****         Count--;
- 309              		.loc 1 281 14
- 310 0080 0C301BE5 		ldr	r3, [fp, #-12]
- 311 0084 013043E2 		sub	r3, r3, #1
- 312 0088 0C300BE5 		str	r3, [fp, #-12]
- 282:Source/rme_benchmark.c ****         Iter=(Uint>>(Count<<2U))&0x0FU;
- 313              		.loc 1 282 27
- 314 008c 0C301BE5 		ldr	r3, [fp, #-12]
- 315 0090 0331A0E1 		lsl	r3, r3, #2
- 316              		.loc 1 282 19
- 317 0094 18201BE5 		ldr	r2, [fp, #-24]
- 318 0098 3233A0E1 		lsr	r3, r2, r3
- 319              		.loc 1 282 13
- 320 009c 0F3003E2 		and	r3, r3, #15
- 321 00a0 08300BE5 		str	r3, [fp, #-8]
- 283:Source/rme_benchmark.c ****         if(Iter<10U)
- 322              		.loc 1 283 11
- 323 00a4 08301BE5 		ldr	r3, [fp, #-8]
- 324 00a8 090053E3 		cmp	r3, #9
- 325 00ac 0700008A 		bhi	.L22
- 284:Source/rme_benchmark.c ****         {
- 285:Source/rme_benchmark.c **** 
- 286:Source/rme_benchmark.c ****             __USR_Putchar((s8)Iter+'0');
- 326              		.loc 1 286 27
- 327 00b0 08301BE5 		ldr	r3, [fp, #-8]
- 328 00b4 7330EFE6 		uxtb	r3, r3
- 329              		.loc 1 286 35
- 330 00b8 303083E2 		add	r3, r3, #48
- 331 00bc 7330EFE6 		uxtb	r3, r3
- 332              		.loc 1 286 13
- 333 00c0 7330AFE6 		sxtb	r3, r3
- 334 00c4 0300A0E1 		mov	r0, r3
- 335 00c8 FEFFFFEB 		bl	__USR_Putchar
- 336 00cc 060000EA 		b	.L21
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 12
+ 892 011c 0F2702E3 		movw	r2, #9999
+ 893 0120 020053E1 		cmp	r3, r2
+ 894 0124 F2FFFFDA 		ble	.L46
+ 895              	.L47:
+ 290:Source/rme_benchmark.c ****                           RME_BOOT_BENCH_THD,
+ 291:Source/rme_benchmark.c ****                           0,
+ 292:Source/rme_benchmark.c ****                           0);
+ 293:Source/rme_benchmark.c ****         //Temp=RME_TSC()-Temp;
+ 294:Source/rme_benchmark.c ****         //Time[Count]=Temp-8;
+ 295:Source/rme_benchmark.c ****     }
+ 296:Source/rme_benchmark.c ****     
+ 297:Source/rme_benchmark.c ****     while(1);
+ 896              		.loc 1 297 10
+ 897 0128 FEFFFFEA 		b	.L47
+ 898              	.L49:
+ 899              		.align	2
+ 900              	.L48:
+ 901 012c FC1F0000 		.word	RME_Stack+8188
+ 902              		.cfi_endproc
+ 903              	.LFE9:
+ 905              		.section	.rodata
+ 906 0129 000000   		.align	2
+ 907              	.LC7:
+ 908 012c 0D0A6265 		.ascii	"\015\012begin test \000"
+ 908      67696E20 
+ 908      74657374 
+ 908      2000
+ 909              		.section	.text.RME_Benchmark,"ax",%progbits
+ 910              		.align	2
+ 911              		.global	RME_Benchmark
+ 912              		.syntax unified
+ 913              		.arm
+ 915              	RME_Benchmark:
+ 916              	.LFB10:
+ 298:Source/rme_benchmark.c **** }
+ 299:Source/rme_benchmark.c **** /* End Function:RME_Diff_Prc_Thd_Switch_Test ********************************/
+ 300:Source/rme_benchmark.c **** 
+ 301:Source/rme_benchmark.c **** /* Function:RME_Benchmark *****************************************************
+ 302:Source/rme_benchmark.c **** Description : The benchmark entry, also the init thread.
+ 303:Source/rme_benchmark.c **** Input       : None.
+ 304:Source/rme_benchmark.c **** Output      : None.
+ 305:Source/rme_benchmark.c **** Return      : None.
+ 306:Source/rme_benchmark.c **** ******************************************************************************/
+ 307:Source/rme_benchmark.c **** void RME_Benchmark(void)
+ 308:Source/rme_benchmark.c **** {
+ 917              		.loc 1 308 1
+ 918              		.cfi_startproc
+ 919              		@ args = 0, pretend = 0, frame = 0
+ 920              		@ frame_needed = 1, uses_anonymous_args = 0
+ 921 0000 00482DE9 		push	{fp, lr}
+ 922              		.cfi_def_cfa_offset 8
+ 923              		.cfi_offset 11, -8
+ 924              		.cfi_offset 14, -4
+ 925 0004 04B08DE2 		add	fp, sp, #4
+ 926              		.cfi_def_cfa 11, 4
+ 309:Source/rme_benchmark.c ****     USR_DBG_S("\r\nbegin test ");
+ 927              		.loc 1 309 5
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 29
 
 
- 337              	.L22:
- 287:Source/rme_benchmark.c ****         }
- 288:Source/rme_benchmark.c ****         else
- 289:Source/rme_benchmark.c ****         {
- 290:Source/rme_benchmark.c **** 
- 291:Source/rme_benchmark.c ****             __USR_Putchar((s8)Iter+'A'-10);
- 338              		.loc 1 291 27
- 339 00d0 08301BE5 		ldr	r3, [fp, #-8]
- 340 00d4 7330EFE6 		uxtb	r3, r3
- 341              		.loc 1 291 39
- 342 00d8 373083E2 		add	r3, r3, #55
- 343 00dc 7330EFE6 		uxtb	r3, r3
- 344              		.loc 1 291 13
- 345 00e0 7330AFE6 		sxtb	r3, r3
- 346 00e4 0300A0E1 		mov	r0, r3
- 347 00e8 FEFFFFEB 		bl	__USR_Putchar
- 348              	.L21:
- 279:Source/rme_benchmark.c ****     {
- 349              		.loc 1 279 16
- 350 00ec 0C301BE5 		ldr	r3, [fp, #-12]
- 351 00f0 000053E3 		cmp	r3, #0
- 352 00f4 E1FFFF1A 		bne	.L23
- 292:Source/rme_benchmark.c ****         }
- 293:Source/rme_benchmark.c ****     }
- 294:Source/rme_benchmark.c **** 
- 295:Source/rme_benchmark.c ****     return (cnt_t)Num;
- 353              		.loc 1 295 12
- 354 00f8 10301BE5 		ldr	r3, [fp, #-16]
- 355              	.L18:
- 296:Source/rme_benchmark.c **** }
- 356              		.loc 1 296 1
- 357 00fc 0300A0E1 		mov	r0, r3
- 358 0100 04D04BE2 		sub	sp, fp, #4
- 359              		.cfi_def_cfa 13, 8
- 360              		@ sp needed
- 361 0104 0088BDE8 		pop	{fp, pc}
- 362              		.cfi_endproc
- 363              	.LFE2:
- 365              		.section	.text.USR_DBG_S,"ax",%progbits
- 366              		.align	2
- 367              		.global	USR_DBG_S
- 368              		.syntax unified
- 369              		.arm
- 371              	USR_DBG_S:
- 372              	.LFB3:
- 297:Source/rme_benchmark.c **** /* End Function:USR_DBG_H ************************************************/
- 298:Source/rme_benchmark.c **** cnt_t USR_DBG_S(const s8* String)
- 299:Source/rme_benchmark.c **** {
- 373              		.loc 1 299 1
- 374              		.cfi_startproc
- 375              		@ args = 0, pretend = 0, frame = 16
- 376              		@ frame_needed = 1, uses_anonymous_args = 0
- 377 0000 00482DE9 		push	{fp, lr}
- 378              		.cfi_def_cfa_offset 8
- 379              		.cfi_offset 11, -8
- 380              		.cfi_offset 14, -4
- 381 0004 04B08DE2 		add	fp, sp, #4
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 13
-
-
- 382              		.cfi_def_cfa 11, 4
- 383 0008 10D04DE2 		sub	sp, sp, #16
- 384 000c 10000BE5 		str	r0, [fp, #-16]
- 300:Source/rme_benchmark.c ****     ptr_t Count;
- 301:Source/rme_benchmark.c **** 
- 302:Source/rme_benchmark.c ****     for(Count=0U;Count<255;Count++)
- 385              		.loc 1 302 14
- 386 0010 0030A0E3 		mov	r3, #0
- 387 0014 08300BE5 		str	r3, [fp, #-8]
- 388              		.loc 1 302 5
- 389 0018 0E0000EA 		b	.L25
- 390              	.L28:
- 303:Source/rme_benchmark.c ****     {
- 304:Source/rme_benchmark.c ****         if(String[Count]==(s8)'\0')
- 391              		.loc 1 304 18
- 392 001c 10201BE5 		ldr	r2, [fp, #-16]
- 393 0020 08301BE5 		ldr	r3, [fp, #-8]
- 394 0024 033082E0 		add	r3, r2, r3
- 395 0028 D030D3E1 		ldrsb	r3, [r3]
- 396              		.loc 1 304 11
- 397 002c 000053E3 		cmp	r3, #0
- 398 0030 0C00000A 		beq	.L30
- 305:Source/rme_benchmark.c ****         {
- 306:Source/rme_benchmark.c **** 
- 307:Source/rme_benchmark.c ****             break;
- 308:Source/rme_benchmark.c ****         }
- 309:Source/rme_benchmark.c ****         else
- 310:Source/rme_benchmark.c ****         {
- 311:Source/rme_benchmark.c ****             /* No action required */
- 312:Source/rme_benchmark.c ****         }
- 313:Source/rme_benchmark.c **** 
- 314:Source/rme_benchmark.c ****         __USR_Putchar(String[Count]);
- 399              		.loc 1 314 29
- 400 0034 10201BE5 		ldr	r2, [fp, #-16]
- 401 0038 08301BE5 		ldr	r3, [fp, #-8]
- 402 003c 033082E0 		add	r3, r2, r3
- 403              		.loc 1 314 9
- 404 0040 D030D3E1 		ldrsb	r3, [r3]
- 405 0044 0300A0E1 		mov	r0, r3
- 406 0048 FEFFFFEB 		bl	__USR_Putchar
- 302:Source/rme_benchmark.c ****     {
- 407              		.loc 1 302 33 discriminator 2
- 408 004c 08301BE5 		ldr	r3, [fp, #-8]
- 409 0050 013083E2 		add	r3, r3, #1
- 410 0054 08300BE5 		str	r3, [fp, #-8]
- 411              	.L25:
- 302:Source/rme_benchmark.c ****     {
- 412              		.loc 1 302 23 discriminator 1
- 413 0058 08301BE5 		ldr	r3, [fp, #-8]
- 414 005c FE0053E3 		cmp	r3, #254
- 415 0060 EDFFFF9A 		bls	.L28
- 416 0064 000000EA 		b	.L27
- 417              	.L30:
- 307:Source/rme_benchmark.c ****         }
- 418              		.loc 1 307 13
- 419 0068 00F020E3 		nop
- 420              	.L27:
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 14
-
-
- 315:Source/rme_benchmark.c ****     }
- 316:Source/rme_benchmark.c **** 
- 317:Source/rme_benchmark.c ****     return (cnt_t)Count;
- 421              		.loc 1 317 12
- 422 006c 08301BE5 		ldr	r3, [fp, #-8]
- 318:Source/rme_benchmark.c **** }
- 423              		.loc 1 318 1
- 424 0070 0300A0E1 		mov	r0, r3
- 425 0074 04D04BE2 		sub	sp, fp, #4
- 426              		.cfi_def_cfa 13, 8
- 427              		@ sp needed
- 428 0078 0088BDE8 		pop	{fp, pc}
- 429              		.cfi_endproc
- 430              	.LFE3:
- 432              		.section	.text._RME_Tsc_Init,"ax",%progbits
- 433              		.align	2
- 434              		.global	_RME_Tsc_Init
- 435              		.syntax unified
- 436              		.arm
- 438              	_RME_Tsc_Init:
- 439              	.LFB4:
- 319:Source/rme_benchmark.c **** 
- 320:Source/rme_benchmark.c **** /* Function:_RME_Tsc_Init *****************************************************
- 321:Source/rme_benchmark.c **** Description : The initialization of timestamp counter. 19 secs before overflowing.
- 322:Source/rme_benchmark.c **** Input       : None.
- 323:Source/rme_benchmark.c **** Output      : None.
- 324:Source/rme_benchmark.c **** Return      : None.
- 325:Source/rme_benchmark.c **** ******************************************************************************/
- 326:Source/rme_benchmark.c **** void _RME_Tsc_Init(void)
- 327:Source/rme_benchmark.c **** {
- 440              		.loc 1 327 1
- 441              		.cfi_startproc
- 442              		@ args = 0, pretend = 0, frame = 0
- 443              		@ frame_needed = 1, uses_anonymous_args = 0
- 444              		@ link register save eliminated.
- 445 0000 04B02DE5 		str	fp, [sp, #-4]!
- 446              		.cfi_def_cfa_offset 4
- 447              		.cfi_offset 11, -4
- 448 0004 00B08DE2 		add	fp, sp, #0
- 449              		.cfi_def_cfa_register 11
- 328:Source/rme_benchmark.c **** //    TIM_HandleTypeDef TIM2_Handle;
- 329:Source/rme_benchmark.c **** //    
- 330:Source/rme_benchmark.c **** //    /* Initialize timer 2 to run at the same speed as the CPU */
- 331:Source/rme_benchmark.c **** //    TIM2_Handle.Instance=TIM2;
- 332:Source/rme_benchmark.c **** //    TIM2_Handle.Init.Prescaler=0;
- 333:Source/rme_benchmark.c **** //    TIM2_Handle.Init.CounterMode=TIM_COUNTERMODE_UP;
- 334:Source/rme_benchmark.c **** //    TIM2_Handle.Init.Period=(ptr_t)(-1);
- 335:Source/rme_benchmark.c **** //    TIM2_Handle.Init.ClockDivision=TIM_CLOCKDIVISION_DIV1;
- 336:Source/rme_benchmark.c **** //    HAL_TIM_Base_Init(&TIM2_Handle);
- 337:Source/rme_benchmark.c **** //    __HAL_RCC_TIM2_CLK_ENABLE();
- 338:Source/rme_benchmark.c **** //    __HAL_TIM_ENABLE(&TIM2_Handle);
- 339:Source/rme_benchmark.c **** }
- 450              		.loc 1 339 1
- 451 0008 00F020E3 		nop
- 452 000c 00D08BE2 		add	sp, fp, #0
- 453              		.cfi_def_cfa_register 13
- 454              		@ sp needed
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 15
-
-
- 455 0010 04B09DE4 		ldr	fp, [sp], #4
- 456              		.cfi_restore 11
- 457              		.cfi_def_cfa_offset 0
- 458 0014 1EFF2FE1 		bx	lr
- 459              		.cfi_endproc
- 460              	.LFE4:
- 462              		.section	.text._RME_Stack_Init,"ax",%progbits
- 463              		.align	2
- 464              		.global	_RME_Stack_Init
- 465              		.syntax unified
- 466              		.arm
- 468              	_RME_Stack_Init:
- 469              	.LFB5:
- 340:Source/rme_benchmark.c **** /* End Function:_RME_Tsc_Init ************************************************/
- 341:Source/rme_benchmark.c **** 
- 342:Source/rme_benchmark.c **** /* Function:_RME_Stack_Init ***************************************************
- 343:Source/rme_benchmark.c **** Description : The thread's stack initializer, initializes the thread's stack.
- 344:Source/rme_benchmark.c **** Input       : None.
- 345:Source/rme_benchmark.c **** Output      : None.
- 346:Source/rme_benchmark.c **** Return      : None.
- 347:Source/rme_benchmark.c **** ******************************************************************************/
- 348:Source/rme_benchmark.c **** ptr_t _RME_Stack_Init(ptr_t Stack, ptr_t Stub, ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Para
- 349:Source/rme_benchmark.c **** {
- 470              		.loc 1 349 1
- 471              		.cfi_startproc
- 472              		@ args = 8, pretend = 0, frame = 24
- 473              		@ frame_needed = 1, uses_anonymous_args = 0
- 474              		@ link register save eliminated.
- 475 0000 04B02DE5 		str	fp, [sp, #-4]!
- 476              		.cfi_def_cfa_offset 4
- 477              		.cfi_offset 11, -4
- 478 0004 00B08DE2 		add	fp, sp, #0
- 479              		.cfi_def_cfa_register 11
- 480 0008 1CD04DE2 		sub	sp, sp, #28
- 481 000c 10000BE5 		str	r0, [fp, #-16]
- 482 0010 14100BE5 		str	r1, [fp, #-20]
- 483 0014 18200BE5 		str	r2, [fp, #-24]
- 484 0018 1C300BE5 		str	r3, [fp, #-28]
- 350:Source/rme_benchmark.c ****     struct RME_CMX_Ret_Stack* Stack_Ptr;
- 351:Source/rme_benchmark.c ****     
- 352:Source/rme_benchmark.c ****     Stack_Ptr=(struct RME_CMX_Ret_Stack*)(Stack-RME_STACK_SAFE_SIZE-sizeof(struct RME_CMX_Ret_Stack
- 485              		.loc 1 352 68
- 486 001c 10301BE5 		ldr	r3, [fp, #-16]
- 487 0020 703043E2 		sub	r3, r3, #112
- 488              		.loc 1 352 14
- 489 0024 08300BE5 		str	r3, [fp, #-8]
- 353:Source/rme_benchmark.c ****     Stack_Ptr->R0=Param1;
- 490              		.loc 1 353 18
- 491 0028 08301BE5 		ldr	r3, [fp, #-8]
- 492 002c 18201BE5 		ldr	r2, [fp, #-24]
- 493 0030 002083E5 		str	r2, [r3]
- 354:Source/rme_benchmark.c ****     Stack_Ptr->R1=Param2;
- 494              		.loc 1 354 18
- 495 0034 08301BE5 		ldr	r3, [fp, #-8]
- 496 0038 1C201BE5 		ldr	r2, [fp, #-28]
- 497 003c 042083E5 		str	r2, [r3, #4]
- 355:Source/rme_benchmark.c ****     Stack_Ptr->R2=Param3;
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 16
-
-
- 498              		.loc 1 355 18
- 499 0040 08301BE5 		ldr	r3, [fp, #-8]
- 500 0044 04209BE5 		ldr	r2, [fp, #4]
- 501 0048 082083E5 		str	r2, [r3, #8]
- 356:Source/rme_benchmark.c ****     Stack_Ptr->R3=Param4;
- 502              		.loc 1 356 18
- 503 004c 08301BE5 		ldr	r3, [fp, #-8]
- 504 0050 08209BE5 		ldr	r2, [fp, #8]
- 505 0054 0C2083E5 		str	r2, [r3, #12]
- 357:Source/rme_benchmark.c ****     Stack_Ptr->R12=0;
- 506              		.loc 1 357 19
- 507 0058 08301BE5 		ldr	r3, [fp, #-8]
- 508 005c 0020A0E3 		mov	r2, #0
- 509 0060 102083E5 		str	r2, [r3, #16]
- 358:Source/rme_benchmark.c ****     Stack_Ptr->LR=0;
- 510              		.loc 1 358 18
- 511 0064 08301BE5 		ldr	r3, [fp, #-8]
- 512 0068 0020A0E3 		mov	r2, #0
- 513 006c 142083E5 		str	r2, [r3, #20]
- 359:Source/rme_benchmark.c ****     Stack_Ptr->PC=Stub;
- 514              		.loc 1 359 18
- 515 0070 08301BE5 		ldr	r3, [fp, #-8]
- 516 0074 14201BE5 		ldr	r2, [fp, #-20]
- 517 0078 182083E5 		str	r2, [r3, #24]
- 360:Source/rme_benchmark.c ****     /* Initialize the xPSR to avoid a transition to ARM state */
- 361:Source/rme_benchmark.c ****     Stack_Ptr->XPSR=0x01000200;
- 518              		.loc 1 361 20
- 519 007c 08201BE5 		ldr	r2, [fp, #-8]
- 520 0080 023CA0E3 		mov	r3, #512
- 521 0084 003140E3 		movt	r3, 256
- 522 0088 1C3082E5 		str	r3, [r2, #28]
- 362:Source/rme_benchmark.c ****     
- 363:Source/rme_benchmark.c ****     return (ptr_t)Stack_Ptr;
- 523              		.loc 1 363 12
- 524 008c 08301BE5 		ldr	r3, [fp, #-8]
- 364:Source/rme_benchmark.c **** }
- 525              		.loc 1 364 1
- 526 0090 0300A0E1 		mov	r0, r3
- 527 0094 00D08BE2 		add	sp, fp, #0
- 528              		.cfi_def_cfa_register 13
- 529              		@ sp needed
- 530 0098 04B09DE4 		ldr	fp, [sp], #4
- 531              		.cfi_restore 11
- 532              		.cfi_def_cfa_offset 0
- 533 009c 1EFF2FE1 		bx	lr
- 534              		.cfi_endproc
- 535              	.LFE5:
- 537              		.section	.text.RME_Same_Prc_Thd_Switch_Test_Thd,"ax",%progbits
- 538              		.align	2
- 539              		.global	RME_Same_Prc_Thd_Switch_Test_Thd
- 540              		.syntax unified
- 541              		.arm
- 543              	RME_Same_Prc_Thd_Switch_Test_Thd:
- 544              	.LFB6:
- 365:Source/rme_benchmark.c **** /* End Function:_RME_Stack_Init **********************************************/
- 366:Source/rme_benchmark.c **** 
- 367:Source/rme_benchmark.c **** /* Function:RME_Same_Prc_Thd_Switch_Test_Thd *********************************
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 17
-
-
- 368:Source/rme_benchmark.c **** Description : The thread for testing same-process thread switching performance.
- 369:Source/rme_benchmark.c **** Input       : None.
- 370:Source/rme_benchmark.c **** Output      : None.
- 371:Source/rme_benchmark.c **** Return      : None.
- 372:Source/rme_benchmark.c **** ******************************************************************************/
- 373:Source/rme_benchmark.c **** void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4)
- 374:Source/rme_benchmark.c **** {
- 545              		.loc 1 374 1
- 546              		.cfi_startproc
- 547              		@ args = 0, pretend = 0, frame = 24
- 548              		@ frame_needed = 1, uses_anonymous_args = 0
- 549 0000 00482DE9 		push	{fp, lr}
- 550              		.cfi_def_cfa_offset 8
- 551              		.cfi_offset 11, -8
- 552              		.cfi_offset 14, -4
- 553 0004 04B08DE2 		add	fp, sp, #4
- 554              		.cfi_def_cfa 11, 4
- 555 0008 18D04DE2 		sub	sp, sp, #24
- 556 000c 10000BE5 		str	r0, [fp, #-16]
- 557 0010 14100BE5 		str	r1, [fp, #-20]
- 558 0014 18200BE5 		str	r2, [fp, #-24]
- 559 0018 1C300BE5 		str	r3, [fp, #-28]
- 560              	.L35:
- 375:Source/rme_benchmark.c ****     ret_t Retval;
- 376:Source/rme_benchmark.c ****     /* Now we switch back to the init thread, immediately */
- 377:Source/rme_benchmark.c ****     while(1)
- 378:Source/rme_benchmark.c ****     {
- 379:Source/rme_benchmark.c ****         Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
- 561              		.loc 1 379 16 discriminator 1
- 562 001c 0030A0E3 		mov	r3, #0
- 563 0020 0020A0E3 		mov	r2, #0
- 564 0024 0310A0E3 		mov	r1, #3
- 565 0028 0908A0E3 		mov	r0, #589824
- 566 002c FEFFFFEB 		bl	RME_Svc
- 567 0030 08000BE5 		str	r0, [fp, #-8]
- 568              		.loc 1 379 15
- 569 0034 F8FFFFEA 		b	.L35
- 570              		.cfi_endproc
- 571              	.LFE6:
- 573              		.section	.rodata
- 574              		.align	2
- 575              	.LC0:
- 576 0000 0D0A2870 		.ascii	"\015\012(ptr_t)(&RME_Stack[2047])= \000"
- 576      74725F74 
- 576      29282652 
- 576      4D455F53 
- 576      7461636B 
- 577 001e 0000     		.align	2
- 578              	.LC1:
- 579 0020 0D0A496E 		.ascii	"\015\012Initialize the thread's stack Stack_Addr= \000"
- 579      69746961 
- 579      6C697A65 
- 579      20746865 
- 579      20746872 
- 580 004d 000000   		.align	2
- 581              	.LC2:
- 582 0050 0D0A6372 		.ascii	"\015\012create a thread      retval= \000"
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 18
-
-
- 582      65617465 
- 582      20612074 
- 582      68726561 
- 582      64202020 
- 583              		.align	2
- 584              	.LC3:
- 585 0070 0D0A4269 		.ascii	"\015\012Bind the thread to the processor retval= \000"
- 585      6E642074 
- 585      68652074 
- 585      68726561 
- 585      6420746F 
- 586              		.align	2
- 587              	.LC4:
- 588 009c 0D0A5365 		.ascii	"\015\012Set the execution information retval= \000"
- 588      74207468 
- 588      65206578 
- 588      65637574 
- 588      696F6E20 
- 589 00c5 000000   		.align	2
- 590              	.LC5:
- 591 00c8 0D0A5472 		.ascii	"\015\012Try to switch to that thread - should fail "
- 591      7920746F 
- 591      20737769 
- 591      74636820 
- 591      746F2074 
- 592 00f5 20726574 		.ascii	" retval= \000"
- 592      76616C3D 
- 592      2000
- 593 00ff 00       		.align	2
- 594              	.LC6:
- 595 0100 0D0A5472 		.ascii	"\015\012Try to switch to that thread  retval= \000"
- 595      7920746F 
- 595      20737769 
- 595      74636820 
- 595      746F2074 
- 596              		.section	.text.RME_Same_Prc_Thd_Switch_Test,"ax",%progbits
- 597              		.align	2
- 598              		.global	RME_Same_Prc_Thd_Switch_Test
- 599              		.syntax unified
- 600              		.arm
- 602              	RME_Same_Prc_Thd_Switch_Test:
- 603              	.LFB7:
- 380:Source/rme_benchmark.c ****                           RME_BOOT_INIT_THD,
- 381:Source/rme_benchmark.c ****                           0,
- 382:Source/rme_benchmark.c ****                           0);
- 383:Source/rme_benchmark.c ****     }
- 384:Source/rme_benchmark.c **** }
- 385:Source/rme_benchmark.c **** /* End Function:RME_Same_Prc_Thd_Switch_Test_Thd ****************************/
- 386:Source/rme_benchmark.c **** 
- 387:Source/rme_benchmark.c **** /* Function:RME_Same_Prc_Thd_Switch_Test *************************************
- 388:Source/rme_benchmark.c **** Description : The same-process thread switch test code.
- 389:Source/rme_benchmark.c **** Input       : None.
- 390:Source/rme_benchmark.c **** Output      : None.
- 391:Source/rme_benchmark.c **** Return      : None.
- 392:Source/rme_benchmark.c **** ******************************************************************************/
- 393:Source/rme_benchmark.c **** void RME_Same_Prc_Thd_Switch_Test(void)
- 394:Source/rme_benchmark.c **** {
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 19
-
-
- 604              		.loc 1 394 1
- 605              		.cfi_startproc
- 606              		@ args = 0, pretend = 0, frame = 16
- 607              		@ frame_needed = 1, uses_anonymous_args = 0
- 608 0000 00482DE9 		push	{fp, lr}
- 609              		.cfi_def_cfa_offset 8
- 610              		.cfi_offset 11, -8
- 611              		.cfi_offset 14, -4
- 612 0004 04B08DE2 		add	fp, sp, #4
- 613              		.cfi_def_cfa 11, 4
- 614 0008 18D04DE2 		sub	sp, sp, #24
- 395:Source/rme_benchmark.c ****     /* Intra-process thread switching time */
- 396:Source/rme_benchmark.c ****     ret_t Retval;
- 397:Source/rme_benchmark.c ****     cnt_t Count;
- 398:Source/rme_benchmark.c ****     ptr_t Stack_Addr;
- 399:Source/rme_benchmark.c ****     ptr_t Temp;
- 400:Source/rme_benchmark.c ****     /* Initialize the thread's stack before entering it */
- 401:Source/rme_benchmark.c ****     Stack_Addr=_RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
- 615              		.loc 1 401 16
- 616 000c 80019FE5 		ldr	r0, .L40
- 617 0010 001000E3 		movw	r1, #:lower16:RME_Thd_Stub
- 618 0014 001040E3 		movt	r1, #:upper16:RME_Thd_Stub
- 619 0018 0430A0E3 		mov	r3, #4
- 620 001c 04308DE5 		str	r3, [sp, #4]
- 621 0020 0330A0E3 		mov	r3, #3
- 622 0024 00308DE5 		str	r3, [sp]
- 623 0028 0230A0E3 		mov	r3, #2
- 624 002c 0120A0E3 		mov	r2, #1
- 625 0030 FEFFFFEB 		bl	_RME_Stack_Init
- 626 0034 0C000BE5 		str	r0, [fp, #-12]
- 402:Source/rme_benchmark.c ****                                (ptr_t)RME_Thd_Stub,
- 403:Source/rme_benchmark.c ****                                1, 2, 3, 4);
- 404:Source/rme_benchmark.c **** 
- 405:Source/rme_benchmark.c ****     USR_DBG_S("\r\n(ptr_t)(&RME_Stack[2047])= ");
- 627              		.loc 1 405 5
- 628 0038 000000E3 		movw	r0, #:lower16:.LC0
- 629 003c 000040E3 		movt	r0, #:upper16:.LC0
- 630 0040 FEFFFFEB 		bl	USR_DBG_S
- 406:Source/rme_benchmark.c ****         USR_DBG_H((ptr_t)(&RME_Stack[2047]));
- 631              		.loc 1 406 9
- 632 0044 48319FE5 		ldr	r3, .L40
- 633 0048 0300A0E1 		mov	r0, r3
- 634 004c FEFFFFEB 		bl	USR_DBG_H
- 407:Source/rme_benchmark.c ****     USR_DBG_S("\r\nInitialize the thread's stack Stack_Addr= ");
- 635              		.loc 1 407 5
- 636 0050 000000E3 		movw	r0, #:lower16:.LC1
- 637 0054 000040E3 		movt	r0, #:upper16:.LC1
- 638 0058 FEFFFFEB 		bl	USR_DBG_S
- 408:Source/rme_benchmark.c ****     USR_DBG_H(Stack_Addr);
- 639              		.loc 1 408 5
- 640 005c 0C001BE5 		ldr	r0, [fp, #-12]
- 641 0060 FEFFFFEB 		bl	USR_DBG_H
- 409:Source/rme_benchmark.c **** 
- 410:Source/rme_benchmark.c ****     /* There are still many bugs in the kernel. Need a white-box test to guarantee
- 411:Source/rme_benchmark.c ****      * that it is free of bugs. Find a scheme to do that */
- 412:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_CRT,RME_BOOT_INIT_CPT,
- 642              		.loc 1 412 12
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 20
-
-
- 643 0064 0239A0E3 		mov	r3, #32768
- 644 0068 1F20A0E3 		mov	r2, #31
- 645 006c 022040E3 		movt	r2, 2
- 646 0070 0810A0E3 		mov	r1, #8
- 647 0074 051040E3 		movt	r1, 5
- 648 0078 1908A0E3 		mov	r0, #1638400
- 649 007c FEFFFFEB 		bl	RME_Svc
- 650 0080 10000BE5 		str	r0, [fp, #-16]
- 413:Source/rme_benchmark.c ****                       RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_D0(RME_BOOT_BENCH_THD),
- 414:Source/rme_benchmark.c ****                       RME_PARAM_D1(RME_BOOT_INIT_PRC)|RME_PARAM_D0(31),
- 415:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_KOM_FRONTIER);
- 416:Source/rme_benchmark.c ****     USR_DBG_S("\r\ncreate a thread      retval= ");
- 651              		.loc 1 416 5
- 652 0084 000000E3 		movw	r0, #:lower16:.LC2
- 653 0088 000040E3 		movt	r0, #:upper16:.LC2
- 654 008c FEFFFFEB 		bl	USR_DBG_S
- 417:Source/rme_benchmark.c ****     USR_DBG_I(Retval);
- 655              		.loc 1 417 5
- 656 0090 10001BE5 		ldr	r0, [fp, #-16]
- 657 0094 FEFFFFEB 		bl	USR_DBG_I
- 418:Source/rme_benchmark.c **** 
- 419:Source/rme_benchmark.c ****     /* Bind the thread to the processor */
- 420:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,0,
- 658              		.loc 1 420 12
- 659 0098 0030A0E3 		mov	r3, #0
- 660 009c 0320A0E3 		mov	r2, #3
- 661 00a0 0810A0E3 		mov	r1, #8
- 662 00a4 1B08A0E3 		mov	r0, #1769472
- 663 00a8 FEFFFFEB 		bl	RME_Svc
- 664 00ac 10000BE5 		str	r0, [fp, #-16]
- 421:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
- 422:Source/rme_benchmark.c ****                       RME_BOOT_INIT_THD,
- 423:Source/rme_benchmark.c ****                       0);
- 424:Source/rme_benchmark.c ****     USR_DBG_S("\r\nBind the thread to the processor retval= ");
- 665              		.loc 1 424 5
- 666 00b0 000000E3 		movw	r0, #:lower16:.LC3
- 667 00b4 000040E3 		movt	r0, #:upper16:.LC3
- 668 00b8 FEFFFFEB 		bl	USR_DBG_S
- 425:Source/rme_benchmark.c ****     USR_DBG_I(Retval);
- 669              		.loc 1 425 5
- 670 00bc 10001BE5 		ldr	r0, [fp, #-16]
- 671 00c0 FEFFFFEB 		bl	USR_DBG_I
- 426:Source/rme_benchmark.c ****     
- 427:Source/rme_benchmark.c ****     /* Set the execution information */
- 428:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,0,
- 672              		.loc 1 428 12
- 673 00c4 002000E3 		movw	r2, #:lower16:RME_Same_Prc_Thd_Switch_Test_Thd
- 674 00c8 002040E3 		movt	r2, #:upper16:RME_Same_Prc_Thd_Switch_Test_Thd
- 675 00cc 0C301BE5 		ldr	r3, [fp, #-12]
- 676 00d0 0810A0E3 		mov	r1, #8
- 677 00d4 0608A0E3 		mov	r0, #393216
- 678 00d8 FEFFFFEB 		bl	RME_Svc
- 679 00dc 10000BE5 		str	r0, [fp, #-16]
- 429:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
- 430:Source/rme_benchmark.c ****                       (ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
- 431:Source/rme_benchmark.c ****                       Stack_Addr);
- 432:Source/rme_benchmark.c **** 
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 21
-
-
- 433:Source/rme_benchmark.c ****     USR_DBG_S("\r\nSet the execution information retval= ");
- 680              		.loc 1 433 5
- 681 00e0 000000E3 		movw	r0, #:lower16:.LC4
- 682 00e4 000040E3 		movt	r0, #:upper16:.LC4
- 683 00e8 FEFFFFEB 		bl	USR_DBG_S
- 434:Source/rme_benchmark.c ****     USR_DBG_I(Retval);
- 684              		.loc 1 434 5
- 685 00ec 10001BE5 		ldr	r0, [fp, #-16]
- 686 00f0 FEFFFFEB 		bl	USR_DBG_I
- 435:Source/rme_benchmark.c **** 
- 436:Source/rme_benchmark.c ****     /* Delegate some timeslice to it */
- 437:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,0,
- 687              		.loc 1 437 12
- 688 00f4 803609E3 		movw	r3, #38528
- 689 00f8 983040E3 		movt	r3, 152
- 690 00fc 0320A0E3 		mov	r2, #3
- 691 0100 0810A0E3 		mov	r1, #8
- 692 0104 0207A0E3 		mov	r0, #524288
- 693 0108 FEFFFFEB 		bl	RME_Svc
- 694 010c 10000BE5 		str	r0, [fp, #-16]
- 438:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
- 439:Source/rme_benchmark.c ****                       RME_BOOT_INIT_THD,
- 440:Source/rme_benchmark.c ****                       10000000);
- 441:Source/rme_benchmark.c ****     
- 442:Source/rme_benchmark.c ****     /* Try to switch to that thread - should fail */
- 443:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
- 695              		.loc 1 443 12
- 696 0110 0030A0E3 		mov	r3, #0
- 697 0114 0020A0E3 		mov	r2, #0
- 698 0118 0810A0E3 		mov	r1, #8
- 699 011c 0908A0E3 		mov	r0, #589824
- 700 0120 FEFFFFEB 		bl	RME_Svc
- 701 0124 10000BE5 		str	r0, [fp, #-16]
- 444:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
- 445:Source/rme_benchmark.c ****                       0,
- 446:Source/rme_benchmark.c ****                       0);
- 447:Source/rme_benchmark.c ****     USR_DBG_S("\r\nTry to switch to that thread - should fail  retval= ");
- 702              		.loc 1 447 5
- 703 0128 000000E3 		movw	r0, #:lower16:.LC5
- 704 012c 000040E3 		movt	r0, #:upper16:.LC5
- 705 0130 FEFFFFEB 		bl	USR_DBG_S
- 448:Source/rme_benchmark.c ****     USR_DBG_I(Retval);
- 706              		.loc 1 448 5
- 707 0134 10001BE5 		ldr	r0, [fp, #-16]
- 708 0138 FEFFFFEB 		bl	USR_DBG_I
- 449:Source/rme_benchmark.c ****     /* Test result: intra-process ctxsw 358cycles/1.657us, frt w/mpu 163cycles/0.754us,
- 450:Source/rme_benchmark.c ****     * composite 324. opted max:323
- 451:Source/rme_benchmark.c ****     * all:33.0
- 452:Source/rme_benchmark.c ****     * empty: 4.09 - 0.409us, most time spent on internals
- 453:Source/rme_benchmark.c ****     * w/selections: 7.15 - maybe no need to check frozen cap from the proc.
- 454:Source/rme_benchmark.c ****     * w/checkings:10.926 - 317us.
- 455:Source/rme_benchmark.c ****     * total:16.57
- 456:Source/rme_benchmark.c ****     * 16.2us now, after cleaning up two bad things
- 457:Source/rme_benchmark.c ****     * 14.7us after CPUID optimizations. The quiescence hardly worked.
- 458:Source/rme_benchmark.c ****     * no cache - 3 times slower, mainly due to the flash. ART does not really help.
- 459:Source/rme_benchmark.c ****     * Performance cannot be further optimized anymore without compiler intrinsics.
- 460:Source/rme_benchmark.c ****     * Something terribly wrong with systick. 38 second wrapwround
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 22
-
-
- 461:Source/rme_benchmark.c ****     * This configuration, CPU works at 216MHz, correct, but the 
- 462:Source/rme_benchmark.c ****     * The TSC is always 8 cycles between reads.
- 463:Source/rme_benchmark.c ****     */
- 464:Source/rme_benchmark.c ****     _RME_Tsc_Init();
- 709              		.loc 1 464 5
- 710 013c FEFFFFEB 		bl	_RME_Tsc_Init
- 465:Source/rme_benchmark.c ****     //for(Count=0;Count<10000;Count++)
- 466:Source/rme_benchmark.c ****     for(Count=0;Count<10;Count++)
- 711              		.loc 1 466 14
- 712 0140 0030A0E3 		mov	r3, #0
- 713 0144 08300BE5 		str	r3, [fp, #-8]
- 714              		.loc 1 466 5
- 715 0148 0D0000EA 		b	.L37
- 716              	.L38:
- 467:Source/rme_benchmark.c ****     {
- 468:Source/rme_benchmark.c ****         //Temp=RME_TSC();
- 469:Source/rme_benchmark.c ****         Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
- 717              		.loc 1 469 16
- 718 014c 0030A0E3 		mov	r3, #0
- 719 0150 0020A0E3 		mov	r2, #0
- 720 0154 0810A0E3 		mov	r1, #8
- 721 0158 0908A0E3 		mov	r0, #589824
- 722 015c FEFFFFEB 		bl	RME_Svc
- 723 0160 10000BE5 		str	r0, [fp, #-16]
- 470:Source/rme_benchmark.c ****                           RME_BOOT_BENCH_THD,
- 471:Source/rme_benchmark.c ****                           0,
- 472:Source/rme_benchmark.c ****                           0);
- 473:Source/rme_benchmark.c ****         //Temp=RME_TSC()-Temp;
- 474:Source/rme_benchmark.c ****        // Time[Count]=Temp-8;
- 475:Source/rme_benchmark.c ****         USR_DBG_S("\r\nTry to switch to that thread  retval= ");
- 724              		.loc 1 475 9
- 725 0164 000000E3 		movw	r0, #:lower16:.LC6
- 726 0168 000040E3 		movt	r0, #:upper16:.LC6
- 727 016c FEFFFFEB 		bl	USR_DBG_S
- 476:Source/rme_benchmark.c ****         USR_DBG_I(Retval);
- 728              		.loc 1 476 9
- 729 0170 10001BE5 		ldr	r0, [fp, #-16]
- 730 0174 FEFFFFEB 		bl	USR_DBG_I
- 466:Source/rme_benchmark.c ****     {
- 731              		.loc 1 466 31 discriminator 3
- 732 0178 08301BE5 		ldr	r3, [fp, #-8]
- 733 017c 013083E2 		add	r3, r3, #1
- 734 0180 08300BE5 		str	r3, [fp, #-8]
- 735              	.L37:
- 466:Source/rme_benchmark.c ****     {
- 736              		.loc 1 466 22 discriminator 1
- 737 0184 08301BE5 		ldr	r3, [fp, #-8]
- 738 0188 090053E3 		cmp	r3, #9
- 739 018c EEFFFFDA 		ble	.L38
- 740              	.L39:
- 477:Source/rme_benchmark.c ****     }
- 478:Source/rme_benchmark.c ****     
- 479:Source/rme_benchmark.c ****     while(1);
- 741              		.loc 1 479 10
- 742 0190 FEFFFFEA 		b	.L39
- 743              	.L41:
- 744              		.align	2
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 23
-
-
- 745              	.L40:
- 746 0194 FC1F0000 		.word	RME_Stack+8188
- 747              		.cfi_endproc
- 748              	.LFE7:
- 750              		.section	.text.RME_Diff_Prc_Thd_Switch_Test_Thd,"ax",%progbits
- 751              		.align	2
- 752              		.global	RME_Diff_Prc_Thd_Switch_Test_Thd
- 753              		.syntax unified
- 754              		.arm
- 756              	RME_Diff_Prc_Thd_Switch_Test_Thd:
- 757              	.LFB8:
- 480:Source/rme_benchmark.c **** }
- 481:Source/rme_benchmark.c **** /* End Function:RME_Same_Prc_Thd_Switch_Test ********************************/
- 482:Source/rme_benchmark.c **** 
- 483:Source/rme_benchmark.c **** /* Function:RME_Diff_Prc_Thd_Switch_Test_Thd *********************************
- 484:Source/rme_benchmark.c **** Description : The thread for testing same-process thread switching performance.
- 485:Source/rme_benchmark.c **** Input       : None.
- 486:Source/rme_benchmark.c **** Output      : None.
- 487:Source/rme_benchmark.c **** Return      : None.
- 488:Source/rme_benchmark.c **** ******************************************************************************/
- 489:Source/rme_benchmark.c **** void RME_Diff_Prc_Thd_Switch_Test_Thd(ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4)
- 490:Source/rme_benchmark.c **** {
- 758              		.loc 1 490 1
- 759              		.cfi_startproc
- 760              		@ args = 0, pretend = 0, frame = 24
- 761              		@ frame_needed = 1, uses_anonymous_args = 0
- 762 0000 00482DE9 		push	{fp, lr}
- 763              		.cfi_def_cfa_offset 8
- 764              		.cfi_offset 11, -8
- 765              		.cfi_offset 14, -4
- 766 0004 04B08DE2 		add	fp, sp, #4
- 767              		.cfi_def_cfa 11, 4
- 768 0008 18D04DE2 		sub	sp, sp, #24
- 769 000c 10000BE5 		str	r0, [fp, #-16]
- 770 0010 14100BE5 		str	r1, [fp, #-20]
- 771 0014 18200BE5 		str	r2, [fp, #-24]
- 772 0018 1C300BE5 		str	r3, [fp, #-28]
- 773              	.L43:
- 491:Source/rme_benchmark.c ****     ret_t Retval;
- 492:Source/rme_benchmark.c ****     /* Now we switch back to the init thread, immediately */
- 493:Source/rme_benchmark.c ****     while(1)
- 494:Source/rme_benchmark.c ****     {
- 495:Source/rme_benchmark.c ****         Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
- 774              		.loc 1 495 16 discriminator 1
- 775 001c 0030A0E3 		mov	r3, #0
- 776 0020 0020A0E3 		mov	r2, #0
- 777 0024 0310A0E3 		mov	r1, #3
- 778 0028 0908A0E3 		mov	r0, #589824
- 779 002c FEFFFFEB 		bl	RME_Svc
- 780 0030 08000BE5 		str	r0, [fp, #-8]
- 781              		.loc 1 495 15
- 782 0034 F8FFFFEA 		b	.L43
- 783              		.cfi_endproc
- 784              	.LFE8:
- 786              		.section	.text.RME_Diff_Prc_Thd_Switch_Test,"ax",%progbits
- 787              		.align	2
- 788              		.global	RME_Diff_Prc_Thd_Switch_Test
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 24
-
-
- 789              		.syntax unified
- 790              		.arm
- 792              	RME_Diff_Prc_Thd_Switch_Test:
- 793              	.LFB9:
- 496:Source/rme_benchmark.c ****                           RME_BOOT_INIT_THD,
- 497:Source/rme_benchmark.c ****                           0,
- 498:Source/rme_benchmark.c ****                           0);
- 499:Source/rme_benchmark.c ****     }
- 500:Source/rme_benchmark.c **** }
- 501:Source/rme_benchmark.c **** /* End Function:RME_Diff_Prc_Thd_Switch_Test_Thd ****************************/
- 502:Source/rme_benchmark.c **** 
- 503:Source/rme_benchmark.c **** /* Function:RME_Diff_Prc_Thd_Switch_Test *************************************
- 504:Source/rme_benchmark.c **** Description : The same-process thread switch test code.
- 505:Source/rme_benchmark.c **** Input       : None.
- 506:Source/rme_benchmark.c **** Output      : None.
- 507:Source/rme_benchmark.c **** Return      : None.
- 508:Source/rme_benchmark.c **** ******************************************************************************/
- 509:Source/rme_benchmark.c **** void RME_Diff_Prc_Thd_Switch_Test(void)
- 510:Source/rme_benchmark.c **** {
- 794              		.loc 1 510 1
- 795              		.cfi_startproc
- 796              		@ args = 0, pretend = 0, frame = 16
- 797              		@ frame_needed = 1, uses_anonymous_args = 0
- 798 0000 00482DE9 		push	{fp, lr}
- 799              		.cfi_def_cfa_offset 8
- 800              		.cfi_offset 11, -8
- 801              		.cfi_offset 14, -4
- 802 0004 04B08DE2 		add	fp, sp, #4
- 803              		.cfi_def_cfa 11, 4
- 804 0008 18D04DE2 		sub	sp, sp, #24
- 511:Source/rme_benchmark.c ****     /* Intra-process thread switching time */
- 512:Source/rme_benchmark.c ****     ret_t Retval;
- 513:Source/rme_benchmark.c ****     cnt_t Count;
- 514:Source/rme_benchmark.c ****     ptr_t Stack_Addr;
- 515:Source/rme_benchmark.c ****     ptr_t Temp;
- 516:Source/rme_benchmark.c ****     ptr_t Frontier;
- 517:Source/rme_benchmark.c ****     
- 518:Source/rme_benchmark.c ****     Frontier=RME_BOOT_BENCH_KOM_FRONTIER;
- 805              		.loc 1 518 13
- 806 000c 0239A0E3 		mov	r3, #32768
- 807 0010 0C300BE5 		str	r3, [fp, #-12]
- 519:Source/rme_benchmark.c ****     /* Initialize the thread's stack before entering it */
- 520:Source/rme_benchmark.c ****     Stack_Addr=_RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
- 808              		.loc 1 520 16
- 809 0014 10019FE5 		ldr	r0, .L48
- 810 0018 001000E3 		movw	r1, #:lower16:RME_Thd_Stub
- 811 001c 001040E3 		movt	r1, #:upper16:RME_Thd_Stub
- 812 0020 0430A0E3 		mov	r3, #4
- 813 0024 04308DE5 		str	r3, [sp, #4]
- 814 0028 0330A0E3 		mov	r3, #3
- 815 002c 00308DE5 		str	r3, [sp]
- 816 0030 0230A0E3 		mov	r3, #2
- 817 0034 0120A0E3 		mov	r2, #1
- 818 0038 FEFFFFEB 		bl	_RME_Stack_Init
- 819 003c 10000BE5 		str	r0, [fp, #-16]
- 521:Source/rme_benchmark.c ****                                (ptr_t)RME_Thd_Stub,
- 522:Source/rme_benchmark.c ****                                1, 2, 3, 4);
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 25
-
-
- 523:Source/rme_benchmark.c ****     
- 524:Source/rme_benchmark.c ****     /* Create the page table for the whole address space range */
- 525:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_PGT_CRT,RME_BOOT_INIT_CPT,
- 820              		.loc 1 525 12
- 821 0040 0130A0E3 		mov	r3, #1
- 822 0044 0C201BE5 		ldr	r2, [fp, #-12]
- 823 0048 D31900E3 		movw	r1, #2515
- 824 004c 051040E3 		movt	r1, 5
- 825 0050 0F08A0E3 		mov	r0, #983040
- 826 0054 FEFFFFEB 		bl	RME_Svc
- 827 0058 14000BE5 		str	r0, [fp, #-20]
- 526:Source/rme_benchmark.c ****                       RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_Q1(RME_BOOT_BENCH_PGT_TOP)|
- 527:Source/rme_benchmark.c ****                       RME_PARAM_O1(29)|RME_PARAM_O0(3),
- 528:Source/rme_benchmark.c ****                       Frontier,
- 529:Source/rme_benchmark.c ****                       1);
- 530:Source/rme_benchmark.c **** //    Frontier+=;
- 531:Source/rme_benchmark.c **** //    /* Create the page table for the SRAM range */
- 532:Source/rme_benchmark.c **** //    Retval=RME_CAP_OP(RME_SVC_PGT_CRT,RME_BOOT_INIT_CPT,
- 533:Source/rme_benchmark.c **** //                      RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_Q1(RME_BOOT_BENCH_PGT_SRAM)|
- 534:Source/rme_benchmark.c **** //                      RME_PARAM_O1(16)|RME_PARAM_O0(3),
- 535:Source/rme_benchmark.c **** //                      Frontier,
- 536:Source/rme_benchmark.c **** //                      0x20000001);
- 537:Source/rme_benchmark.c **** //    Frontier+=;
- 538:Source/rme_benchmark.c **** //    /* Map the pages into the top-level and the second-level */
- 539:Source/rme_benchmark.c **** //    RME_CAP_OP(RME_SVC_PGT_ADD,0,
- 540:Source/rme_benchmark.c **** //               RME_PARAM_Q1(RME_BOOT_BENCH_PGT_TOP)|0,
- 541:Source/rme_benchmark.c **** //               RME_PARAM_D1(RME_BOOT_INIT_PGT)|0,
- 542:Source/rme_benchmark.c **** //               |0)
- 543:Source/rme_benchmark.c ****                       
- 544:Source/rme_benchmark.c ****                   
- 545:Source/rme_benchmark.c ****     
- 546:Source/rme_benchmark.c ****     
- 547:Source/rme_benchmark.c ****     
- 548:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_CRT,RME_BOOT_INIT_CPT,
- 828              		.loc 1 548 12
- 829 005c 0239A0E3 		mov	r3, #32768
- 830 0060 1F20A0E3 		mov	r2, #31
- 831 0064 022040E3 		movt	r2, 2
- 832 0068 0810A0E3 		mov	r1, #8
- 833 006c 051040E3 		movt	r1, 5
- 834 0070 1908A0E3 		mov	r0, #1638400
- 835 0074 FEFFFFEB 		bl	RME_Svc
- 836 0078 14000BE5 		str	r0, [fp, #-20]
- 549:Source/rme_benchmark.c ****                       RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_D0(RME_BOOT_BENCH_THD),
- 550:Source/rme_benchmark.c ****                       RME_PARAM_D1(RME_BOOT_INIT_PRC)|RME_PARAM_D0(31),
- 551:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_KOM_FRONTIER);
- 552:Source/rme_benchmark.c ****     
- 553:Source/rme_benchmark.c ****     /* Bind the thread to the processor */
- 554:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,0,
- 837              		.loc 1 554 12
- 838 007c 0030A0E3 		mov	r3, #0
- 839 0080 0320A0E3 		mov	r2, #3
- 840 0084 0810A0E3 		mov	r1, #8
- 841 0088 1B08A0E3 		mov	r0, #1769472
- 842 008c FEFFFFEB 		bl	RME_Svc
- 843 0090 14000BE5 		str	r0, [fp, #-20]
- 555:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 26
-
-
- 556:Source/rme_benchmark.c ****                       RME_BOOT_INIT_THD,
- 557:Source/rme_benchmark.c ****                       0);
- 558:Source/rme_benchmark.c ****     
- 559:Source/rme_benchmark.c ****     /* Set the execution information */
- 560:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,0,
- 844              		.loc 1 560 12
- 845 0094 002000E3 		movw	r2, #:lower16:RME_Same_Prc_Thd_Switch_Test_Thd
- 846 0098 002040E3 		movt	r2, #:upper16:RME_Same_Prc_Thd_Switch_Test_Thd
- 847 009c 10301BE5 		ldr	r3, [fp, #-16]
- 848 00a0 0810A0E3 		mov	r1, #8
- 849 00a4 0608A0E3 		mov	r0, #393216
- 850 00a8 FEFFFFEB 		bl	RME_Svc
- 851 00ac 14000BE5 		str	r0, [fp, #-20]
- 561:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
- 562:Source/rme_benchmark.c ****                       (ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
- 563:Source/rme_benchmark.c ****                       Stack_Addr);
- 564:Source/rme_benchmark.c ****                       
- 565:Source/rme_benchmark.c ****     /* Delegate some timeslice to it */
- 566:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,0,
- 852              		.loc 1 566 12
- 853 00b0 803609E3 		movw	r3, #38528
- 854 00b4 983040E3 		movt	r3, 152
- 855 00b8 0320A0E3 		mov	r2, #3
- 856 00bc 0810A0E3 		mov	r1, #8
- 857 00c0 0207A0E3 		mov	r0, #524288
- 858 00c4 FEFFFFEB 		bl	RME_Svc
- 859 00c8 14000BE5 		str	r0, [fp, #-20]
- 567:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
- 568:Source/rme_benchmark.c ****                       RME_BOOT_INIT_THD,
- 569:Source/rme_benchmark.c ****                       10000000);
- 570:Source/rme_benchmark.c ****     
- 571:Source/rme_benchmark.c ****     /* Try to switch to that thread - should fail */
- 572:Source/rme_benchmark.c ****     Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
- 860              		.loc 1 572 12
- 861 00cc 0030A0E3 		mov	r3, #0
- 862 00d0 0020A0E3 		mov	r2, #0
- 863 00d4 0810A0E3 		mov	r1, #8
- 864 00d8 0908A0E3 		mov	r0, #589824
- 865 00dc FEFFFFEB 		bl	RME_Svc
- 866 00e0 14000BE5 		str	r0, [fp, #-20]
- 573:Source/rme_benchmark.c ****                       RME_BOOT_BENCH_THD,
- 574:Source/rme_benchmark.c ****                       0,
- 575:Source/rme_benchmark.c ****                       0);
- 576:Source/rme_benchmark.c ****     /* Test result: intra-process ctxsw 358cycles/1.657us, frt w/mpu 163cycles/0.754us,
- 577:Source/rme_benchmark.c ****     * composite 324. opted max:323
- 578:Source/rme_benchmark.c ****     * all:33.0
- 579:Source/rme_benchmark.c ****     * empty: 4.09 - 0.409us, most time spent on internals
- 580:Source/rme_benchmark.c ****     * w/selections: 7.15 - maybe no need to check frozen cap from the proc.
- 581:Source/rme_benchmark.c ****     * w/checkings:10.926 - 317us.
- 582:Source/rme_benchmark.c ****     * total:16.57
- 583:Source/rme_benchmark.c ****     * 16.2us now, after cleaning up two bad things
- 584:Source/rme_benchmark.c ****     * 14.7us after CPUID optimizations. The quiescence hardly worked.
- 585:Source/rme_benchmark.c ****     * no cache - 3 times slower, mainly due to the flash. ART does not really help.
- 586:Source/rme_benchmark.c ****     * Performance cannot be further optimized anymore without compiler intrinsics.
- 587:Source/rme_benchmark.c ****     * Something terribly wrong with systick. 38 second wrapwround
- 588:Source/rme_benchmark.c ****     * This configuration, CPU works at 216MHz, correct, but the 
- 589:Source/rme_benchmark.c ****     * The TSC is always 8 cycles between reads.
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 27
-
-
- 590:Source/rme_benchmark.c ****     */
- 591:Source/rme_benchmark.c ****     _RME_Tsc_Init();
- 867              		.loc 1 591 5
- 868 00e4 FEFFFFEB 		bl	_RME_Tsc_Init
- 592:Source/rme_benchmark.c ****     for(Count=0;Count<10000;Count++)
- 869              		.loc 1 592 14
- 870 00e8 0030A0E3 		mov	r3, #0
- 871 00ec 08300BE5 		str	r3, [fp, #-8]
- 872              		.loc 1 592 5
- 873 00f0 080000EA 		b	.L45
- 874              	.L46:
- 593:Source/rme_benchmark.c ****     {
- 594:Source/rme_benchmark.c ****         //Temp=RME_TSC();
- 595:Source/rme_benchmark.c ****         Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
- 875              		.loc 1 595 16
- 876 00f4 0030A0E3 		mov	r3, #0
- 877 00f8 0020A0E3 		mov	r2, #0
- 878 00fc 0810A0E3 		mov	r1, #8
- 879 0100 0908A0E3 		mov	r0, #589824
- 880 0104 FEFFFFEB 		bl	RME_Svc
- 881 0108 14000BE5 		str	r0, [fp, #-20]
- 592:Source/rme_benchmark.c ****     for(Count=0;Count<10000;Count++)
- 882              		.loc 1 592 34 discriminator 3
- 883 010c 08301BE5 		ldr	r3, [fp, #-8]
- 884 0110 013083E2 		add	r3, r3, #1
- 885 0114 08300BE5 		str	r3, [fp, #-8]
- 886              	.L45:
- 592:Source/rme_benchmark.c ****     for(Count=0;Count<10000;Count++)
- 887              		.loc 1 592 22 discriminator 1
- 888 0118 08301BE5 		ldr	r3, [fp, #-8]
- 889 011c 0F2702E3 		movw	r2, #9999
- 890 0120 020053E1 		cmp	r3, r2
- 891 0124 F2FFFFDA 		ble	.L46
- 892              	.L47:
- 596:Source/rme_benchmark.c ****                           RME_BOOT_BENCH_THD,
- 597:Source/rme_benchmark.c ****                           0,
- 598:Source/rme_benchmark.c ****                           0);
- 599:Source/rme_benchmark.c ****         //Temp=RME_TSC()-Temp;
- 600:Source/rme_benchmark.c ****         //Time[Count]=Temp-8;
- 601:Source/rme_benchmark.c ****     }
- 602:Source/rme_benchmark.c ****     
- 603:Source/rme_benchmark.c ****     while(1);
- 893              		.loc 1 603 10
- 894 0128 FEFFFFEA 		b	.L47
- 895              	.L49:
- 896              		.align	2
- 897              	.L48:
- 898 012c FC1F0000 		.word	RME_Stack+8188
- 899              		.cfi_endproc
- 900              	.LFE9:
- 902              		.section	.rodata
- 903 0129 000000   		.align	2
- 904              	.LC7:
- 905 012c 0D0A6265 		.ascii	"\015\012begin test \000"
- 905      67696E20 
- 905      74657374 
- 905      2000
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 28
-
-
- 906              		.section	.text.RME_Benchmark,"ax",%progbits
- 907              		.align	2
- 908              		.global	RME_Benchmark
- 909              		.syntax unified
- 910              		.arm
- 912              	RME_Benchmark:
- 913              	.LFB10:
- 604:Source/rme_benchmark.c **** }
- 605:Source/rme_benchmark.c **** /* End Function:RME_Diff_Prc_Thd_Switch_Test ********************************/
- 606:Source/rme_benchmark.c **** 
- 607:Source/rme_benchmark.c **** /* Function:RME_Benchmark *****************************************************
- 608:Source/rme_benchmark.c **** Description : The benchmark entry, also the init thread.
- 609:Source/rme_benchmark.c **** Input       : None.
- 610:Source/rme_benchmark.c **** Output      : None.
- 611:Source/rme_benchmark.c **** Return      : None.
- 612:Source/rme_benchmark.c **** ******************************************************************************/
- 613:Source/rme_benchmark.c **** void RME_Benchmark(void)
- 614:Source/rme_benchmark.c **** {
- 914              		.loc 1 614 1
- 915              		.cfi_startproc
- 916              		@ args = 0, pretend = 0, frame = 0
- 917              		@ frame_needed = 1, uses_anonymous_args = 0
- 918 0000 00482DE9 		push	{fp, lr}
- 919              		.cfi_def_cfa_offset 8
- 920              		.cfi_offset 11, -8
- 921              		.cfi_offset 14, -4
- 922 0004 04B08DE2 		add	fp, sp, #4
- 923              		.cfi_def_cfa 11, 4
- 615:Source/rme_benchmark.c ****     USR_DBG_S("\r\nbegin test ");
- 924              		.loc 1 615 5
- 925 0008 000000E3 		movw	r0, #:lower16:.LC7
- 926 000c 000040E3 		movt	r0, #:upper16:.LC7
- 927 0010 FEFFFFEB 		bl	USR_DBG_S
- 616:Source/rme_benchmark.c ****     USR_DBG_H(0x111111);
- 928              		.loc 1 616 5
- 929 0014 110101E3 		movw	r0, #4369
- 930 0018 110040E3 		movt	r0, 17
- 931 001c FEFFFFEB 		bl	USR_DBG_H
- 617:Source/rme_benchmark.c ****     RME_Same_Prc_Thd_Switch_Test();
- 932              		.loc 1 617 5
- 933 0020 FEFFFFEB 		bl	RME_Same_Prc_Thd_Switch_Test
- 618:Source/rme_benchmark.c **** }
- 934              		.loc 1 618 1
- 935 0024 00F020E3 		nop
- 936 0028 0088BDE8 		pop	{fp, pc}
- 937              		.cfi_endproc
- 938              	.LFE10:
- 940              		.text
- 941              	.Letext0:
-ARM GAS  C:\Users\even\AppData\Local\Temp\ccSTVUWG.s 			page 29
+ 928 0008 000000E3 		movw	r0, #:lower16:.LC7
+ 929 000c 000040E3 		movt	r0, #:upper16:.LC7
+ 930 0010 FEFFFFEB 		bl	USR_DBG_S
+ 310:Source/rme_benchmark.c ****     USR_DBG_H(0x111111);
+ 931              		.loc 1 310 5
+ 932 0014 110101E3 		movw	r0, #4369
+ 933 0018 110040E3 		movt	r0, 17
+ 934 001c FEFFFFEB 		bl	USR_DBG_H
+ 311:Source/rme_benchmark.c ****     RME_Same_Prc_Thd_Switch_Test();
+ 935              		.loc 1 311 5
+ 936 0020 FEFFFFEB 		bl	RME_Same_Prc_Thd_Switch_Test
+ 312:Source/rme_benchmark.c **** }
+ 937              		.loc 1 312 1
+ 938 0024 00F020E3 		nop
+ 939 0028 0088BDE8 		pop	{fp, pc}
+ 940              		.cfi_endproc
+ 941              	.LFE10:
+ 943              		.text
+ 944              	.Letext0:
+ARM GAS  C:\Users\even\AppData\Local\Temp\ccBBZTwm.s 			page 30
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 rme_benchmark.c
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:25     .bss.RME_Stack:00000000 RME_Stack
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:22     .bss.RME_Stack:00000000 $d
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:32     .bss.Time:00000000 Time
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:29     .bss.Time:00000000 $d
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:39     .bss.RME_Bench_Buf:00000000 RME_Bench_Buf
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:36     .bss.RME_Bench_Buf:00000000 $d
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:42     .text.__USR_Putchar:00000000 $a
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:47     .text.__USR_Putchar:00000000 __USR_Putchar
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:90     .text.USR_DBG_I:00000000 $a
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:95     .text.USR_DBG_I:00000000 USR_DBG_I
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:245    .text.USR_DBG_H:00000000 $a
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:250    .text.USR_DBG_H:00000000 USR_DBG_H
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:366    .text.USR_DBG_S:00000000 $a
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:371    .text.USR_DBG_S:00000000 USR_DBG_S
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:433    .text._RME_Tsc_Init:00000000 $a
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:438    .text._RME_Tsc_Init:00000000 _RME_Tsc_Init
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:463    .text._RME_Stack_Init:00000000 $a
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:468    .text._RME_Stack_Init:00000000 _RME_Stack_Init
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:538    .text.RME_Same_Prc_Thd_Switch_Test_Thd:00000000 $a
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:543    .text.RME_Same_Prc_Thd_Switch_Test_Thd:00000000 RME_Same_Prc_Thd_Switch_Test_Thd
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:574    .rodata:00000000 $d
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:575    .rodata:00000000 .LC0
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:578    .rodata:00000020 .LC1
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:581    .rodata:00000050 .LC2
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:584    .rodata:00000070 .LC3
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:587    .rodata:0000009c .LC4
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:590    .rodata:000000c8 .LC5
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:594    .rodata:00000100 .LC6
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:597    .text.RME_Same_Prc_Thd_Switch_Test:00000000 $a
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:602    .text.RME_Same_Prc_Thd_Switch_Test:00000000 RME_Same_Prc_Thd_Switch_Test
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:746    .text.RME_Same_Prc_Thd_Switch_Test:00000194 $d
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:751    .text.RME_Diff_Prc_Thd_Switch_Test_Thd:00000000 $a
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:756    .text.RME_Diff_Prc_Thd_Switch_Test_Thd:00000000 RME_Diff_Prc_Thd_Switch_Test_Thd
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:787    .text.RME_Diff_Prc_Thd_Switch_Test:00000000 $a
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:792    .text.RME_Diff_Prc_Thd_Switch_Test:00000000 RME_Diff_Prc_Thd_Switch_Test
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:898    .text.RME_Diff_Prc_Thd_Switch_Test:0000012c $d
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:904    .rodata:0000012c .LC7
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:907    .text.RME_Benchmark:00000000 $a
-C:\Users\even\AppData\Local\Temp\ccSTVUWG.s:912    .text.RME_Benchmark:00000000 RME_Benchmark
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:25     .bss.RME_Stack:00000000 RME_Stack
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:22     .bss.RME_Stack:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:32     .bss.Time:00000000 Time
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:29     .bss.Time:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:39     .bss.RME_Bench_Buf:00000000 RME_Bench_Buf
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:36     .bss.RME_Bench_Buf:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:42     .text.__USR_Putchar:00000000 $a
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:47     .text.__USR_Putchar:00000000 __USR_Putchar
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:91     .text.USR_DBG_I:00000000 $a
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:96     .text.USR_DBG_I:00000000 USR_DBG_I
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:246    .text.USR_DBG_H:00000000 $a
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:251    .text.USR_DBG_H:00000000 USR_DBG_H
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:367    .text.USR_DBG_S:00000000 $a
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:372    .text.USR_DBG_S:00000000 USR_DBG_S
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:434    .text._RME_Tsc_Init:00000000 $a
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:439    .text._RME_Tsc_Init:00000000 _RME_Tsc_Init
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:464    .text._RME_Stack_Init:00000000 $a
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:469    .text._RME_Stack_Init:00000000 _RME_Stack_Init
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:539    .text.RME_Same_Prc_Thd_Switch_Test_Thd:00000000 $a
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:544    .text.RME_Same_Prc_Thd_Switch_Test_Thd:00000000 RME_Same_Prc_Thd_Switch_Test_Thd
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:575    .rodata:00000000 $d
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:576    .rodata:00000000 .LC0
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:579    .rodata:00000020 .LC1
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:582    .rodata:00000050 .LC2
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:585    .rodata:00000070 .LC3
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:588    .rodata:0000009c .LC4
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:591    .rodata:000000c8 .LC5
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:595    .rodata:00000100 .LC6
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:598    .text.RME_Same_Prc_Thd_Switch_Test:00000000 $a
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:603    .text.RME_Same_Prc_Thd_Switch_Test:00000000 RME_Same_Prc_Thd_Switch_Test
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:749    .text.RME_Same_Prc_Thd_Switch_Test:0000019c $d
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:754    .text.RME_Diff_Prc_Thd_Switch_Test_Thd:00000000 $a
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:759    .text.RME_Diff_Prc_Thd_Switch_Test_Thd:00000000 RME_Diff_Prc_Thd_Switch_Test_Thd
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:790    .text.RME_Diff_Prc_Thd_Switch_Test:00000000 $a
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:795    .text.RME_Diff_Prc_Thd_Switch_Test:00000000 RME_Diff_Prc_Thd_Switch_Test
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:901    .text.RME_Diff_Prc_Thd_Switch_Test:0000012c $d
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:907    .rodata:0000012c .LC7
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:910    .text.RME_Benchmark:00000000 $a
+C:\Users\even\AppData\Local\Temp\ccBBZTwm.s:915    .text.RME_Benchmark:00000000 RME_Benchmark
                            .group:00000000 wm4.0.3b9f63523dc4e8d86e863c7e7e762be7
-                           .group:00000000 wm4.benchmark.h.3.6dea14774214a614d5e4a465bd5d6f37
                            .group:00000000 wm4.rme.h.11.105c42759f88404be372052d8d99e5e6
+                           .group:00000000 wm4.benchmark.h.4.4fbf7d42e85f7460496b2d1dcd83513f
 
 UNDEFINED SYMBOLS
 __aeabi_idiv
