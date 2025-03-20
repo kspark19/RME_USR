@@ -91,45 +91,21 @@ typedef s32                        			ret_t;
 /* Need to export the flags as well ! */
 /* Export the errno too */
 #define RME_BOOT_BENCH_KOM_FRONTIER 			0x00009000
+/*The kernel-accessible virtual memory address,for this thread's register sets*/
+#define RME_BOOT_HYPER_KOM_VADDR                       0x00000000
 //0x10005000
 /* The stack safe size */
 #define RME_STACK_SAFE_SIZE 					16
 /* Doesn't want to receive the scheduler signal for the thread */
 #define RME_CID_NULL   							0x8000
-
+/*The thread ID*/
+#define RME_TID_1                               1
+#define RME_TID_2                               2
+#define RME_TID_3                               3
+#define RME_TID_4                               4
+#define RME_TID_6                               6
 //#define RME_TSC() TIM2->CNT
 
-/* Need to export the system priority limit! */
-struct RME_CMX_Ret_Stack
-{
-    /* Normal registers */
-    ptr_t R0;
-    ptr_t R1;
-    ptr_t R2;
-    ptr_t R3;
-    ptr_t R12;
-    ptr_t LR;
-    ptr_t PC;
-    ptr_t XPSR;
-    /* FPU registers follow - no matter they are used or not, we reserve the space
-     * in stack creation */
-    ptr_t S0;
-    ptr_t S1;
-    ptr_t S2;
-    ptr_t S3;
-    ptr_t S4;
-    ptr_t S5;
-    ptr_t S6;
-    ptr_t S7;
-    ptr_t S8;
-    ptr_t S9;
-    ptr_t S10;
-    ptr_t S11;
-    ptr_t S12;
-    ptr_t S13;
-    ptr_t S14;
-    ptr_t S15;
-};
 /* End Define ****************************************************************/
 
 
@@ -148,7 +124,7 @@ extern void RME_Thd_Stub(void);
 extern void RME_Inv_Stub(void);
 ptr_t _RME_Stack_Init(ptr_t Stack, ptr_t Stub, ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4);
 void RME_Benchmark(void);
-void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4);
+void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1);
 void RME_Same_Prc_Thd_Switch_Test(void);
 /* End Function Prototypes ***************************************************/
 

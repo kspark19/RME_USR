@@ -11,354 +11,942 @@ Disassembly of section .text:
 //*****************************************************************************/
 RME_Entry:
                  LDR     R0, =RME_Benchmark
- 8004000:	e59f0070 	ldr	r0, [pc, #112]	@ 8004078 <__user_setup_stackheap+0x10>
+ 8004000:	e59f006c 	ldr	r0, [pc, #108]	@ 8004074 <__user_setup_stackheap+0x10>
                  BX      R0
  8004004:	e12fff10 	bx	r0
 
-08004008 <RME_Thd_Stub>:
+08004008 <RME_Deadloop>:
+///* End Function:RME_Entry ***************************************************/
+
+RME_Deadloop:
+				NOP
+ 8004008:	e320f000 	nop	{0}
+				NOP
+ 800400c:	e320f000 	nop	{0}
+				NOP
+ 8004010:	e320f000 	nop	{0}
+				MOV		R0,R1
+ 8004014:	e1a00001 	mov	r0, r1
+				PUSH	{R0}
+ 8004018:	e52d0004 	push	{r0}		@ (str r0, [sp, #-4]!)
+				B   .
+ 800401c:	eafffffe 	b	800401c <RME_Deadloop+0x14>
+
+08004020 <RME_Thd_Stub>:
 //Input       : R4 - The entry address.
 //              R5 - The stack address that we are using now.
 //Output      : None.
 //*****************************************************************************/
 RME_Thd_Stub:
                 BLX      R4                 // Branch to the actual entry address
- 8004008:	e12fff34 	blx	r4
+ 8004020:	e12fff34 	blx	r4
                 //B        RME_Thd_Finish     // Jump to exiting code, should never return.
                 B        .                  // Capture faults.
- 800400c:	eafffffe 	b	800400c <RME_Thd_Stub+0x4>
+ 8004024:	eafffffe 	b	8004024 <RME_Thd_Stub+0x4>
 
-08004010 <RME_Inv_Stub>:
+08004028 <RME_Inv_Stub>:
 //Input       : R4 - The entry address.
 //              R5 - The stack address that we are using now.
 //Output      : None.
 //*****************************************************************************/
 RME_Inv_Stub:
                 BLX      R4                 // Branch to the actual entry address
- 8004010:	e12fff34 	blx	r4
+ 8004028:	e12fff34 	blx	r4
                 //BX       RME_Inv_Finish     // Jump to exiting code, should never return.
                 B        .                  // Capture faults.
- 8004014:	eafffffe 	b	8004014 <RME_Inv_Stub+0x4>
+ 800402c:	eafffffe 	b	800402c <RME_Inv_Stub+0x4>
 
-08004018 <RME_Svc>:
-//              R6 - Argument 2.
-//              R7 - Argument 3.
+08004030 <RME_Svc>:
 //Output      : None.
 //*****************************************************************************/
 RME_Svc:
-                PUSH       {R4-R7}  // Manual clobbering
- 8004018:	e92d00f0 	push	{r4, r5, r6, r7}
-                MOV        R4,R0    // Manually pass the parameters according to ARM calling convention
- 800401c:	e1a04000 	mov	r4, r0
-                MOV        R5,R1
- 8004020:	e1a05001 	mov	r5, r1
-                MOV        R6,R2
- 8004024:	e1a06002 	mov	r6, r2
-                MOV        R7,R3
- 8004028:	e1a07003 	mov	r7, r3
+                // Manually pass the parameters according to ARM calling convention
+                //a7a put parameters in r0-r3,so we do nothing
                 SVC        #0x00   
- 800402c:	ef000000 	svc	0x00000000
-                MOV        R0,R4    // This is the return value
- 8004030:	e1a00004 	mov	r0, r4
-                POP        {R4-R7}  // Manual recovering
- 8004034:	e8bd00f0 	pop	{r4, r5, r6, r7}
+ 8004030:	ef000000 	svc	0x00000000
                 BX         LR
- 8004038:	e12fff1e 	bx	lr
+ 8004034:	e12fff1e 	bx	lr
                 B          .        // Shouldn't reach here.
- 800403c:	eafffffe 	b	800403c <RME_Svc+0x24>
+ 8004038:	eafffffe 	b	8004038 <RME_Svc+0x8>
 
-08004040 <RME_Inv>:
+0800403c <RME_Inv>:
 //              R6 - The first argument for the invocation.
 //              R7 - Argument 3.
 //Output      : None.
 //*****************************************************************************/
 RME_Inv:
                 PUSH       {R4-R7}  // Manual clobbering
- 8004040:	e92d00f0 	push	{r4, r5, r6, r7}
+ 800403c:	e92d00f0 	push	{r4, r5, r6, r7}
                 MOV        R4,R0    // Manually pass the parameters according to ARM calling convention
- 8004044:	e1a04000 	mov	r4, r0
+ 8004040:	e1a04000 	mov	r4, r0
                 MOV        R5,R1
- 8004048:	e1a05001 	mov	r5, r1
+ 8004044:	e1a05001 	mov	r5, r1
                 MOV        R6,R2
- 800404c:	e1a06002 	mov	r6, r2
+ 8004048:	e1a06002 	mov	r6, r2
                 MOV        R7,R3
- 8004050:	e1a07003 	mov	r7, r3
+ 800404c:	e1a07003 	mov	r7, r3
                 SVC        #0x00   
- 8004054:	ef000000 	svc	0x00000000
+ 8004050:	ef000000 	svc	0x00000000
                 MOV        R0,R4    // This is the return value
- 8004058:	e1a00004 	mov	r0, r4
+ 8004054:	e1a00004 	mov	r0, r4
                 POP        {R4-R7}  // Manual recovering
- 800405c:	e8bd00f0 	pop	{r4, r5, r6, r7}
+ 8004058:	e8bd00f0 	pop	{r4, r5, r6, r7}
                 BX         LR
- 8004060:	e12fff1e 	bx	lr
+ 800405c:	e12fff1e 	bx	lr
                 B          .        // Shouldn't reach here.
- 8004064:	eafffffe 	b	8004064 <RME_Inv+0x24>
+ 8004060:	eafffffe 	b	8004060 <RME_Inv+0x24>
 
-08004068 <__user_setup_stackheap>:
+08004064 <__user_setup_stackheap>:
 //Description : We place the function here to shut the SEMIHOSTING up.
 //Input       : None.
 //Output      : None.
 //*****************************************************************************/
 __user_setup_stackheap:
                 MOV      R0,R1     // Stack as where we came in, and definitely no heap
- 8004068:	e1a00001 	mov	r0, r1
+ 8004064:	e1a00001 	mov	r0, r1
                 MOV      R2,R1
- 800406c:	e1a02001 	mov	r2, r1
+ 8004068:	e1a02001 	mov	r2, r1
                 BX       LR
- 8004070:	e12fff1e 	bx	lr
+ 800406c:	e12fff1e 	bx	lr
                 B        .         // Capture faults
- 8004074:	eafffffe 	b	8004074 <__user_setup_stackheap+0xc>
+ 8004070:	eafffffe 	b	8004070 <__user_setup_stackheap+0xc>
                  LDR     R0, =RME_Benchmark
- 8004078:	0800427c 	.word	0x0800427c
+ 8004074:	0800458c 	.word	0x0800458c
 
-0800407c <_RME_Tsc_Init>:
+08004078 <__USR_Putchar>:
+Input       : char Char - The character to print.
+Output      : None.
+Return      : rme_ptr_t - Always 0.
+******************************************************************************/
+ptr_t __USR_Putchar(char Char)
+{
+ 8004078:	e52db004 	push	{fp}		@ (str fp, [sp, #-4]!)
+ 800407c:	e28db000 	add	fp, sp, #0
+ 8004080:	e24dd00c 	sub	sp, sp, #12
+ 8004084:	e1a03000 	mov	r3, r0
+ 8004088:	e54b3005 	strb	r3, [fp, #-5]
+    RME_A7A_PUTCHAR(Char);
+ 800408c:	e301302c 	movw	r3, #4140	@ 0x102c
+ 8004090:	e34e3000 	movt	r3, #57344	@ 0xe000
+ 8004094:	e5933000 	ldr	r3, [r3]
+ 8004098:	e2033008 	and	r3, r3, #8
+ 800409c:	e3530000 	cmp	r3, #0
+ 80040a0:	0afffff9 	beq	800408c <__USR_Putchar+0x14>
+ 80040a4:	e3013030 	movw	r3, #4144	@ 0x1030
+ 80040a8:	e34e3000 	movt	r3, #57344	@ 0xe000
+ 80040ac:	e15b20d5 	ldrsb	r2, [fp, #-5]
+ 80040b0:	e5832000 	str	r2, [r3]
+    return 0;
+ 80040b4:	e3a03000 	mov	r3, #0
+}
+ 80040b8:	e1a00003 	mov	r0, r3
+ 80040bc:	e28bd000 	add	sp, fp, #0
+ 80040c0:	e49db004 	pop	{fp}		@ (ldr fp, [sp], #4)
+ 80040c4:	e12fff1e 	bx	lr
+
+080040c8 <USR_DBG_I>:
+Input       : rme_cnt_t Int - The integer to print.
+Output      : None.
+Return      : rme_cnt_t - The length of the string printed.
+******************************************************************************/
+cnt_t USR_DBG_I(cnt_t Int)
+{
+ 80040c8:	e92d4800 	push	{fp, lr}
+ 80040cc:	e28db004 	add	fp, sp, #4
+ 80040d0:	e24dd020 	sub	sp, sp, #32
+ 80040d4:	e50b0020 	str	r0, [fp, #-32]	@ 0xffffffe0
+    cnt_t Iter;
+    cnt_t Count;
+    cnt_t Div;
+
+    /* Exit on zero */
+    if(Int==0)
+ 80040d8:	e51b3020 	ldr	r3, [fp, #-32]	@ 0xffffffe0
+ 80040dc:	e3530000 	cmp	r3, #0
+ 80040e0:	1a000003 	bne	80040f4 <USR_DBG_I+0x2c>
+    {
+
+
+        __USR_Putchar('0');
+ 80040e4:	e3a00030 	mov	r0, #48	@ 0x30
+ 80040e8:	ebffffe2 	bl	8004078 <__USR_Putchar>
+        return 1;
+ 80040ec:	e3a03001 	mov	r3, #1
+ 80040f0:	ea000050 	b	8004238 <USR_DBG_I+0x170>
+        /* No action required */
+    }
+
+
+    /* Correct all negatives into positives */
+    if(Int<0)
+ 80040f4:	e51b3020 	ldr	r3, [fp, #-32]	@ 0xffffffe0
+ 80040f8:	e3530000 	cmp	r3, #0
+ 80040fc:	aa000007 	bge	8004120 <USR_DBG_I+0x58>
+    {
+
+
+        __USR_Putchar('-');
+ 8004100:	e3a0002d 	mov	r0, #45	@ 0x2d
+ 8004104:	ebffffdb 	bl	8004078 <__USR_Putchar>
+        Abs=-Int;
+ 8004108:	e51b3020 	ldr	r3, [fp, #-32]	@ 0xffffffe0
+ 800410c:	e2633000 	rsb	r3, r3, #0
+ 8004110:	e50b300c 	str	r3, [fp, #-12]
+        Num=1;
+ 8004114:	e3a03001 	mov	r3, #1
+ 8004118:	e50b3008 	str	r3, [fp, #-8]
+ 800411c:	ea000003 	b	8004130 <USR_DBG_I+0x68>
+    }
+    else
+    {
+
+
+        Abs=Int;
+ 8004120:	e51b3020 	ldr	r3, [fp, #-32]	@ 0xffffffe0
+ 8004124:	e50b300c 	str	r3, [fp, #-12]
+        Num=0;
+ 8004128:	e3a03000 	mov	r3, #0
+ 800412c:	e50b3008 	str	r3, [fp, #-8]
+    }
+
+    /* How many digits are there? */
+    Count=0;
+ 8004130:	e3a03000 	mov	r3, #0
+ 8004134:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+    Div=1;
+ 8004138:	e3a03001 	mov	r3, #1
+ 800413c:	e50b3018 	str	r3, [fp, #-24]	@ 0xffffffe8
+    Iter=Abs;
+ 8004140:	e51b300c 	ldr	r3, [fp, #-12]
+ 8004144:	e50b3010 	str	r3, [fp, #-16]
+    while(1U)
+    {
+        Iter/=10;
+ 8004148:	e51b2010 	ldr	r2, [fp, #-16]
+ 800414c:	e3063667 	movw	r3, #26215	@ 0x6667
+ 8004150:	e3463666 	movt	r3, #26214	@ 0x6666
+ 8004154:	e0c31293 	smull	r1, r3, r3, r2
+ 8004158:	e1a01143 	asr	r1, r3, #2
+ 800415c:	e1a03fc2 	asr	r3, r2, #31
+ 8004160:	e0413003 	sub	r3, r1, r3
+ 8004164:	e50b3010 	str	r3, [fp, #-16]
+        Count++;
+ 8004168:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 800416c:	e2833001 	add	r3, r3, #1
+ 8004170:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+        if(Iter!=0)
+ 8004174:	e51b3010 	ldr	r3, [fp, #-16]
+ 8004178:	e3530000 	cmp	r3, #0
+ 800417c:	0a000006 	beq	800419c <USR_DBG_I+0xd4>
+        {
+
+
+            Div*=10;
+ 8004180:	e51b2018 	ldr	r2, [fp, #-24]	@ 0xffffffe8
+ 8004184:	e1a03002 	mov	r3, r2
+ 8004188:	e1a03103 	lsl	r3, r3, #2
+ 800418c:	e0833002 	add	r3, r3, r2
+ 8004190:	e1a03083 	lsl	r3, r3, #1
+ 8004194:	e50b3018 	str	r3, [fp, #-24]	@ 0xffffffe8
+        Iter/=10;
+ 8004198:	eaffffea 	b	8004148 <USR_DBG_I+0x80>
+        }
+        else
+        {
+
+
+            break;
+ 800419c:	e320f000 	nop	{0}
+        }
+    }
+    Num+=Count;
+ 80041a0:	e51b2008 	ldr	r2, [fp, #-8]
+ 80041a4:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 80041a8:	e0823003 	add	r3, r2, r3
+ 80041ac:	e50b3008 	str	r3, [fp, #-8]
+
+    /* Print the integer */
+    Iter=Abs;
+ 80041b0:	e51b300c 	ldr	r3, [fp, #-12]
+ 80041b4:	e50b3010 	str	r3, [fp, #-16]
+
+    while(Count>0)
+ 80041b8:	ea00001a 	b	8004228 <USR_DBG_I+0x160>
+    {
+        Count--;
+ 80041bc:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 80041c0:	e2433001 	sub	r3, r3, #1
+ 80041c4:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+        __USR_Putchar((s8)(Iter/Div)+'0');
+ 80041c8:	e51b1018 	ldr	r1, [fp, #-24]	@ 0xffffffe8
+ 80041cc:	e51b0010 	ldr	r0, [fp, #-16]
+ 80041d0:	fa0000f8 	blx	80045b8 <__divsi3>
+ 80041d4:	e1a03000 	mov	r3, r0
+ 80041d8:	e6ef3073 	uxtb	r3, r3
+ 80041dc:	e2833030 	add	r3, r3, #48	@ 0x30
+ 80041e0:	e6ef3073 	uxtb	r3, r3
+ 80041e4:	e6af3073 	sxtb	r3, r3
+ 80041e8:	e1a00003 	mov	r0, r3
+ 80041ec:	ebffffa1 	bl	8004078 <__USR_Putchar>
+        Iter=Iter%Div;
+ 80041f0:	e51b3010 	ldr	r3, [fp, #-16]
+ 80041f4:	e51b1018 	ldr	r1, [fp, #-24]	@ 0xffffffe8
+ 80041f8:	e1a00003 	mov	r0, r3
+ 80041fc:	fa000192 	blx	800484c <__aeabi_idivmod>
+ 8004200:	e1a03001 	mov	r3, r1
+ 8004204:	e50b3010 	str	r3, [fp, #-16]
+        Div/=10;
+ 8004208:	e51b2018 	ldr	r2, [fp, #-24]	@ 0xffffffe8
+ 800420c:	e3063667 	movw	r3, #26215	@ 0x6667
+ 8004210:	e3463666 	movt	r3, #26214	@ 0x6666
+ 8004214:	e0c31293 	smull	r1, r3, r3, r2
+ 8004218:	e1a01143 	asr	r1, r3, #2
+ 800421c:	e1a03fc2 	asr	r3, r2, #31
+ 8004220:	e0413003 	sub	r3, r1, r3
+ 8004224:	e50b3018 	str	r3, [fp, #-24]	@ 0xffffffe8
+    while(Count>0)
+ 8004228:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 800422c:	e3530000 	cmp	r3, #0
+ 8004230:	caffffe1 	bgt	80041bc <USR_DBG_I+0xf4>
+    }
+
+    return Num;
+ 8004234:	e51b3008 	ldr	r3, [fp, #-8]
+}
+ 8004238:	e1a00003 	mov	r0, r3
+ 800423c:	e24bd004 	sub	sp, fp, #4
+ 8004240:	e8bd8800 	pop	{fp, pc}
+
+08004244 <USR_DBG_H>:
+Input       : rme_ptr_t Uint - The unsigned integer to print.
+Output      : None.
+Return      : rme_cnt_t - The length of the string printed.
+******************************************************************************/
+cnt_t USR_DBG_H(ptr_t Uint)
+{
+ 8004244:	e92d4800 	push	{fp, lr}
+ 8004248:	e28db004 	add	fp, sp, #4
+ 800424c:	e24dd018 	sub	sp, sp, #24
+ 8004250:	e50b0018 	str	r0, [fp, #-24]	@ 0xffffffe8
+    ptr_t Iter;
+    ptr_t Count;
+    ptr_t Num;
+
+    /* Exit on zero */
+    if(Uint==0U)
+ 8004254:	e51b3018 	ldr	r3, [fp, #-24]	@ 0xffffffe8
+ 8004258:	e3530000 	cmp	r3, #0
+ 800425c:	1a000003 	bne	8004270 <USR_DBG_H+0x2c>
+    {
+        __USR_Putchar('0');
+ 8004260:	e3a00030 	mov	r0, #48	@ 0x30
+ 8004264:	ebffff83 	bl	8004078 <__USR_Putchar>
+        return 1;
+ 8004268:	e3a03001 	mov	r3, #1
+ 800426c:	ea000033 	b	8004340 <USR_DBG_H+0xfc>
+    {
+        /* No action required */
+    }
+
+    /* Filter out all the zeroes */
+    Count=0U;
+ 8004270:	e3a03000 	mov	r3, #0
+ 8004274:	e50b300c 	str	r3, [fp, #-12]
+    Iter=Uint;
+ 8004278:	e51b3018 	ldr	r3, [fp, #-24]	@ 0xffffffe8
+ 800427c:	e50b3008 	str	r3, [fp, #-8]
+    while((Iter>>(RME_WORD_BIT-4U))==0U)
+ 8004280:	ea000005 	b	800429c <USR_DBG_H+0x58>
+    {
+        Iter<<=4;
+ 8004284:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004288:	e1a03203 	lsl	r3, r3, #4
+ 800428c:	e50b3008 	str	r3, [fp, #-8]
+        Count++;
+ 8004290:	e51b300c 	ldr	r3, [fp, #-12]
+ 8004294:	e2833001 	add	r3, r3, #1
+ 8004298:	e50b300c 	str	r3, [fp, #-12]
+    while((Iter>>(RME_WORD_BIT-4U))==0U)
+ 800429c:	e51b3008 	ldr	r3, [fp, #-8]
+ 80042a0:	e1a03e23 	lsr	r3, r3, #28
+ 80042a4:	e3530000 	cmp	r3, #0
+ 80042a8:	0afffff5 	beq	8004284 <USR_DBG_H+0x40>
+    }
+
+    /* Count is the number of pts to print */
+    Count=RME_POW2(RME_WORD_ORDER-2U)-Count;
+ 80042ac:	e51b300c 	ldr	r3, [fp, #-12]
+ 80042b0:	e2633008 	rsb	r3, r3, #8
+ 80042b4:	e50b300c 	str	r3, [fp, #-12]
+    Num=Count;
+ 80042b8:	e51b300c 	ldr	r3, [fp, #-12]
+ 80042bc:	e50b3010 	str	r3, [fp, #-16]
+    while(Count>0U)
+ 80042c0:	ea00001a 	b	8004330 <USR_DBG_H+0xec>
+    {
+        Count--;
+ 80042c4:	e51b300c 	ldr	r3, [fp, #-12]
+ 80042c8:	e2433001 	sub	r3, r3, #1
+ 80042cc:	e50b300c 	str	r3, [fp, #-12]
+        Iter=(Uint>>(Count<<2U))&0x0FU;
+ 80042d0:	e51b300c 	ldr	r3, [fp, #-12]
+ 80042d4:	e1a03103 	lsl	r3, r3, #2
+ 80042d8:	e51b2018 	ldr	r2, [fp, #-24]	@ 0xffffffe8
+ 80042dc:	e1a03332 	lsr	r3, r2, r3
+ 80042e0:	e203300f 	and	r3, r3, #15
+ 80042e4:	e50b3008 	str	r3, [fp, #-8]
+        if(Iter<10U)
+ 80042e8:	e51b3008 	ldr	r3, [fp, #-8]
+ 80042ec:	e3530009 	cmp	r3, #9
+ 80042f0:	8a000007 	bhi	8004314 <USR_DBG_H+0xd0>
+        {
+
+            __USR_Putchar((s8)Iter+'0');
+ 80042f4:	e51b3008 	ldr	r3, [fp, #-8]
+ 80042f8:	e6ef3073 	uxtb	r3, r3
+ 80042fc:	e2833030 	add	r3, r3, #48	@ 0x30
+ 8004300:	e6ef3073 	uxtb	r3, r3
+ 8004304:	e6af3073 	sxtb	r3, r3
+ 8004308:	e1a00003 	mov	r0, r3
+ 800430c:	ebffff59 	bl	8004078 <__USR_Putchar>
+ 8004310:	ea000006 	b	8004330 <USR_DBG_H+0xec>
+        }
+        else
+        {
+
+            __USR_Putchar((s8)Iter+'A'-10);
+ 8004314:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004318:	e6ef3073 	uxtb	r3, r3
+ 800431c:	e2833037 	add	r3, r3, #55	@ 0x37
+ 8004320:	e6ef3073 	uxtb	r3, r3
+ 8004324:	e6af3073 	sxtb	r3, r3
+ 8004328:	e1a00003 	mov	r0, r3
+ 800432c:	ebffff51 	bl	8004078 <__USR_Putchar>
+    while(Count>0U)
+ 8004330:	e51b300c 	ldr	r3, [fp, #-12]
+ 8004334:	e3530000 	cmp	r3, #0
+ 8004338:	1affffe1 	bne	80042c4 <USR_DBG_H+0x80>
+        }
+    }
+
+    return (cnt_t)Num;
+ 800433c:	e51b3010 	ldr	r3, [fp, #-16]
+}
+ 8004340:	e1a00003 	mov	r0, r3
+ 8004344:	e24bd004 	sub	sp, fp, #4
+ 8004348:	e8bd8800 	pop	{fp, pc}
+
+0800434c <USR_DBG_S>:
+/* End Function:USR_DBG_H ************************************************/
+cnt_t USR_DBG_S(const s8* String)
+{
+ 800434c:	e92d4800 	push	{fp, lr}
+ 8004350:	e28db004 	add	fp, sp, #4
+ 8004354:	e24dd010 	sub	sp, sp, #16
+ 8004358:	e50b0010 	str	r0, [fp, #-16]
+    ptr_t Count;
+
+    for(Count=0U;Count<255;Count++)
+ 800435c:	e3a03000 	mov	r3, #0
+ 8004360:	e50b3008 	str	r3, [fp, #-8]
+ 8004364:	ea00000e 	b	80043a4 <USR_DBG_S+0x58>
+    {
+        if(String[Count]==(s8)'\0')
+ 8004368:	e51b2010 	ldr	r2, [fp, #-16]
+ 800436c:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004370:	e0823003 	add	r3, r2, r3
+ 8004374:	e1d330d0 	ldrsb	r3, [r3]
+ 8004378:	e3530000 	cmp	r3, #0
+ 800437c:	0a00000c 	beq	80043b4 <USR_DBG_S+0x68>
+        else
+        {
+            /* No action required */
+        }
+
+        __USR_Putchar(String[Count]);
+ 8004380:	e51b2010 	ldr	r2, [fp, #-16]
+ 8004384:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004388:	e0823003 	add	r3, r2, r3
+ 800438c:	e1d330d0 	ldrsb	r3, [r3]
+ 8004390:	e1a00003 	mov	r0, r3
+ 8004394:	ebffff37 	bl	8004078 <__USR_Putchar>
+    for(Count=0U;Count<255;Count++)
+ 8004398:	e51b3008 	ldr	r3, [fp, #-8]
+ 800439c:	e2833001 	add	r3, r3, #1
+ 80043a0:	e50b3008 	str	r3, [fp, #-8]
+ 80043a4:	e51b3008 	ldr	r3, [fp, #-8]
+ 80043a8:	e35300fe 	cmp	r3, #254	@ 0xfe
+ 80043ac:	9affffed 	bls	8004368 <USR_DBG_S+0x1c>
+ 80043b0:	ea000000 	b	80043b8 <USR_DBG_S+0x6c>
+            break;
+ 80043b4:	e320f000 	nop	{0}
+    }
+
+    return (cnt_t)Count;
+ 80043b8:	e51b3008 	ldr	r3, [fp, #-8]
+}
+ 80043bc:	e1a00003 	mov	r0, r3
+ 80043c0:	e24bd004 	sub	sp, fp, #4
+ 80043c4:	e8bd8800 	pop	{fp, pc}
+
+080043c8 <_RME_Tsc_Init>:
 Input       : None.
 Output      : None.
 Return      : None.
 ******************************************************************************/
 void _RME_Tsc_Init(void)
 {
- 800407c:	e52db004 	push	{fp}		@ (str fp, [sp, #-4]!)
- 8004080:	e28db000 	add	fp, sp, #0
+ 80043c8:	e52db004 	push	{fp}		@ (str fp, [sp, #-4]!)
+ 80043cc:	e28db000 	add	fp, sp, #0
 //    TIM2_Handle.Init.Period=(ptr_t)(-1);
 //    TIM2_Handle.Init.ClockDivision=TIM_CLOCKDIVISION_DIV1;
 //    HAL_TIM_Base_Init(&TIM2_Handle);
 //    __HAL_RCC_TIM2_CLK_ENABLE();
 //    __HAL_TIM_ENABLE(&TIM2_Handle);
 }
- 8004084:	e320f000 	nop	{0}
- 8004088:	e28bd000 	add	sp, fp, #0
- 800408c:	e49db004 	pop	{fp}		@ (ldr fp, [sp], #4)
- 8004090:	e12fff1e 	bx	lr
+ 80043d0:	e320f000 	nop	{0}
+ 80043d4:	e28bd000 	add	sp, fp, #0
+ 80043d8:	e49db004 	pop	{fp}		@ (ldr fp, [sp], #4)
+ 80043dc:	e12fff1e 	bx	lr
 
-08004094 <_RME_Stack_Init>:
-Input       : None.
-Output      : None.
-Return      : None.
-******************************************************************************/
-ptr_t _RME_Stack_Init(ptr_t Stack, ptr_t Stub, ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4)
-{
- 8004094:	e52db004 	push	{fp}		@ (str fp, [sp, #-4]!)
- 8004098:	e28db000 	add	fp, sp, #0
- 800409c:	e24dd01c 	sub	sp, sp, #28
- 80040a0:	e50b0010 	str	r0, [fp, #-16]
- 80040a4:	e50b1014 	str	r1, [fp, #-20]	@ 0xffffffec
- 80040a8:	e50b2018 	str	r2, [fp, #-24]	@ 0xffffffe8
- 80040ac:	e50b301c 	str	r3, [fp, #-28]	@ 0xffffffe4
-    struct RME_CMX_Ret_Stack* Stack_Ptr;
-    
-    Stack_Ptr=(struct RME_CMX_Ret_Stack*)(Stack-RME_STACK_SAFE_SIZE-sizeof(struct RME_CMX_Ret_Stack));
- 80040b0:	e51b3010 	ldr	r3, [fp, #-16]
- 80040b4:	e2433070 	sub	r3, r3, #112	@ 0x70
- 80040b8:	e50b3008 	str	r3, [fp, #-8]
-    Stack_Ptr->R0=Param1;
- 80040bc:	e51b3008 	ldr	r3, [fp, #-8]
- 80040c0:	e51b2018 	ldr	r2, [fp, #-24]	@ 0xffffffe8
- 80040c4:	e5832000 	str	r2, [r3]
-    Stack_Ptr->R1=Param2;
- 80040c8:	e51b3008 	ldr	r3, [fp, #-8]
- 80040cc:	e51b201c 	ldr	r2, [fp, #-28]	@ 0xffffffe4
- 80040d0:	e5832004 	str	r2, [r3, #4]
-    Stack_Ptr->R2=Param3;
- 80040d4:	e51b3008 	ldr	r3, [fp, #-8]
- 80040d8:	e59b2004 	ldr	r2, [fp, #4]
- 80040dc:	e5832008 	str	r2, [r3, #8]
-    Stack_Ptr->R3=Param4;
- 80040e0:	e51b3008 	ldr	r3, [fp, #-8]
- 80040e4:	e59b2008 	ldr	r2, [fp, #8]
- 80040e8:	e583200c 	str	r2, [r3, #12]
-    Stack_Ptr->R12=0;
- 80040ec:	e51b3008 	ldr	r3, [fp, #-8]
- 80040f0:	e3a02000 	mov	r2, #0
- 80040f4:	e5832010 	str	r2, [r3, #16]
-    Stack_Ptr->LR=0;
- 80040f8:	e51b3008 	ldr	r3, [fp, #-8]
- 80040fc:	e3a02000 	mov	r2, #0
- 8004100:	e5832014 	str	r2, [r3, #20]
-    Stack_Ptr->PC=Stub;
- 8004104:	e51b3008 	ldr	r3, [fp, #-8]
- 8004108:	e51b2014 	ldr	r2, [fp, #-20]	@ 0xffffffec
- 800410c:	e5832018 	str	r2, [r3, #24]
-    /* Initialize the xPSR to avoid a transition to ARM state */
-    Stack_Ptr->XPSR=0x01000200;
- 8004110:	e51b2008 	ldr	r2, [fp, #-8]
- 8004114:	e3a03c02 	mov	r3, #512	@ 0x200
- 8004118:	e3403100 	movt	r3, #256	@ 0x100
- 800411c:	e582301c 	str	r3, [r2, #28]
-    
-    return (ptr_t)Stack_Ptr;
- 8004120:	e51b3008 	ldr	r3, [fp, #-8]
-}
- 8004124:	e1a00003 	mov	r0, r3
- 8004128:	e28bd000 	add	sp, fp, #0
- 800412c:	e49db004 	pop	{fp}		@ (ldr fp, [sp], #4)
- 8004130:	e12fff1e 	bx	lr
-
-08004134 <RME_Same_Prc_Thd_Switch_Test_Thd>:
-Input       : None.
-Output      : None.
-Return      : None.
-******************************************************************************/
-void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4)
-{
- 8004134:	e92d4800 	push	{fp, lr}
- 8004138:	e28db004 	add	fp, sp, #4
- 800413c:	e24dd018 	sub	sp, sp, #24
- 8004140:	e50b0010 	str	r0, [fp, #-16]
- 8004144:	e50b1014 	str	r1, [fp, #-20]	@ 0xffffffec
- 8004148:	e50b2018 	str	r2, [fp, #-24]	@ 0xffffffe8
- 800414c:	e50b301c 	str	r3, [fp, #-28]	@ 0xffffffe4
-    ret_t Retval;
-    /* Now we switch back to the init thread, immediately */
-    while(1)
-    {
-        Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
- 8004150:	e3a03000 	mov	r3, #0
- 8004154:	e3a02000 	mov	r2, #0
- 8004158:	e3a01004 	mov	r1, #4
- 800415c:	e3a00809 	mov	r0, #589824	@ 0x90000
- 8004160:	ebffffac 	bl	8004018 <RME_Svc>
- 8004164:	e50b0008 	str	r0, [fp, #-8]
- 8004168:	eafffff8 	b	8004150 <RME_Same_Prc_Thd_Switch_Test_Thd+0x1c>
-
-0800416c <RME_Same_Prc_Thd_Switch_Test>:
+080043e0 <RME_Same_Prc_Thd_Switch_Test>:
 Input       : None.
 Output      : None.
 Return      : None.
 ******************************************************************************/
 void RME_Same_Prc_Thd_Switch_Test(void)
 {
- 800416c:	e92d4800 	push	{fp, lr}
- 8004170:	e28db004 	add	fp, sp, #4
- 8004174:	e24dd018 	sub	sp, sp, #24
+ 80043e0:	e92d4800 	push	{fp, lr}
+ 80043e4:	e28db004 	add	fp, sp, #4
+ 80043e8:	e24dd010 	sub	sp, sp, #16
     ret_t Retval;
     cnt_t Count;
     ptr_t Stack_Addr;
     ptr_t Temp;
     /* Initialize the thread's stack before entering it */
-    Stack_Addr=_RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
- 8004178:	e59f00f8 	ldr	r0, [pc, #248]	@ 8004278 <RME_Same_Prc_Thd_Switch_Test+0x10c>
- 800417c:	e3041008 	movw	r1, #16392	@ 0x4008
- 8004180:	e3401800 	movt	r1, #2048	@ 0x800
- 8004184:	e3a03004 	mov	r3, #4
- 8004188:	e58d3004 	str	r3, [sp, #4]
- 800418c:	e3a03003 	mov	r3, #3
- 8004190:	e58d3000 	str	r3, [sp]
- 8004194:	e3a03002 	mov	r3, #2
- 8004198:	e3a02001 	mov	r2, #1
- 800419c:	ebffffbc 	bl	8004094 <_RME_Stack_Init>
- 80041a0:	e50b000c 	str	r0, [fp, #-12]
+    Stack_Addr=(ptr_t)&RME_Stack[2000];/* _RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
+ 80043ec:	e59f3190 	ldr	r3, [pc, #400]	@ 8004584 <RME_Same_Prc_Thd_Switch_Test+0x1a4>
+ 80043f0:	e50b300c 	str	r3, [fp, #-12]
                                (ptr_t)RME_Thd_Stub,
-                               1, 2, 3, 4);
+                               1, 2, 3, 4); */
+
+    USR_DBG_S("\r\n(ptr_t)(&RME_Stack[2047])= ");
+ 80043f4:	e3040888 	movw	r0, #18568	@ 0x4888
+ 80043f8:	e3400800 	movt	r0, #2048	@ 0x800
+ 80043fc:	ebffffd2 	bl	800434c <USR_DBG_S>
+    USR_DBG_H((ptr_t)(&RME_Stack[2047]));
+ 8004400:	e59f3180 	ldr	r3, [pc, #384]	@ 8004588 <RME_Same_Prc_Thd_Switch_Test+0x1a8>
+ 8004404:	e1a00003 	mov	r0, r3
+ 8004408:	ebffff8d 	bl	8004244 <USR_DBG_H>
+    USR_DBG_S("\r\nInitialize the thread's stack Stack_Addr= ");
+ 800440c:	e30408a8 	movw	r0, #18600	@ 0x48a8
+ 8004410:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004414:	ebffffcc 	bl	800434c <USR_DBG_S>
+    USR_DBG_H(Stack_Addr);
+ 8004418:	e51b000c 	ldr	r0, [fp, #-12]
+ 800441c:	ebffff88 	bl	8004244 <USR_DBG_H>
+
     /* There are still many bugs in the kernel. Need a white-box test to guarantee
      * that it is free of bugs. Find a scheme to do that */
     Retval=RME_CAP_OP(RME_SVC_THD_CRT,RME_BOOT_INIT_CPT,
- 80041a4:	e3a03a05 	mov	r3, #20480	@ 0x5000
- 80041a8:	e3413000 	movt	r3, #4096	@ 0x1000
- 80041ac:	e3a0201f 	mov	r2, #31
- 80041b0:	e3402003 	movt	r2, #3
- 80041b4:	e3a01008 	mov	r1, #8
- 80041b8:	e3401006 	movt	r1, #6
- 80041bc:	e3a00819 	mov	r0, #1638400	@ 0x190000
- 80041c0:	ebffff94 	bl	8004018 <RME_Svc>
- 80041c4:	e50b0010 	str	r0, [fp, #-16]
+ 8004420:	e3a03a09 	mov	r3, #36864	@ 0x9000
+ 8004424:	e3a0201f 	mov	r2, #31
+ 8004428:	e3402002 	movt	r2, #2
+ 800442c:	e3a01008 	mov	r1, #8
+ 8004430:	e3401005 	movt	r1, #5
+ 8004434:	e3a00819 	mov	r0, #1638400	@ 0x190000
+ 8004438:	ebfffefc 	bl	8004030 <RME_Svc>
+ 800443c:	e50b0010 	str	r0, [fp, #-16]
                       RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_D0(RME_BOOT_BENCH_THD),
                       RME_PARAM_D1(RME_BOOT_INIT_PRC)|RME_PARAM_D0(31),
                       RME_BOOT_BENCH_KOM_FRONTIER);
-    
+    USR_DBG_S("\r\ncreate a thread      retval= ");
+ 8004440:	e30408d8 	movw	r0, #18648	@ 0x48d8
+ 8004444:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004448:	ebffffbf 	bl	800434c <USR_DBG_S>
+    USR_DBG_I(Retval);
+ 800444c:	e51b0010 	ldr	r0, [fp, #-16]
+ 8004450:	ebffff1c 	bl	80040c8 <USR_DBG_I>
+
     /* Bind the thread to the processor */
-    Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,0,
- 80041c8:	e3a03000 	mov	r3, #0
- 80041cc:	e3a02004 	mov	r2, #4
- 80041d0:	e3a01008 	mov	r1, #8
- 80041d4:	e3a0081b 	mov	r0, #1769472	@ 0x1b0000
- 80041d8:	ebffff8e 	bl	8004018 <RME_Svc>
- 80041dc:	e50b0010 	str	r0, [fp, #-16]
-                      RME_BOOT_BENCH_THD,
-                      RME_BOOT_INIT_THD,
-                      0);
-    
+    Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,RME_BOOT_BENCH_THD,
+ 8004454:	e3a03000 	mov	r3, #0
+ 8004458:	e3a02002 	mov	r2, #2
+ 800445c:	e3402002 	movt	r2, #2
+ 8004460:	e3a0190e 	mov	r1, #229376	@ 0x38000
+ 8004464:	e3a00008 	mov	r0, #8
+ 8004468:	e340001b 	movt	r0, #27
+ 800446c:	ebfffeef 	bl	8004030 <RME_Svc>
+ 8004470:	e50b0010 	str	r0, [fp, #-16]
+    		          RME_PARAM_D1(RME_BOOT_INIT_THD)|RME_PARAM_D0(RME_CID_NULL),
+					  RME_PARAM_D1(RME_TID_2)|RME_PARAM_D0(RME_BOOT_INIT_PRC),
+					  RME_BOOT_HYPER_KOM_VADDR);
+    USR_DBG_S("\r\nBind the thread to the processor retval= ");
+ 8004474:	e30408f8 	movw	r0, #18680	@ 0x48f8
+ 8004478:	e3400800 	movt	r0, #2048	@ 0x800
+ 800447c:	ebffffb2 	bl	800434c <USR_DBG_S>
+    USR_DBG_I(Retval);
+ 8004480:	e51b0010 	ldr	r0, [fp, #-16]
+ 8004484:	ebffff0f 	bl	80040c8 <USR_DBG_I>
+    extern void RME_Deadloop(void);
     /* Set the execution information */
-    Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,0,
- 80041e0:	e3042134 	movw	r2, #16692	@ 0x4134
- 80041e4:	e3402800 	movt	r2, #2048	@ 0x800
- 80041e8:	e51b300c 	ldr	r3, [fp, #-12]
- 80041ec:	e3a01008 	mov	r1, #8
- 80041f0:	e3a00806 	mov	r0, #393216	@ 0x60000
- 80041f4:	ebffff87 	bl	8004018 <RME_Svc>
- 80041f8:	e50b0010 	str	r0, [fp, #-16]
-                      RME_BOOT_BENCH_THD,
-                      (ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
-                      Stack_Addr);
-                      
+    Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,RME_BOOT_BENCH_THD,
+ 8004488:	e3041008 	movw	r1, #16392	@ 0x4008
+ 800448c:	e3401800 	movt	r1, #2048	@ 0x800
+ 8004490:	e3a03002 	mov	r3, #2
+ 8004494:	e51b200c 	ldr	r2, [fp, #-12]
+ 8004498:	e3a00008 	mov	r0, #8
+ 800449c:	e3400006 	movt	r0, #6
+ 80044a0:	ebfffee2 	bl	8004030 <RME_Svc>
+ 80044a4:	e50b0010 	str	r0, [fp, #-16]
+    		         (ptr_t)RME_Deadloop,//RME_Same_Prc_Thd_Switch_Test_Thd,
+					 Stack_Addr,RME_TID_2);
+    RME_Stack[2000]=1234;
+ 80044a8:	e3053000 	movw	r3, #20480	@ 0x5000
+ 80044ac:	e3403800 	movt	r3, #2048	@ 0x800
+ 80044b0:	e2833a01 	add	r3, r3, #4096	@ 0x1000
+ 80044b4:	e1a02003 	mov	r2, r3
+ 80044b8:	e30034d2 	movw	r3, #1234	@ 0x4d2
+ 80044bc:	e5823f40 	str	r3, [r2, #3904]	@ 0xf40
+    USR_DBG_S("\r\nSet the execution information retval= ");
+ 80044c0:	e3040924 	movw	r0, #18724	@ 0x4924
+ 80044c4:	e3400800 	movt	r0, #2048	@ 0x800
+ 80044c8:	ebffff9f 	bl	800434c <USR_DBG_S>
+    USR_DBG_I(Retval);
+ 80044cc:	e51b0010 	ldr	r0, [fp, #-16]
+ 80044d0:	ebfffefc 	bl	80040c8 <USR_DBG_I>
+    USR_DBG_S("\r\n");
+ 80044d4:	e3040950 	movw	r0, #18768	@ 0x4950
+ 80044d8:	e3400800 	movt	r0, #2048	@ 0x800
+ 80044dc:	ebffff9a 	bl	800434c <USR_DBG_S>
     /* Delegate some timeslice to it */
-    Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,0,
- 80041fc:	e3093680 	movw	r3, #38528	@ 0x9680
- 8004200:	e3403098 	movt	r3, #152	@ 0x98
- 8004204:	e3a02004 	mov	r2, #4
- 8004208:	e3a01008 	mov	r1, #8
- 800420c:	e3a00702 	mov	r0, #524288	@ 0x80000
- 8004210:	ebffff80 	bl	8004018 <RME_Svc>
- 8004214:	e50b0010 	str	r0, [fp, #-16]
+    Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,RME_BOOT_BENCH_THD,
+ 80044e0:	e3093680 	movw	r3, #38528	@ 0x9680
+ 80044e4:	e3403098 	movt	r3, #152	@ 0x98
+ 80044e8:	e3a02003 	mov	r2, #3
+ 80044ec:	e3a01008 	mov	r1, #8
+ 80044f0:	e3a00008 	mov	r0, #8
+ 80044f4:	e3400008 	movt	r0, #8
+ 80044f8:	ebfffecc 	bl	8004030 <RME_Svc>
+ 80044fc:	e50b0010 	str	r0, [fp, #-16]
                       RME_BOOT_BENCH_THD,
                       RME_BOOT_INIT_THD,
                       10000000);
     
     /* Try to switch to that thread - should fail */
     Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
- 8004218:	e3a03000 	mov	r3, #0
- 800421c:	e3a02000 	mov	r2, #0
- 8004220:	e3a01008 	mov	r1, #8
- 8004224:	e3a00809 	mov	r0, #589824	@ 0x90000
- 8004228:	ebffff7a 	bl	8004018 <RME_Svc>
- 800422c:	e50b0010 	str	r0, [fp, #-16]
+ 8004500:	e3a03000 	mov	r3, #0
+ 8004504:	e3a02000 	mov	r2, #0
+ 8004508:	e3a01008 	mov	r1, #8
+ 800450c:	e3a00809 	mov	r0, #589824	@ 0x90000
+ 8004510:	ebfffec6 	bl	8004030 <RME_Svc>
+ 8004514:	e50b0010 	str	r0, [fp, #-16]
+                      RME_BOOT_BENCH_THD,
+                      0,
+                      0);
+    USR_DBG_S("\r\nTry to switch to that thread - should fail  retval= ");
+ 8004518:	e3040954 	movw	r0, #18772	@ 0x4954
+ 800451c:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004520:	ebffff89 	bl	800434c <USR_DBG_S>
+    USR_DBG_I(Retval);
+ 8004524:	e51b0010 	ldr	r0, [fp, #-16]
+ 8004528:	ebfffee6 	bl	80040c8 <USR_DBG_I>
     * Performance cannot be further optimized anymore without compiler intrinsics.
     * Something terribly wrong with systick. 38 second wrapwround
     * This configuration, CPU works at 216MHz, correct, but the 
     * The TSC is always 8 cycles between reads.
     */
     _RME_Tsc_Init();
- 8004230:	ebffff91 	bl	800407c <_RME_Tsc_Init>
-    for(Count=0;Count<10000;Count++)
- 8004234:	e3a03000 	mov	r3, #0
- 8004238:	e50b3008 	str	r3, [fp, #-8]
- 800423c:	ea000008 	b	8004264 <RME_Same_Prc_Thd_Switch_Test+0xf8>
+ 800452c:	ebffffa5 	bl	80043c8 <_RME_Tsc_Init>
+    //for(Count=0;Count<10000;Count++)
+    for(Count=0;Count<10;Count++)
+ 8004530:	e3a03000 	mov	r3, #0
+ 8004534:	e50b3008 	str	r3, [fp, #-8]
+ 8004538:	ea00000d 	b	8004574 <RME_Same_Prc_Thd_Switch_Test+0x194>
     {
         //Temp=RME_TSC();
         Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
- 8004240:	e3a03000 	mov	r3, #0
- 8004244:	e3a02000 	mov	r2, #0
- 8004248:	e3a01008 	mov	r1, #8
- 800424c:	e3a00809 	mov	r0, #589824	@ 0x90000
- 8004250:	ebffff70 	bl	8004018 <RME_Svc>
- 8004254:	e50b0010 	str	r0, [fp, #-16]
-    for(Count=0;Count<10000;Count++)
- 8004258:	e51b3008 	ldr	r3, [fp, #-8]
- 800425c:	e2833001 	add	r3, r3, #1
- 8004260:	e50b3008 	str	r3, [fp, #-8]
- 8004264:	e51b3008 	ldr	r3, [fp, #-8]
- 8004268:	e302270f 	movw	r2, #9999	@ 0x270f
- 800426c:	e1530002 	cmp	r3, r2
- 8004270:	dafffff2 	ble	8004240 <RME_Same_Prc_Thd_Switch_Test+0xd4>
+ 800453c:	e3a03000 	mov	r3, #0
+ 8004540:	e3a02000 	mov	r2, #0
+ 8004544:	e3a01008 	mov	r1, #8
+ 8004548:	e3a00809 	mov	r0, #589824	@ 0x90000
+ 800454c:	ebfffeb7 	bl	8004030 <RME_Svc>
+ 8004550:	e50b0010 	str	r0, [fp, #-16]
+                          RME_BOOT_BENCH_THD,
+                          0,
                           0);
         //Temp=RME_TSC()-Temp;
        // Time[Count]=Temp-8;
+        USR_DBG_S("\r\nTry to switch to that thread  retval= ");
+ 8004554:	e304098c 	movw	r0, #18828	@ 0x498c
+ 8004558:	e3400800 	movt	r0, #2048	@ 0x800
+ 800455c:	ebffff7a 	bl	800434c <USR_DBG_S>
+        USR_DBG_I(Retval);
+ 8004560:	e51b0010 	ldr	r0, [fp, #-16]
+ 8004564:	ebfffed7 	bl	80040c8 <USR_DBG_I>
+    for(Count=0;Count<10;Count++)
+ 8004568:	e51b3008 	ldr	r3, [fp, #-8]
+ 800456c:	e2833001 	add	r3, r3, #1
+ 8004570:	e50b3008 	str	r3, [fp, #-8]
+ 8004574:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004578:	e3530009 	cmp	r3, #9
+ 800457c:	daffffee 	ble	800453c <RME_Same_Prc_Thd_Switch_Test+0x15c>
     }
     
     while(1);
- 8004274:	eafffffe 	b	8004274 <RME_Same_Prc_Thd_Switch_Test+0x108>
- 8004278:	08006ffc 	.word	0x08006ffc
+ 8004580:	eafffffe 	b	8004580 <RME_Same_Prc_Thd_Switch_Test+0x1a0>
+ 8004584:	08006f40 	.word	0x08006f40
+ 8004588:	08006ffc 	.word	0x08006ffc
 
-0800427c <RME_Benchmark>:
+0800458c <RME_Benchmark>:
 Input       : None.
 Output      : None.
 Return      : None.
 ******************************************************************************/
 void RME_Benchmark(void)
 {
- 800427c:	e92d4800 	push	{fp, lr}
- 8004280:	e28db004 	add	fp, sp, #4
+ 800458c:	e92d4800 	push	{fp, lr}
+ 8004590:	e28db004 	add	fp, sp, #4
+    USR_DBG_S("\r\nbegin test ");
+ 8004594:	e30409b8 	movw	r0, #18872	@ 0x49b8
+ 8004598:	e3400800 	movt	r0, #2048	@ 0x800
+ 800459c:	ebffff6a 	bl	800434c <USR_DBG_S>
+    USR_DBG_H(0x111111);
+ 80045a0:	e3010111 	movw	r0, #4369	@ 0x1111
+ 80045a4:	e3400011 	movt	r0, #17
+ 80045a8:	ebffff25 	bl	8004244 <USR_DBG_H>
     RME_Same_Prc_Thd_Switch_Test();
- 8004284:	ebffffb8 	bl	800416c <RME_Same_Prc_Thd_Switch_Test>
+ 80045ac:	ebffff8b 	bl	80043e0 <RME_Same_Prc_Thd_Switch_Test>
 }
- 8004288:	e320f000 	nop	{0}
- 800428c:	e8bd8800 	pop	{fp, pc}
+ 80045b0:	e320f000 	nop	{0}
+ 80045b4:	e8bd8800 	pop	{fp, pc}
+
+080045b8 <__divsi3>:
+ 80045b8:	2900      	cmp	r1, #0
+ 80045ba:	f000 813e 	beq.w	800483a <.divsi3_skip_div0_test+0x27c>
+
+080045be <.divsi3_skip_div0_test>:
+ 80045be:	ea80 0c01 	eor.w	ip, r0, r1
+ 80045c2:	bf48      	it	mi
+ 80045c4:	4249      	negmi	r1, r1
+ 80045c6:	1e4a      	subs	r2, r1, #1
+ 80045c8:	f000 811f 	beq.w	800480a <.divsi3_skip_div0_test+0x24c>
+ 80045cc:	0003      	movs	r3, r0
+ 80045ce:	bf48      	it	mi
+ 80045d0:	4243      	negmi	r3, r0
+ 80045d2:	428b      	cmp	r3, r1
+ 80045d4:	f240 811e 	bls.w	8004814 <.divsi3_skip_div0_test+0x256>
+ 80045d8:	4211      	tst	r1, r2
+ 80045da:	f000 8123 	beq.w	8004824 <.divsi3_skip_div0_test+0x266>
+ 80045de:	fab3 f283 	clz	r2, r3
+ 80045e2:	fab1 f081 	clz	r0, r1
+ 80045e6:	eba0 0202 	sub.w	r2, r0, r2
+ 80045ea:	f1c2 021f 	rsb	r2, r2, #31
+ 80045ee:	a004      	add	r0, pc, #16	@ (adr r0, 8004600 <.divsi3_skip_div0_test+0x42>)
+ 80045f0:	eb00 1202 	add.w	r2, r0, r2, lsl #4
+ 80045f4:	f04f 0000 	mov.w	r0, #0
+ 80045f8:	4697      	mov	pc, r2
+ 80045fa:	bf00      	nop
+ 80045fc:	f3af 8000 	nop.w
+ 8004600:	ebb3 7fc1 	cmp.w	r3, r1, lsl #31
+ 8004604:	bf00      	nop
+ 8004606:	eb40 0000 	adc.w	r0, r0, r0
+ 800460a:	bf28      	it	cs
+ 800460c:	eba3 73c1 	subcs.w	r3, r3, r1, lsl #31
+ 8004610:	ebb3 7f81 	cmp.w	r3, r1, lsl #30
+ 8004614:	bf00      	nop
+ 8004616:	eb40 0000 	adc.w	r0, r0, r0
+ 800461a:	bf28      	it	cs
+ 800461c:	eba3 7381 	subcs.w	r3, r3, r1, lsl #30
+ 8004620:	ebb3 7f41 	cmp.w	r3, r1, lsl #29
+ 8004624:	bf00      	nop
+ 8004626:	eb40 0000 	adc.w	r0, r0, r0
+ 800462a:	bf28      	it	cs
+ 800462c:	eba3 7341 	subcs.w	r3, r3, r1, lsl #29
+ 8004630:	ebb3 7f01 	cmp.w	r3, r1, lsl #28
+ 8004634:	bf00      	nop
+ 8004636:	eb40 0000 	adc.w	r0, r0, r0
+ 800463a:	bf28      	it	cs
+ 800463c:	eba3 7301 	subcs.w	r3, r3, r1, lsl #28
+ 8004640:	ebb3 6fc1 	cmp.w	r3, r1, lsl #27
+ 8004644:	bf00      	nop
+ 8004646:	eb40 0000 	adc.w	r0, r0, r0
+ 800464a:	bf28      	it	cs
+ 800464c:	eba3 63c1 	subcs.w	r3, r3, r1, lsl #27
+ 8004650:	ebb3 6f81 	cmp.w	r3, r1, lsl #26
+ 8004654:	bf00      	nop
+ 8004656:	eb40 0000 	adc.w	r0, r0, r0
+ 800465a:	bf28      	it	cs
+ 800465c:	eba3 6381 	subcs.w	r3, r3, r1, lsl #26
+ 8004660:	ebb3 6f41 	cmp.w	r3, r1, lsl #25
+ 8004664:	bf00      	nop
+ 8004666:	eb40 0000 	adc.w	r0, r0, r0
+ 800466a:	bf28      	it	cs
+ 800466c:	eba3 6341 	subcs.w	r3, r3, r1, lsl #25
+ 8004670:	ebb3 6f01 	cmp.w	r3, r1, lsl #24
+ 8004674:	bf00      	nop
+ 8004676:	eb40 0000 	adc.w	r0, r0, r0
+ 800467a:	bf28      	it	cs
+ 800467c:	eba3 6301 	subcs.w	r3, r3, r1, lsl #24
+ 8004680:	ebb3 5fc1 	cmp.w	r3, r1, lsl #23
+ 8004684:	bf00      	nop
+ 8004686:	eb40 0000 	adc.w	r0, r0, r0
+ 800468a:	bf28      	it	cs
+ 800468c:	eba3 53c1 	subcs.w	r3, r3, r1, lsl #23
+ 8004690:	ebb3 5f81 	cmp.w	r3, r1, lsl #22
+ 8004694:	bf00      	nop
+ 8004696:	eb40 0000 	adc.w	r0, r0, r0
+ 800469a:	bf28      	it	cs
+ 800469c:	eba3 5381 	subcs.w	r3, r3, r1, lsl #22
+ 80046a0:	ebb3 5f41 	cmp.w	r3, r1, lsl #21
+ 80046a4:	bf00      	nop
+ 80046a6:	eb40 0000 	adc.w	r0, r0, r0
+ 80046aa:	bf28      	it	cs
+ 80046ac:	eba3 5341 	subcs.w	r3, r3, r1, lsl #21
+ 80046b0:	ebb3 5f01 	cmp.w	r3, r1, lsl #20
+ 80046b4:	bf00      	nop
+ 80046b6:	eb40 0000 	adc.w	r0, r0, r0
+ 80046ba:	bf28      	it	cs
+ 80046bc:	eba3 5301 	subcs.w	r3, r3, r1, lsl #20
+ 80046c0:	ebb3 4fc1 	cmp.w	r3, r1, lsl #19
+ 80046c4:	bf00      	nop
+ 80046c6:	eb40 0000 	adc.w	r0, r0, r0
+ 80046ca:	bf28      	it	cs
+ 80046cc:	eba3 43c1 	subcs.w	r3, r3, r1, lsl #19
+ 80046d0:	ebb3 4f81 	cmp.w	r3, r1, lsl #18
+ 80046d4:	bf00      	nop
+ 80046d6:	eb40 0000 	adc.w	r0, r0, r0
+ 80046da:	bf28      	it	cs
+ 80046dc:	eba3 4381 	subcs.w	r3, r3, r1, lsl #18
+ 80046e0:	ebb3 4f41 	cmp.w	r3, r1, lsl #17
+ 80046e4:	bf00      	nop
+ 80046e6:	eb40 0000 	adc.w	r0, r0, r0
+ 80046ea:	bf28      	it	cs
+ 80046ec:	eba3 4341 	subcs.w	r3, r3, r1, lsl #17
+ 80046f0:	ebb3 4f01 	cmp.w	r3, r1, lsl #16
+ 80046f4:	bf00      	nop
+ 80046f6:	eb40 0000 	adc.w	r0, r0, r0
+ 80046fa:	bf28      	it	cs
+ 80046fc:	eba3 4301 	subcs.w	r3, r3, r1, lsl #16
+ 8004700:	ebb3 3fc1 	cmp.w	r3, r1, lsl #15
+ 8004704:	bf00      	nop
+ 8004706:	eb40 0000 	adc.w	r0, r0, r0
+ 800470a:	bf28      	it	cs
+ 800470c:	eba3 33c1 	subcs.w	r3, r3, r1, lsl #15
+ 8004710:	ebb3 3f81 	cmp.w	r3, r1, lsl #14
+ 8004714:	bf00      	nop
+ 8004716:	eb40 0000 	adc.w	r0, r0, r0
+ 800471a:	bf28      	it	cs
+ 800471c:	eba3 3381 	subcs.w	r3, r3, r1, lsl #14
+ 8004720:	ebb3 3f41 	cmp.w	r3, r1, lsl #13
+ 8004724:	bf00      	nop
+ 8004726:	eb40 0000 	adc.w	r0, r0, r0
+ 800472a:	bf28      	it	cs
+ 800472c:	eba3 3341 	subcs.w	r3, r3, r1, lsl #13
+ 8004730:	ebb3 3f01 	cmp.w	r3, r1, lsl #12
+ 8004734:	bf00      	nop
+ 8004736:	eb40 0000 	adc.w	r0, r0, r0
+ 800473a:	bf28      	it	cs
+ 800473c:	eba3 3301 	subcs.w	r3, r3, r1, lsl #12
+ 8004740:	ebb3 2fc1 	cmp.w	r3, r1, lsl #11
+ 8004744:	bf00      	nop
+ 8004746:	eb40 0000 	adc.w	r0, r0, r0
+ 800474a:	bf28      	it	cs
+ 800474c:	eba3 23c1 	subcs.w	r3, r3, r1, lsl #11
+ 8004750:	ebb3 2f81 	cmp.w	r3, r1, lsl #10
+ 8004754:	bf00      	nop
+ 8004756:	eb40 0000 	adc.w	r0, r0, r0
+ 800475a:	bf28      	it	cs
+ 800475c:	eba3 2381 	subcs.w	r3, r3, r1, lsl #10
+ 8004760:	ebb3 2f41 	cmp.w	r3, r1, lsl #9
+ 8004764:	bf00      	nop
+ 8004766:	eb40 0000 	adc.w	r0, r0, r0
+ 800476a:	bf28      	it	cs
+ 800476c:	eba3 2341 	subcs.w	r3, r3, r1, lsl #9
+ 8004770:	ebb3 2f01 	cmp.w	r3, r1, lsl #8
+ 8004774:	bf00      	nop
+ 8004776:	eb40 0000 	adc.w	r0, r0, r0
+ 800477a:	bf28      	it	cs
+ 800477c:	eba3 2301 	subcs.w	r3, r3, r1, lsl #8
+ 8004780:	ebb3 1fc1 	cmp.w	r3, r1, lsl #7
+ 8004784:	bf00      	nop
+ 8004786:	eb40 0000 	adc.w	r0, r0, r0
+ 800478a:	bf28      	it	cs
+ 800478c:	eba3 13c1 	subcs.w	r3, r3, r1, lsl #7
+ 8004790:	ebb3 1f81 	cmp.w	r3, r1, lsl #6
+ 8004794:	bf00      	nop
+ 8004796:	eb40 0000 	adc.w	r0, r0, r0
+ 800479a:	bf28      	it	cs
+ 800479c:	eba3 1381 	subcs.w	r3, r3, r1, lsl #6
+ 80047a0:	ebb3 1f41 	cmp.w	r3, r1, lsl #5
+ 80047a4:	bf00      	nop
+ 80047a6:	eb40 0000 	adc.w	r0, r0, r0
+ 80047aa:	bf28      	it	cs
+ 80047ac:	eba3 1341 	subcs.w	r3, r3, r1, lsl #5
+ 80047b0:	ebb3 1f01 	cmp.w	r3, r1, lsl #4
+ 80047b4:	bf00      	nop
+ 80047b6:	eb40 0000 	adc.w	r0, r0, r0
+ 80047ba:	bf28      	it	cs
+ 80047bc:	eba3 1301 	subcs.w	r3, r3, r1, lsl #4
+ 80047c0:	ebb3 0fc1 	cmp.w	r3, r1, lsl #3
+ 80047c4:	bf00      	nop
+ 80047c6:	eb40 0000 	adc.w	r0, r0, r0
+ 80047ca:	bf28      	it	cs
+ 80047cc:	eba3 03c1 	subcs.w	r3, r3, r1, lsl #3
+ 80047d0:	ebb3 0f81 	cmp.w	r3, r1, lsl #2
+ 80047d4:	bf00      	nop
+ 80047d6:	eb40 0000 	adc.w	r0, r0, r0
+ 80047da:	bf28      	it	cs
+ 80047dc:	eba3 0381 	subcs.w	r3, r3, r1, lsl #2
+ 80047e0:	ebb3 0f41 	cmp.w	r3, r1, lsl #1
+ 80047e4:	bf00      	nop
+ 80047e6:	eb40 0000 	adc.w	r0, r0, r0
+ 80047ea:	bf28      	it	cs
+ 80047ec:	eba3 0341 	subcs.w	r3, r3, r1, lsl #1
+ 80047f0:	ebb3 0f01 	cmp.w	r3, r1
+ 80047f4:	bf00      	nop
+ 80047f6:	eb40 0000 	adc.w	r0, r0, r0
+ 80047fa:	bf28      	it	cs
+ 80047fc:	eba3 0301 	subcs.w	r3, r3, r1
+ 8004800:	f1bc 0f00 	cmp.w	ip, #0
+ 8004804:	bf48      	it	mi
+ 8004806:	4240      	negmi	r0, r0
+ 8004808:	4770      	bx	lr
+ 800480a:	ea9c 0f00 	teq	ip, r0
+ 800480e:	bf48      	it	mi
+ 8004810:	4240      	negmi	r0, r0
+ 8004812:	4770      	bx	lr
+ 8004814:	bf38      	it	cc
+ 8004816:	2000      	movcc	r0, #0
+ 8004818:	bf04      	itt	eq
+ 800481a:	ea4f 70ec 	moveq.w	r0, ip, asr #31
+ 800481e:	f040 0001 	orreq.w	r0, r0, #1
+ 8004822:	4770      	bx	lr
+ 8004824:	fab1 f281 	clz	r2, r1
+ 8004828:	f1c2 021f 	rsb	r2, r2, #31
+ 800482c:	f1bc 0f00 	cmp.w	ip, #0
+ 8004830:	fa23 f002 	lsr.w	r0, r3, r2
+ 8004834:	bf48      	it	mi
+ 8004836:	4240      	negmi	r0, r0
+ 8004838:	4770      	bx	lr
+ 800483a:	2800      	cmp	r0, #0
+ 800483c:	bfc8      	it	gt
+ 800483e:	f06f 4000 	mvngt.w	r0, #2147483648	@ 0x80000000
+ 8004842:	bfb8      	it	lt
+ 8004844:	f04f 4000 	movlt.w	r0, #2147483648	@ 0x80000000
+ 8004848:	f000 b80e 	b.w	8004868 <__aeabi_idiv0>
+
+0800484c <__aeabi_idivmod>:
+ 800484c:	2900      	cmp	r1, #0
+ 800484e:	d0f4      	beq.n	800483a <.divsi3_skip_div0_test+0x27c>
+ 8004850:	e92d 4003 	stmdb	sp!, {r0, r1, lr}
+ 8004854:	f7ff feb3 	bl	80045be <.divsi3_skip_div0_test>
+ 8004858:	e8bd 4006 	ldmia.w	sp!, {r1, r2, lr}
+ 800485c:	fb02 f300 	mul.w	r3, r2, r0
+ 8004860:	eba1 0103 	sub.w	r1, r1, r3
+ 8004864:	4770      	bx	lr
+ 8004866:	bf00      	nop
+
+08004868 <__aeabi_idiv0>:
+ 8004868:	4770      	bx	lr
+ 800486a:	bf00      	nop

@@ -16,6 +16,7 @@
 ///* .global  *******************************************************************/
                 //User entry stub
                 .global           RME_Entry
+                .global           RME_Deadloop
                 //System call gate
                 .global           RME_Svc
                 //User level stub for thread creation
@@ -41,6 +42,14 @@ RME_Entry:
                  LDR     R0, =RME_Benchmark
                  BX      R0
 ///* End Function:RME_Entry ***************************************************/
+
+RME_Deadloop:
+				NOP
+				NOP
+				NOP
+				MOV		R0,R1
+				PUSH	{R0}
+				B   .
 
 ///* Function:RME_Thd_Stub *****************************************************
 //Description : The user level stub for thread creation.

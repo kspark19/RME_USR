@@ -35,6 +35,10 @@ SECTIONS
     *(.data .data.*)
     }
     
+    .bss : {
+    *(.bss .bss.*)
+    }
+    
     PROVIDE (edata = .);
 
     . = ALIGN(0x1000);

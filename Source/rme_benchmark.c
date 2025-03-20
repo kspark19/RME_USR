@@ -33,40 +33,18 @@ void _RME_Tsc_Init(void)
 }
 /* End Function:_RME_Tsc_Init ************************************************/
 
-/* Function:_RME_Stack_Init ***************************************************
-Description : The thread's stack initializer, initializes the thread's stack.
-Input       : None.
-Output      : None.
-Return      : None.
-******************************************************************************/
-ptr_t _RME_Stack_Init(ptr_t Stack, ptr_t Stub, ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4)
-{
-    struct RME_CMX_Ret_Stack* Stack_Ptr;
-    
-    Stack_Ptr=(struct RME_CMX_Ret_Stack*)(Stack-RME_STACK_SAFE_SIZE-sizeof(struct RME_CMX_Ret_Stack));
-    Stack_Ptr->R0=Param1;
-    Stack_Ptr->R1=Param2;
-    Stack_Ptr->R2=Param3;
-    Stack_Ptr->R3=Param4;
-    Stack_Ptr->R12=0;
-    Stack_Ptr->LR=0;
-    Stack_Ptr->PC=Stub;
-    /* Initialize the xPSR to avoid a transition to ARM state */
-    Stack_Ptr->XPSR=0x01000200;
-    
-    return (ptr_t)Stack_Ptr;
-}
-/* End Function:_RME_Stack_Init **********************************************/
-
 /* Function:RME_Same_Prc_Thd_Switch_Test_Thd *********************************
 Description : The thread for testing same-process thread switching performance.
 Input       : None.
 Output      : None.
 Return      : None.
 ******************************************************************************/
-void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4)
+void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1)
 {
     ret_t Retval;
+
+    USR_DBG_S("\r\n hello! this is thread ");
+    USR_DBG_I(Param1);
     /* Now we switch back to the init thread, immediately */
     while(1)
     {
@@ -92,12 +70,12 @@ void RME_Same_Prc_Thd_Switch_Test(void)
     ptr_t Stack_Addr;
     ptr_t Temp;
     /* Initialize the thread's stack before entering it */
-    Stack_Addr=_RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
+    Stack_Addr=(ptr_t)&RME_Stack[2000];/* _RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
                                (ptr_t)RME_Thd_Stub,
-                               1, 2, 3, 4);
+                               1, 2, 3, 4); */
 
     USR_DBG_S("\r\n(ptr_t)(&RME_Stack[2047])= ");
-        USR_DBG_H((ptr_t)(&RME_Stack[2047]));
+    USR_DBG_H((ptr_t)(&RME_Stack[2047]));
     USR_DBG_S("\r\nInitialize the thread's stack Stack_Addr= ");
     USR_DBG_H(Stack_Addr);
 
@@ -113,22 +91,22 @@ void RME_Same_Prc_Thd_Switch_Test(void)
     /* Bind the thread to the processor */
     Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,RME_BOOT_BENCH_THD,
     		          RME_PARAM_D1(RME_BOOT_INIT_THD)|RME_PARAM_D0(RME_CID_NULL),
-					  RME_PARAM_D1(11)|RME_PARAM_D0(RME_BOOT_INIT_PRC),
-                      0);
+					  RME_PARAM_D1(RME_TID_2)|RME_PARAM_D0(RME_BOOT_INIT_PRC),
+					  RME_BOOT_HYPER_KOM_VADDR);
     USR_DBG_S("\r\nBind the thread to the processor retval= ");
     USR_DBG_I(Retval);
-    
+    extern void RME_Deadloop(void);
     /* Set the execution information */
-    Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,0,
-                      RME_BOOT_BENCH_THD,
-                      (ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
-                      Stack_Addr);
-
+    Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,RME_BOOT_BENCH_THD,
+	         	 	 (ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
+    		         //(ptr_t)RME_Deadloop,
+					 Stack_Addr,RME_TID_2);
+    RME_Stack[2000]=1234;
     USR_DBG_S("\r\nSet the execution information retval= ");
     USR_DBG_I(Retval);
-
+    USR_DBG_S("\r\n");
     /* Delegate some timeslice to it */
-    Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,0,
+    Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,RME_BOOT_BENCH_THD,
                       RME_BOOT_BENCH_THD,
                       RME_BOOT_INIT_THD,
                       10000000);
@@ -170,6 +148,8 @@ void RME_Same_Prc_Thd_Switch_Test(void)
         USR_DBG_I(Retval);
     }
     
+    // test sig_snd/sig_rcv
+
     while(1);
 }
 /* End Function:RME_Same_Prc_Thd_Switch_Test ********************************/
