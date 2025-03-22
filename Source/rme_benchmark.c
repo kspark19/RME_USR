@@ -8,6 +8,7 @@ Description : The benchmark file for RME.
 
 /* Include *******************************************************************/
 #include"benchmark.h"
+
 /* Need to export error codes, and size of each object, in words! */
 /* End Include ***************************************************************/
 
@@ -48,10 +49,11 @@ void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1)
     /* Now we switch back to the init thread, immediately */
     while(1)
     {
-        Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+        /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
                           RME_BOOT_INIT_THD,
                           0,
-                          0);
+                          0);*/
+        Retval=RME_Thd_Swt(RME_BOOT_INIT_THD,0);
     }
 }
 /* End Function:RME_Same_Prc_Thd_Switch_Test_Thd ****************************/
@@ -81,41 +83,48 @@ void RME_Same_Prc_Thd_Switch_Test(void)
 
     /* There are still many bugs in the kernel. Need a white-box test to guarantee
      * that it is free of bugs. Find a scheme to do that */
-    Retval=RME_CAP_OP(RME_SVC_THD_CRT,RME_BOOT_INIT_CPT,
+    /*Retval=RME_CAP_OP(RME_SVC_THD_CRT,RME_BOOT_INIT_CPT,
                       RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_D0(RME_BOOT_BENCH_THD),
                       RME_PARAM_D1(RME_BOOT_INIT_PRC)|RME_PARAM_D0(31),
-                      RME_BOOT_BENCH_KOM_FRONTIER);
+                      RME_BOOT_BENCH_KOM_FRONTIER);*/
+    Retval=RME_Thd_Crt(RME_BOOT_INIT_CPT,RME_BOOT_INIT_KOM,RME_BOOT_BENCH_THD,
+                       RME_BOOT_INIT_PRC,RME_THD_PRIO_MAX,RME_BOOT_BENCH_KOM_FRONTIER,0);
     USR_DBG_S("\r\ncreate a thread      retval= ");
     USR_DBG_I(Retval);
 
     /* Bind the thread to the processor */
-    Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,RME_BOOT_BENCH_THD,
+    /*Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,RME_BOOT_BENCH_THD,
     		          RME_PARAM_D1(RME_BOOT_INIT_THD)|RME_PARAM_D0(RME_CID_NULL),
 					  RME_PARAM_D1(RME_TID_2)|RME_PARAM_D0(RME_BOOT_INIT_PRC),
-					  RME_BOOT_HYPER_KOM_VADDR);
+					  RME_BOOT_HYPER_KOM_VADDR);*/
+    Retval=RME_Thd_Sched_Bind(RME_BOOT_BENCH_THD,RME_BOOT_INIT_THD,RME_CID_NULL,
+                              RME_TID_2,RME_BOOT_INIT_PRC,RME_BOOT_HYPER_KOM_VADDR);
     USR_DBG_S("\r\nBind the thread to the processor retval= ");
     USR_DBG_I(Retval);
     extern void RME_Deadloop(void);
     /* Set the execution information */
-    Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,RME_BOOT_BENCH_THD,
+    /*Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,RME_BOOT_BENCH_THD,
 	         	 	 (ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
     		         //(ptr_t)RME_Deadloop,
-					 Stack_Addr,RME_TID_2);
-    RME_Stack[2000]=1234;
+					 Stack_Addr,RME_TID_2);*/
+    Retval=RME_Thd_Exec_Set(RME_BOOT_BENCH_THD,(ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,Stack_Addr,RME_TID_2);
+    //RME_Stack[2000]=1234;
     USR_DBG_S("\r\nSet the execution information retval= ");
     USR_DBG_I(Retval);
     USR_DBG_S("\r\n");
     /* Delegate some timeslice to it */
-    Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,RME_BOOT_BENCH_THD,
+    /*Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,RME_BOOT_BENCH_THD,
                       RME_BOOT_BENCH_THD,
                       RME_BOOT_INIT_THD,
-                      10000000);
+                      10000000);*/
+    Retval=RME_Thd_Time_Xfer(RME_BOOT_BENCH_THD,RME_BOOT_INIT_THD,RME_THD_INF_TIME);
     
     /* Try to switch to that thread - should fail */
-    Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+    /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
                       RME_BOOT_BENCH_THD,
                       0,
-                      0);
+                      0);*/
+    Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
     USR_DBG_S("\r\nTry to switch to that thread - should fail  retval= ");
     USR_DBG_I(Retval);
     /* Test result: intra-process ctxsw 358cycles/1.657us, frt w/mpu 163cycles/0.754us,
@@ -133,15 +142,16 @@ void RME_Same_Prc_Thd_Switch_Test(void)
     * This configuration, CPU works at 216MHz, correct, but the 
     * The TSC is always 8 cycles between reads.
     */
-    _RME_Tsc_Init();
+    //_RME_Tsc_Init();
     //for(Count=0;Count<10000;Count++)
     for(Count=0;Count<10;Count++)
     {
         //Temp=RME_TSC();
-        Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+        /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
                           RME_BOOT_BENCH_THD,
                           0,
-                          0);
+                          0);*/
+        Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
         //Temp=RME_TSC()-Temp;
        // Time[Count]=Temp-8;
         USR_DBG_S("\r\nTry to switch to that thread  retval= ");
@@ -166,10 +176,11 @@ void RME_Diff_Prc_Thd_Switch_Test_Thd(ptr_t Param1, ptr_t Param2, ptr_t Param3, 
     /* Now we switch back to the init thread, immediately */
     while(1)
     {
-        Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+        /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
                           RME_BOOT_INIT_THD,
                           0,
-                          0);
+                          0);*/
+        Retval=RME_Thd_Swt(RME_BOOT_INIT_THD,0);
     }
 }
 /* End Function:RME_Diff_Prc_Thd_Switch_Test_Thd ****************************/
@@ -196,57 +207,57 @@ void RME_Diff_Prc_Thd_Switch_Test(void)
                                1, 2, 3, 4);
     
     /* Create the page table for the whole address space range */
-    Retval=RME_CAP_OP(RME_SVC_PGT_CRT,RME_BOOT_INIT_CPT,
+    /*Retval=RME_CAP_OP(RME_SVC_PGT_CRT,RME_BOOT_INIT_CPT,
                       RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_Q1(RME_BOOT_BENCH_PGT_TOP)|
                       RME_PARAM_O1(29)|RME_PARAM_O0(3),
                       Frontier,
-                      1);
+                      1);*/
 //    Frontier+=;
 //    /* Create the page table for the SRAM range */
 //    Retval=RME_CAP_OP(RME_SVC_PGT_CRT,RME_BOOT_INIT_CPT,
 //                      RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_Q1(RME_BOOT_BENCH_PGT_SRAM)|
 //                      RME_PARAM_O1(16)|RME_PARAM_O0(3),
 //                      Frontier,
-//                      0x20000001);
+//                      0x20000001);*/
 //    Frontier+=;
 //    /* Map the pages into the top-level and the second-level */
 //    RME_CAP_OP(RME_SVC_PGT_ADD,0,
 //               RME_PARAM_Q1(RME_BOOT_BENCH_PGT_TOP)|0,
 //               RME_PARAM_D1(RME_BOOT_INIT_PGT)|0,
-//               |0)
+//               |0)*/
                       
                   
     
     
     
-    Retval=RME_CAP_OP(RME_SVC_THD_CRT,RME_BOOT_INIT_CPT,
+    /*Retval=RME_CAP_OP(RME_SVC_THD_CRT,RME_BOOT_INIT_CPT,
                       RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_D0(RME_BOOT_BENCH_THD),
                       RME_PARAM_D1(RME_BOOT_INIT_PRC)|RME_PARAM_D0(31),
-                      RME_BOOT_BENCH_KOM_FRONTIER);
+                      RME_BOOT_BENCH_KOM_FRONTIER);*/
     
     /* Bind the thread to the processor */
-    Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,0,
+    /*Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,0,
                       RME_BOOT_BENCH_THD,
                       RME_BOOT_INIT_THD,
-                      0);
+                      0);*/
     
     /* Set the execution information */
-    Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,0,
+    /*Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,0,
                       RME_BOOT_BENCH_THD,
                       (ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
-                      Stack_Addr);
+                      Stack_Addr);*/
                       
     /* Delegate some timeslice to it */
-    Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,0,
+    /*Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,0,
                       RME_BOOT_BENCH_THD,
                       RME_BOOT_INIT_THD,
-                      10000000);
+                      10000000);*/
     
     /* Try to switch to that thread - should fail */
-    Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+    /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
                       RME_BOOT_BENCH_THD,
                       0,
-                      0);
+                      0);*/
     /* Test result: intra-process ctxsw 358cycles/1.657us, frt w/mpu 163cycles/0.754us,
     * composite 324. opted max:323
     * all:33.0
@@ -266,10 +277,10 @@ void RME_Diff_Prc_Thd_Switch_Test(void)
     for(Count=0;Count<10000;Count++)
     {
         //Temp=RME_TSC();
-        Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+        /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
                           RME_BOOT_BENCH_THD,
                           0,
-                          0);
+                          0);*/
         //Temp=RME_TSC()-Temp;
         //Time[Count]=Temp-8;
     }

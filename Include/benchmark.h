@@ -1,15 +1,32 @@
 
 #include"rme.h"
+/* Word size */
+#define RME_WORD_BIT                                RME_POW2(RME_WORD_ORDER)
+#define RME_WORD_BYTE                               (RME_WORD_BIT>>3)
+#define RME_WORD_BIT_O1                             (RME_WORD_BYTE)
+#define RME_WORD_BIT_O2                             (RME_WORD_BYTE*2U)
+#define RME_WORD_BIT_O3                             (RME_WORD_BYTE*3U)
+#define RME_WORD_BIT_O4                             (RME_WORD_BYTE*4U)
+#define RME_WORD_BIT_O5                             (RME_WORD_BYTE*5U)
+#define RME_WORD_BIT_O6                             (RME_WORD_BYTE*6U)
+#define RME_WORD_BIT_O7                             (RME_WORD_BYTE*7U)
+#define RME_WORD_BIT_Q1                             RME_WORD_BIT_O2
+#define RME_WORD_BIT_Q2                             RME_WORD_BIT_O4
+#define RME_WORD_BIT_Q3                             RME_WORD_BIT_O6
+#define RME_WORD_BIT_D1                             RME_WORD_BIT_Q2
+/* Thread creation */
+#define RME_THD_SVC(ATTR,IS_HYP,SVC)                (RME_FIELD(ATTR,7U)|RME_FIELD(IS_HYP,6U)|(SVC))
 /* UART peripheral address */
-#define RME_A7A_UART_CONTROL      (*((volatile unsigned int*)(0xE0001000)))
-#define RME_A7A_UART_MODE         (*((volatile unsigned int*)(0xE0001004)))
-#define RME_A7A_UART_BRGEN        (*((volatile unsigned int*)(0xE0001018)))
-#define RME_A7A_UART_STATUS       (*((volatile unsigned int*)(0xE000102C)))
-#define RME_A7A_UART_FIFO         (*((volatile unsigned int*)(0xE0001030)))
-#define RME_A7A_UART_BRDIV        (*((volatile unsigned int*)(0xE0001034)))
-#define RME_A7A_UART_STATUS_TXE   (1U<<3)
+#define RME_A7A_UART_CONTROL      					(*((volatile unsigned int*)(0xE0001000)))
+#define RME_A7A_UART_MODE         					(*((volatile unsigned int*)(0xE0001004)))
+#define RME_A7A_UART_BRGEN        					(*((volatile unsigned int*)(0xE0001018)))
+#define RME_A7A_UART_STATUS       					(*((volatile unsigned int*)(0xE000102C)))
+#define RME_A7A_UART_FIFO         					(*((volatile unsigned int*)(0xE0001030)))
+#define RME_A7A_UART_BRDIV        					(*((volatile unsigned int*)(0xE0001034)))
+#define RME_A7A_UART_STATUS_TXE   					(1U<<3)
 //#define RME_DBG_S(STR)                              RME_Str_Print((const signed char*)(STR))
-
+/*NULL*/
+#define RME_NULL 									0
 
 #define RME_A7A_PUTCHAR(CHAR) \
 do \
@@ -36,7 +53,7 @@ typedef s32                        			ret_t;
 
 #define BENCHMARK_STACK_SIZE 4096
 /* System service stub */
-#define RME_CAP_OP(OP,CAPID,ARG1,ARG2,ARG3) RME_Svc(((OP)<<(sizeof(ptr_t)*4)|(CAPID)),ARG1,ARG2,ARG3)
+//#define RME_CAP_OP(OP,CAPID,ARG1,ARG2,ARG3) RME_Svc(((OP)<<(sizeof(ptr_t)*4)|(CAPID)),ARG1,ARG2,ARG3)
 #define RME_PARAM_D_MASK                    (((ptr_t)(-1))>>(sizeof(ptr_t)*4))
 #define RME_PARAM_Q_MASK                    (((ptr_t)(-1))>>(sizeof(ptr_t)*6))
 #define RME_PARAM_O_MASK                    (((ptr_t)(-1))>>(sizeof(ptr_t)*7))
@@ -57,6 +74,18 @@ typedef s32                        			ret_t;
 #define RME_PARAM_O2(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*2))
 #define RME_PARAM_O1(X)                     (((X)&RME_PARAM_O_MASK)<<(sizeof(ptr_t)*1))
 #define RME_PARAM_O0(X)                     ((X)&RME_PARAM_O_MASK)
+
+
+/* Bit mask */
+#define RME_MASK_FULL                               (~((ptr_t)0U))
+#define RME_MASK_WORD                               (~(RME_MASK_FULL<<RME_WORD_ORDER))
+#define RME_MASK_WORD_O                             RME_MASK_END(RME_WORD_BIT_O1-1U)
+#define RME_MASK_WORD_Q                             RME_MASK_END(RME_WORD_BIT_Q1-1U)
+#define RME_MASK_WORD_D                             RME_MASK_END(RME_WORD_BIT_D1-1U)
+/* Init thread infinite time marker */
+#define RME_THD_INIT_TIME                           (RME_MASK_FULL>>1)
+/* Other thread infinite time marker */
+#define RME_THD_INF_TIME                            (RME_THD_INIT_TIME-1U)
 
 /* Initial boot capabilities - This should be in accordnace with the kernel settings */
 /* The capability table of the init process */
@@ -91,20 +120,21 @@ typedef s32                        			ret_t;
 /* Need to export the flags as well ! */
 /* Export the errno too */
 #define RME_BOOT_BENCH_KOM_FRONTIER 			0x00009000
-/*The kernel-accessible virtual memory address,for this thread's register sets*/
-#define RME_BOOT_HYPER_KOM_VADDR                       0x00000000
+/* The kernel-accessible virtual memory address,for this thread's register sets */
+#define RME_BOOT_HYPER_KOM_VADDR                0x00000000
 //0x10005000
 /* The stack safe size */
 #define RME_STACK_SAFE_SIZE 					16
 /* Doesn't want to receive the scheduler signal for the thread */
 #define RME_CID_NULL   							0x8000
+/* The maximum priority allowed for this thread. Once set, this cannot be changed. */
+#define RME_THD_PRIO_MAX                        31
 /*The thread ID*/
 #define RME_TID_1                               1
 #define RME_TID_2                               2
 #define RME_TID_3                               3
 #define RME_TID_4                               4
 #define RME_TID_6                               6
-//#define RME_TSC() TIM2->CNT
 
 /* End Define ****************************************************************/
 
@@ -119,6 +149,8 @@ s8 RME_Bench_Buf[1024];
 
 /* Function Prototypes *******************************************************/
 extern ret_t RME_Svc(ptr_t Svc_Capid,ptr_t Param1, ptr_t Param2, ptr_t Param3);
+/* System service stub */
+#define RME_SVC(SVC,CID,ARG1,ARG2,ARG3)             RME_Svc(RME_FIELD(SVC,RME_WORD_BIT_D1)|((ptr_t)(CID)),((ptr_t)(ARG1)),((ptr_t)(ARG2)),((ptr_t)(ARG3)));
 extern cnt_t RME_Sprint_Uint(s8* Buffer,u32 Arg_Int);
 extern void RME_Thd_Stub(void);
 extern void RME_Inv_Stub(void);
@@ -307,6 +339,104 @@ cnt_t USR_DBG_S(const s8* String)
 
 
 
+/* Function:RME_Thd_Crt *******************************************************
+Description : Create a thread. A thread is the minimal kernel-level execution
+              unit.
+Input       : RME_cid_t Cap_Cpt - The capability to the capability table.
+                                  2-Level.
+              RME_cid_t Cap_Kom - The kernel memory capability.
+                                  2-Level.
+              RME_cid_t Cap_Thd - The capability slot that you want this newly
+                                  created thread capability to be in.
+                                  1-Level.
+              RME_cid_t Cap_Prc - The capability to the process that it is in.
+                                  2-Level.
+              RME_ptr_t Prio_Max - The maximum priority allowed for this
+                                   thread. Once set, this cannot be changed.
+              RME_ptr_t Raddr - The relative virtual address to store the
+                                thread kernel object.
+              RME_ptr_t Attr - The context attributes.
+Output      : None.
+Return      : RME_ret_t - If successful, the Thread ID; or an error code.
+******************************************************************************/
+ret_t RME_Thd_Crt(cid_t Cap_Cpt,
+                      cid_t Cap_Kom,
+                      cid_t Cap_Thd,
+                      cid_t Cap_Prc,
+                      ptr_t Prio_Max,
+                      ptr_t Raddr,
+                      ptr_t Attr)
+{
+    return RME_SVC(RME_THD_SVC(Attr,0U,RME_SVC_THD_CRT),
+                   Cap_Cpt,
+                   RME_PARAM_D1(Cap_Kom)|RME_PARAM_D0(Cap_Thd),
+                   RME_PARAM_D1(Cap_Prc)|RME_PARAM_D0(Prio_Max),
+                   Raddr);
+}
+/* End Function:RME_Thd_Crt **************************************************/
+
+/* Function:RME_Thd_Exec_Set **************************************************
+Description : Set a thread's entry point and stack. The registers will be
+              initialized with these contents.
+Input       : RME_cid_t Cap_Thd - The capability to the thread.
+                                  2-Level.
+              void* Entry - The entry address of the thread.
+              void* Stack - The stack address to use for execution.
+              void* Param - The parameter to pass to the thread.
+Output      : None.
+Return      : RME_ret_t - If successful, 0; or an error code.
+******************************************************************************/
+ret_t RME_Thd_Exec_Set(cid_t Cap_Thd,
+                           ptr_t Entry,
+                           ptr_t Stack,
+                           ptr_t Param)
+{
+    return RME_SVC(RME_SVC_THD_EXEC_SET,
+                   Cap_Thd,
+                   (ptr_t)Entry,
+                   (ptr_t)Stack,
+                   (ptr_t)Param);
+}
+/* End Function:RME_Thd_Exec_Set *********************************************/
+
+/* Function:RME_Thd_Time_Xfer *************************************************
+Description : Transfer time from one thread to another. This can only be called
+              from the core that the thread is on, and the the two threads
+              involved in the time transfer must be on the same core.
+              If the time transfered is more than or equal to what the source
+              have, the source will be out of time or blocked. If the source is
+              both out of time and blocked, we do not send the notification;
+              Instead, we send the notification when the receive endpoint
+              actually receive something.
+              It is possible to transfer time to threads have a lower priority,
+              and it is also possible to transfer time to threads that have a
+              higher priority. In the latter case, and if the source is
+              currently running, a preemption will occur.
+Input       : RME_cid_t Cap_Thd_Dst - The destination thread.
+                                      2-Level.
+              RME_cid_t Cap_Thd_Src - The source thread.
+                                      2-Level.
+              RME_ptr_t Time - The time to transfer, in slices. A slice is the
+                               minimal amount of time transfered in the system
+                               usually on the order of 100us or 1ms.
+                               Use RME_THD_INIT_TIME for revoking transfer.
+                               Use RME_THD_INF_TIME for infinite trasnfer.
+Output      : None.
+Return      : RME_ret_t - If successful, the destination time amount; or an
+                          error code.
+******************************************************************************/
+ret_t RME_Thd_Time_Xfer(cid_t Cap_Thd_Dst,
+                        cid_t Cap_Thd_Src,
+                        ptr_t Time)
+{
+    return RME_SVC(RME_SVC_THD_TIME_XFER,
+                   0U,
+                   Cap_Thd_Dst,
+                   Cap_Thd_Src,
+                   Time);
+}
+/* End Function:RME_Thd_Time_Xfer ********************************************/
+
 
 /* Function:RME_Thd_Sched_Bind ************************************************
 Description : Set a thread's priority level, and its scheduler thread. When
@@ -338,16 +468,44 @@ Input       : RME_cid_t Cap_Thd - The capability to the thread.
 Output      : None.
 Return      : RME_ret_t - If successful, 0; or an error code.
 ******************************************************************************/
-/*ret_t _RME_Thd_Sched_Bind(cid_t Cap_Thd,
-						  cid_t Cap_Thd_Sched,
-                          cid_t Cap_Sig,
-                          tid_t TID,
-                          ptr_t Prio,
-                          ptr_t Haddr)
+ret_t RME_Thd_Sched_Bind(cid_t Cap_Thd,
+                         cid_t Cap_Thd_Sched,
+                         cid_t Cap_Sig,
+                         tid_t TID,
+                         ptr_t Prio,
+                         ptr_t Haddr)
 {
-    return RME_Svc(RME_SVC_THD_SCHED_BIND,Cap_Thd
+    return RME_SVC(RME_SVC_THD_SCHED_BIND,
+                   Cap_Thd,
                    RME_PARAM_D1(Cap_Thd_Sched)|RME_PARAM_D0(Cap_Sig),
                    RME_PARAM_D1(TID)|RME_PARAM_D0(Prio),
-				   Haddr);
-}*/
+                   Haddr);
+}
 /* End Function:RME_Thd_Sched_Bind *******************************************/
+
+
+/* Function:RME_Thd_Swt *******************************************************
+Description : Switch to another thread. The thread to switch to must have the
+              same preemptive priority as this thread, and have time, and not
+              blocked.
+Input       : RME_cid_t Cap_Thd - The capability to the thread. If this is -1,
+                                  the kernel will pickup whatever thread that
+                                  has the highest priority and time to run.
+                                  2-Level.
+              RME_ptr_t Is_Yield - This is a flag to indicate whether this
+                                   is a full yield. If it is, the kernel will
+                                   discard all the time alloted on this
+                                   thread.
+Output      : None.
+Return      : RME_ret_t - If successful, 0; or an error code.
+******************************************************************************/
+ret_t RME_Thd_Swt(cid_t Cap_Thd,
+                      ptr_t Is_Yield)
+{
+    return RME_SVC(RME_SVC_THD_SWT,
+                   0U,
+                   Cap_Thd,
+                   Is_Yield,
+                   0U);
+}
+/* End Function:RME_Thd_Swt **************************************************/
