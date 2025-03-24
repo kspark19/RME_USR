@@ -465,6 +465,11 @@ Input       : RME_cid_t Cap_Thd - The capability to the thread.
                               kernel will not check whether there are two
                               threads that have the same TID.
               RME_ptr_t Prio - The priority level, higher is more critical.
+              rme_ptr_t Haddr - The kernel-accessible virtual memory address
+                                for this thread's register sets, only used by
+                                hypervisor-managed threads. For other threads,
+                                please pass in NULL instead.
+
 Output      : None.
 Return      : RME_ret_t - If successful, 0; or an error code.
 ******************************************************************************/
@@ -500,7 +505,7 @@ Output      : None.
 Return      : RME_ret_t - If successful, 0; or an error code.
 ******************************************************************************/
 ret_t RME_Thd_Swt(cid_t Cap_Thd,
-                      ptr_t Is_Yield)
+                  ptr_t Is_Yield)
 {
     return RME_SVC(RME_SVC_THD_SWT,
                    0U,
@@ -509,3 +514,88 @@ ret_t RME_Thd_Swt(cid_t Cap_Thd,
                    0U);
 }
 /* End Function:RME_Thd_Swt **************************************************/
+/*asynchronous communication function*/
+/* Function:RME_Sig_Crt *******************************************************
+Description : Create a signal endpoint.
+Input       : RME_cid_t Cap_Cpt - The capability to the capability table to use
+                                  for this signal.
+                                  2-Level.
+              RME_cid_t Cap_Sig - The capability slot that you want this newly
+                                  created signal capability to be in.
+                                  1-Level.
+Output      : None.
+Return      : RME_ret_t - If successful, 0; or an error code.
+******************************************************************************/
+ret_t RME_Sig_Crt(cid_t Cap_Cpt,
+                  cid_t Cap_Sig)
+{
+    return RME_SVC(RME_SVC_SIG_CRT,
+                   Cap_Cpt,
+                   Cap_Sig,
+                   0U,
+                   0U);
+}
+/* End Function:RME_Sig_Crt **************************************************/
+/* Function:RME_Sig_Del *******************************************************
+Description : Delete a signal endpoint.
+Input       : RME_cid_t Cap_Cpt - The capability to the capability table to
+                                  delete from.
+                                  2-Level.
+              RME_cid_t Cap_Sig - The capability to the signal.
+                                  1-Level.
+Output      : None.
+Return      : RME_ret_t - If successful, 0; or an error code.
+******************************************************************************/
+ret_t RME_Sig_Del(cid_t Cap_Cpt,
+                  cid_t Cap_Sig)
+{
+    return RME_SVC(RME_SVC_SIG_DEL,
+                   Cap_Cpt,
+                   Cap_Sig,
+                   0U,
+                   0U);
+}
+/* End Function:RME_Sig_Del **************************************************/
+/* Function:RME_Sig_Snd ******************************************************
+Description : Try to send to a signal endpoint. This system call can cause
+              a potential context switch.
+Input       : RME_cid_t Cap_Sig - The capability to the signal.
+                                  2-Level.
+Output      : None.
+Return      : RME_ret_t - If successful, 0, or an error code.
+******************************************************************************/
+ret_t RME_Sig_Snd(cid_t Cap_Sig)
+{
+    return RME_SVC(RME_SVC_SIG_SND,
+                   0U,
+                   Cap_Sig,
+                   0U,
+                   0U);
+}
+/* End Function:RME_Sig_Snd **************************************************/
+/* Function:RME_Sig_Rcv *******************************************************
+Description : Try to receive from a signal endpoint. The rules for signal
+              endpoint receive is:
+              1.If a receive endpoint have many send endpoints, everyone can
+                send to it, and sending to it will increase the count by 1.
+              2.If some thread blocks on a receive endpoint, the wakeup is only
+                possible from the same core that thread is on.
+              3.It is not recommended to let 2 cores operate on the rcv
+                endpoint simutaneously.
+              This system call can potentially trigger a context switch.
+Input       : RME_cid_t Cap_Sig - The capability to the signal.
+                                  2-Level.
+              RME_ptr_t Option - The receive option.
+Output      : None.
+Return      : RME_ret_t - If successful, a non-negative number containing the
+                          number of signals received; or an error code.
+******************************************************************************/
+ret_t RME_Sig_Rcv(cid_t Cap_Sig,
+                  ptr_t Option)
+{
+    return RME_SVC(RME_SVC_SIG_RCV,
+                   0U,
+                   Cap_Sig,
+                   Option,
+                   0U);
+}

@@ -111,7 +111,7 @@ __user_setup_stackheap:
                 B        .         // Capture faults
  8004070:	eafffffe 	b	8004070 <__user_setup_stackheap+0xc>
                  LDR     R0, =RME_Benchmark
- 8004074:	0800458c 	.word	0x0800458c
+ 8004074:	08004720 	.word	0x08004720
 
 08004078 <__USR_Putchar>:
 Input       : char Char - The character to print.
@@ -280,7 +280,7 @@ cnt_t USR_DBG_I(cnt_t Int)
         __USR_Putchar((s8)(Iter/Div)+'0');
  80041c8:	e51b1018 	ldr	r1, [fp, #-24]	@ 0xffffffe8
  80041cc:	e51b0010 	ldr	r0, [fp, #-16]
- 80041d0:	fa0000f8 	blx	80045b8 <__divsi3>
+ 80041d0:	fa00015e 	blx	8004750 <__divsi3>
  80041d4:	e1a03000 	mov	r3, r0
  80041d8:	e6ef3073 	uxtb	r3, r3
  80041dc:	e2833030 	add	r3, r3, #48	@ 0x30
@@ -292,7 +292,7 @@ cnt_t USR_DBG_I(cnt_t Int)
  80041f0:	e51b3010 	ldr	r3, [fp, #-16]
  80041f4:	e51b1018 	ldr	r1, [fp, #-24]	@ 0xffffffe8
  80041f8:	e1a00003 	mov	r0, r3
- 80041fc:	fa000192 	blx	800484c <__aeabi_idivmod>
+ 80041fc:	fa0001f8 	blx	80049e4 <__aeabi_idivmod>
  8004200:	e1a03001 	mov	r3, r1
  8004204:	e50b3010 	str	r3, [fp, #-16]
         Div/=10;
@@ -489,464 +489,645 @@ cnt_t USR_DBG_S(const s8* String)
  80043c0:	e24bd004 	sub	sp, fp, #4
  80043c4:	e8bd8800 	pop	{fp, pc}
 
-080043c8 <_RME_Tsc_Init>:
+080043c8 <RME_Thd_Crt>:
+                      cid_t Cap_Thd,
+                      cid_t Cap_Prc,
+                      ptr_t Prio_Max,
+                      ptr_t Raddr,
+                      ptr_t Attr)
+{
+ 80043c8:	e92d4800 	push	{fp, lr}
+ 80043cc:	e28db004 	add	fp, sp, #4
+ 80043d0:	e24dd010 	sub	sp, sp, #16
+ 80043d4:	e50b0008 	str	r0, [fp, #-8]
+ 80043d8:	e50b100c 	str	r1, [fp, #-12]
+ 80043dc:	e50b2010 	str	r2, [fp, #-16]
+ 80043e0:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+    return RME_SVC(RME_THD_SVC(Attr,0U,RME_SVC_THD_CRT),
+ 80043e4:	e59b300c 	ldr	r3, [fp, #12]
+ 80043e8:	e1a02b83 	lsl	r2, r3, #23
+ 80043ec:	e51b3008 	ldr	r3, [fp, #-8]
+ 80043f0:	e1823003 	orr	r3, r2, r3
+ 80043f4:	e3830819 	orr	r0, r3, #1638400	@ 0x190000
+ 80043f8:	e51b300c 	ldr	r3, [fp, #-12]
+ 80043fc:	e1a02803 	lsl	r2, r3, #16
+ 8004400:	e51b3010 	ldr	r3, [fp, #-16]
+ 8004404:	e6ff3073 	uxth	r3, r3
+ 8004408:	e1821003 	orr	r1, r2, r3
+ 800440c:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 8004410:	e1a02803 	lsl	r2, r3, #16
+ 8004414:	e59b3004 	ldr	r3, [fp, #4]
+ 8004418:	e6ff3073 	uxth	r3, r3
+ 800441c:	e1822003 	orr	r2, r2, r3
+ 8004420:	e59b3008 	ldr	r3, [fp, #8]
+ 8004424:	ebffff01 	bl	8004030 <RME_Svc>
+ 8004428:	e1a03000 	mov	r3, r0
+                   Cap_Cpt,
+                   RME_PARAM_D1(Cap_Kom)|RME_PARAM_D0(Cap_Thd),
+                   RME_PARAM_D1(Cap_Prc)|RME_PARAM_D0(Prio_Max),
+                   Raddr);
+}
+ 800442c:	e1a00003 	mov	r0, r3
+ 8004430:	e24bd004 	sub	sp, fp, #4
+ 8004434:	e8bd8800 	pop	{fp, pc}
+
+08004438 <RME_Thd_Exec_Set>:
+******************************************************************************/
+ret_t RME_Thd_Exec_Set(cid_t Cap_Thd,
+                           ptr_t Entry,
+                           ptr_t Stack,
+                           ptr_t Param)
+{
+ 8004438:	e92d4800 	push	{fp, lr}
+ 800443c:	e28db004 	add	fp, sp, #4
+ 8004440:	e24dd010 	sub	sp, sp, #16
+ 8004444:	e50b0008 	str	r0, [fp, #-8]
+ 8004448:	e50b100c 	str	r1, [fp, #-12]
+ 800444c:	e50b2010 	str	r2, [fp, #-16]
+ 8004450:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+    return RME_SVC(RME_SVC_THD_EXEC_SET,
+ 8004454:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004458:	e3830806 	orr	r0, r3, #393216	@ 0x60000
+ 800445c:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 8004460:	e51b2010 	ldr	r2, [fp, #-16]
+ 8004464:	e51b100c 	ldr	r1, [fp, #-12]
+ 8004468:	ebfffef0 	bl	8004030 <RME_Svc>
+ 800446c:	e1a03000 	mov	r3, r0
+                   Cap_Thd,
+                   (ptr_t)Entry,
+                   (ptr_t)Stack,
+                   (ptr_t)Param);
+}
+ 8004470:	e1a00003 	mov	r0, r3
+ 8004474:	e24bd004 	sub	sp, fp, #4
+ 8004478:	e8bd8800 	pop	{fp, pc}
+
+0800447c <RME_Thd_Time_Xfer>:
+                          error code.
+******************************************************************************/
+ret_t RME_Thd_Time_Xfer(cid_t Cap_Thd_Dst,
+                        cid_t Cap_Thd_Src,
+                        ptr_t Time)
+{
+ 800447c:	e92d4800 	push	{fp, lr}
+ 8004480:	e28db004 	add	fp, sp, #4
+ 8004484:	e24dd010 	sub	sp, sp, #16
+ 8004488:	e50b0008 	str	r0, [fp, #-8]
+ 800448c:	e50b100c 	str	r1, [fp, #-12]
+ 8004490:	e50b2010 	str	r2, [fp, #-16]
+    return RME_SVC(RME_SVC_THD_TIME_XFER,
+ 8004494:	e51b1008 	ldr	r1, [fp, #-8]
+ 8004498:	e51b200c 	ldr	r2, [fp, #-12]
+ 800449c:	e51b3010 	ldr	r3, [fp, #-16]
+ 80044a0:	e3a00702 	mov	r0, #524288	@ 0x80000
+ 80044a4:	ebfffee1 	bl	8004030 <RME_Svc>
+ 80044a8:	e1a03000 	mov	r3, r0
+                   0U,
+                   Cap_Thd_Dst,
+                   Cap_Thd_Src,
+                   Time);
+}
+ 80044ac:	e1a00003 	mov	r0, r3
+ 80044b0:	e24bd004 	sub	sp, fp, #4
+ 80044b4:	e8bd8800 	pop	{fp, pc}
+
+080044b8 <RME_Thd_Sched_Bind>:
+                         cid_t Cap_Thd_Sched,
+                         cid_t Cap_Sig,
+                         tid_t TID,
+                         ptr_t Prio,
+                         ptr_t Haddr)
+{
+ 80044b8:	e92d4800 	push	{fp, lr}
+ 80044bc:	e28db004 	add	fp, sp, #4
+ 80044c0:	e24dd010 	sub	sp, sp, #16
+ 80044c4:	e50b0008 	str	r0, [fp, #-8]
+ 80044c8:	e50b100c 	str	r1, [fp, #-12]
+ 80044cc:	e50b2010 	str	r2, [fp, #-16]
+ 80044d0:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+    return RME_SVC(RME_SVC_THD_SCHED_BIND,
+ 80044d4:	e51b3008 	ldr	r3, [fp, #-8]
+ 80044d8:	e383081b 	orr	r0, r3, #1769472	@ 0x1b0000
+ 80044dc:	e51b300c 	ldr	r3, [fp, #-12]
+ 80044e0:	e1a02803 	lsl	r2, r3, #16
+ 80044e4:	e51b3010 	ldr	r3, [fp, #-16]
+ 80044e8:	e6ff3073 	uxth	r3, r3
+ 80044ec:	e1821003 	orr	r1, r2, r3
+ 80044f0:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 80044f4:	e1a02803 	lsl	r2, r3, #16
+ 80044f8:	e59b3004 	ldr	r3, [fp, #4]
+ 80044fc:	e6ff3073 	uxth	r3, r3
+ 8004500:	e1822003 	orr	r2, r2, r3
+ 8004504:	e59b3008 	ldr	r3, [fp, #8]
+ 8004508:	ebfffec8 	bl	8004030 <RME_Svc>
+ 800450c:	e1a03000 	mov	r3, r0
+                   Cap_Thd,
+                   RME_PARAM_D1(Cap_Thd_Sched)|RME_PARAM_D0(Cap_Sig),
+                   RME_PARAM_D1(TID)|RME_PARAM_D0(Prio),
+                   Haddr);
+}
+ 8004510:	e1a00003 	mov	r0, r3
+ 8004514:	e24bd004 	sub	sp, fp, #4
+ 8004518:	e8bd8800 	pop	{fp, pc}
+
+0800451c <RME_Thd_Swt>:
+Output      : None.
+Return      : RME_ret_t - If successful, 0; or an error code.
+******************************************************************************/
+ret_t RME_Thd_Swt(cid_t Cap_Thd,
+                      ptr_t Is_Yield)
+{
+ 800451c:	e92d4800 	push	{fp, lr}
+ 8004520:	e28db004 	add	fp, sp, #4
+ 8004524:	e24dd008 	sub	sp, sp, #8
+ 8004528:	e50b0008 	str	r0, [fp, #-8]
+ 800452c:	e50b100c 	str	r1, [fp, #-12]
+    return RME_SVC(RME_SVC_THD_SWT,
+ 8004530:	e51b1008 	ldr	r1, [fp, #-8]
+ 8004534:	e3a03000 	mov	r3, #0
+ 8004538:	e51b200c 	ldr	r2, [fp, #-12]
+ 800453c:	e3a00809 	mov	r0, #589824	@ 0x90000
+ 8004540:	ebfffeba 	bl	8004030 <RME_Svc>
+ 8004544:	e1a03000 	mov	r3, r0
+                   0U,
+                   Cap_Thd,
+                   Is_Yield,
+                   0U);
+}
+ 8004548:	e1a00003 	mov	r0, r3
+ 800454c:	e24bd004 	sub	sp, fp, #4
+ 8004550:	e8bd8800 	pop	{fp, pc}
+
+08004554 <RME_Same_Prc_Thd_Switch_Test_Thd>:
 Input       : None.
 Output      : None.
 Return      : None.
 ******************************************************************************/
-void _RME_Tsc_Init(void)
+void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1)
 {
- 80043c8:	e52db004 	push	{fp}		@ (str fp, [sp, #-4]!)
- 80043cc:	e28db000 	add	fp, sp, #0
-//    TIM2_Handle.Init.Period=(ptr_t)(-1);
-//    TIM2_Handle.Init.ClockDivision=TIM_CLOCKDIVISION_DIV1;
-//    HAL_TIM_Base_Init(&TIM2_Handle);
-//    __HAL_RCC_TIM2_CLK_ENABLE();
-//    __HAL_TIM_ENABLE(&TIM2_Handle);
-}
- 80043d0:	e320f000 	nop	{0}
- 80043d4:	e28bd000 	add	sp, fp, #0
- 80043d8:	e49db004 	pop	{fp}		@ (ldr fp, [sp], #4)
- 80043dc:	e12fff1e 	bx	lr
+ 8004554:	e92d4800 	push	{fp, lr}
+ 8004558:	e28db004 	add	fp, sp, #4
+ 800455c:	e24dd010 	sub	sp, sp, #16
+ 8004560:	e50b0010 	str	r0, [fp, #-16]
+    ret_t Retval;
 
-080043e0 <RME_Same_Prc_Thd_Switch_Test>:
+    USR_DBG_S("\r\n hello! this is thread ");
+ 8004564:	e3040a04 	movw	r0, #18948	@ 0x4a04
+ 8004568:	e3400800 	movt	r0, #2048	@ 0x800
+ 800456c:	ebffff76 	bl	800434c <USR_DBG_S>
+    USR_DBG_I(Param1);
+ 8004570:	e51b3010 	ldr	r3, [fp, #-16]
+ 8004574:	e1a00003 	mov	r0, r3
+ 8004578:	ebfffed2 	bl	80040c8 <USR_DBG_I>
+    //{
+        /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+                          RME_BOOT_INIT_THD,
+                          0,
+                          0);*/
+        Retval=RME_Thd_Swt(RME_BOOT_INIT_THD,0);
+ 800457c:	e3a01000 	mov	r1, #0
+ 8004580:	e3a00003 	mov	r0, #3
+ 8004584:	ebffffe4 	bl	800451c <RME_Thd_Swt>
+ 8004588:	e50b0008 	str	r0, [fp, #-8]
+    //}
+}
+ 800458c:	e320f000 	nop	{0}
+ 8004590:	e24bd004 	sub	sp, fp, #4
+ 8004594:	e8bd8800 	pop	{fp, pc}
+
+08004598 <RME_Same_Prc_Thd_Switch_Test>:
 Input       : None.
 Output      : None.
 Return      : None.
 ******************************************************************************/
 void RME_Same_Prc_Thd_Switch_Test(void)
 {
- 80043e0:	e92d4800 	push	{fp, lr}
- 80043e4:	e28db004 	add	fp, sp, #4
- 80043e8:	e24dd010 	sub	sp, sp, #16
+ 8004598:	e92d4800 	push	{fp, lr}
+ 800459c:	e28db004 	add	fp, sp, #4
+ 80045a0:	e24dd020 	sub	sp, sp, #32
     ret_t Retval;
     cnt_t Count;
     ptr_t Stack_Addr;
     ptr_t Temp;
     /* Initialize the thread's stack before entering it */
     Stack_Addr=(ptr_t)&RME_Stack[2000];/* _RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
- 80043ec:	e59f3190 	ldr	r3, [pc, #400]	@ 8004584 <RME_Same_Prc_Thd_Switch_Test+0x1a4>
- 80043f0:	e50b300c 	str	r3, [fp, #-12]
+ 80045a4:	e59f316c 	ldr	r3, [pc, #364]	@ 8004718 <RME_Same_Prc_Thd_Switch_Test+0x180>
+ 80045a8:	e50b300c 	str	r3, [fp, #-12]
                                (ptr_t)RME_Thd_Stub,
                                1, 2, 3, 4); */
 
     USR_DBG_S("\r\n(ptr_t)(&RME_Stack[2047])= ");
- 80043f4:	e3040888 	movw	r0, #18568	@ 0x4888
- 80043f8:	e3400800 	movt	r0, #2048	@ 0x800
- 80043fc:	ebffffd2 	bl	800434c <USR_DBG_S>
+ 80045ac:	e3040a20 	movw	r0, #18976	@ 0x4a20
+ 80045b0:	e3400800 	movt	r0, #2048	@ 0x800
+ 80045b4:	ebffff64 	bl	800434c <USR_DBG_S>
     USR_DBG_H((ptr_t)(&RME_Stack[2047]));
- 8004400:	e59f3180 	ldr	r3, [pc, #384]	@ 8004588 <RME_Same_Prc_Thd_Switch_Test+0x1a8>
- 8004404:	e1a00003 	mov	r0, r3
- 8004408:	ebffff8d 	bl	8004244 <USR_DBG_H>
+ 80045b8:	e59f315c 	ldr	r3, [pc, #348]	@ 800471c <RME_Same_Prc_Thd_Switch_Test+0x184>
+ 80045bc:	e1a00003 	mov	r0, r3
+ 80045c0:	ebffff1f 	bl	8004244 <USR_DBG_H>
     USR_DBG_S("\r\nInitialize the thread's stack Stack_Addr= ");
- 800440c:	e30408a8 	movw	r0, #18600	@ 0x48a8
- 8004410:	e3400800 	movt	r0, #2048	@ 0x800
- 8004414:	ebffffcc 	bl	800434c <USR_DBG_S>
+ 80045c4:	e3040a40 	movw	r0, #19008	@ 0x4a40
+ 80045c8:	e3400800 	movt	r0, #2048	@ 0x800
+ 80045cc:	ebffff5e 	bl	800434c <USR_DBG_S>
     USR_DBG_H(Stack_Addr);
- 8004418:	e51b000c 	ldr	r0, [fp, #-12]
- 800441c:	ebffff88 	bl	8004244 <USR_DBG_H>
-
-    /* There are still many bugs in the kernel. Need a white-box test to guarantee
+ 80045d0:	e51b000c 	ldr	r0, [fp, #-12]
+ 80045d4:	ebffff1a 	bl	8004244 <USR_DBG_H>
      * that it is free of bugs. Find a scheme to do that */
-    Retval=RME_CAP_OP(RME_SVC_THD_CRT,RME_BOOT_INIT_CPT,
- 8004420:	e3a03a09 	mov	r3, #36864	@ 0x9000
- 8004424:	e3a0201f 	mov	r2, #31
- 8004428:	e3402002 	movt	r2, #2
- 800442c:	e3a01008 	mov	r1, #8
- 8004430:	e3401005 	movt	r1, #5
- 8004434:	e3a00819 	mov	r0, #1638400	@ 0x190000
- 8004438:	ebfffefc 	bl	8004030 <RME_Svc>
- 800443c:	e50b0010 	str	r0, [fp, #-16]
+    /*Retval=RME_CAP_OP(RME_SVC_THD_CRT,RME_BOOT_INIT_CPT,
                       RME_PARAM_D1(RME_BOOT_INIT_KOM)|RME_PARAM_D0(RME_BOOT_BENCH_THD),
                       RME_PARAM_D1(RME_BOOT_INIT_PRC)|RME_PARAM_D0(31),
-                      RME_BOOT_BENCH_KOM_FRONTIER);
+                      RME_BOOT_BENCH_KOM_FRONTIER);*/
+    Retval=RME_Thd_Crt(RME_BOOT_INIT_CPT,RME_BOOT_INIT_KOM,RME_BOOT_BENCH_THD,
+ 80045d8:	e3a03000 	mov	r3, #0
+ 80045dc:	e58d3008 	str	r3, [sp, #8]
+ 80045e0:	e3a03a09 	mov	r3, #36864	@ 0x9000
+ 80045e4:	e58d3004 	str	r3, [sp, #4]
+ 80045e8:	e3a0301f 	mov	r3, #31
+ 80045ec:	e58d3000 	str	r3, [sp]
+ 80045f0:	e3a03002 	mov	r3, #2
+ 80045f4:	e3a02008 	mov	r2, #8
+ 80045f8:	e3a01005 	mov	r1, #5
+ 80045fc:	e3a00000 	mov	r0, #0
+ 8004600:	ebffff70 	bl	80043c8 <RME_Thd_Crt>
+ 8004604:	e50b0010 	str	r0, [fp, #-16]
+                       RME_BOOT_INIT_PRC,RME_THD_PRIO_MAX,RME_BOOT_BENCH_KOM_FRONTIER,0);
     USR_DBG_S("\r\ncreate a thread      retval= ");
- 8004440:	e30408d8 	movw	r0, #18648	@ 0x48d8
- 8004444:	e3400800 	movt	r0, #2048	@ 0x800
- 8004448:	ebffffbf 	bl	800434c <USR_DBG_S>
+ 8004608:	e3040a70 	movw	r0, #19056	@ 0x4a70
+ 800460c:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004610:	ebffff4d 	bl	800434c <USR_DBG_S>
     USR_DBG_I(Retval);
- 800444c:	e51b0010 	ldr	r0, [fp, #-16]
- 8004450:	ebffff1c 	bl	80040c8 <USR_DBG_I>
-
+ 8004614:	e51b0010 	ldr	r0, [fp, #-16]
+ 8004618:	ebfffeaa 	bl	80040c8 <USR_DBG_I>
     /* Bind the thread to the processor */
-    Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,RME_BOOT_BENCH_THD,
- 8004454:	e3a03000 	mov	r3, #0
- 8004458:	e3a02002 	mov	r2, #2
- 800445c:	e3402002 	movt	r2, #2
- 8004460:	e3a0190e 	mov	r1, #229376	@ 0x38000
- 8004464:	e3a00008 	mov	r0, #8
- 8004468:	e340001b 	movt	r0, #27
- 800446c:	ebfffeef 	bl	8004030 <RME_Svc>
- 8004470:	e50b0010 	str	r0, [fp, #-16]
+    /*Retval=RME_CAP_OP(RME_SVC_THD_SCHED_BIND,RME_BOOT_BENCH_THD,
     		          RME_PARAM_D1(RME_BOOT_INIT_THD)|RME_PARAM_D0(RME_CID_NULL),
 					  RME_PARAM_D1(RME_TID_2)|RME_PARAM_D0(RME_BOOT_INIT_PRC),
-					  RME_BOOT_HYPER_KOM_VADDR);
+					  RME_BOOT_HYPER_KOM_VADDR);*/
+    Retval=RME_Thd_Sched_Bind(RME_BOOT_BENCH_THD,RME_BOOT_INIT_THD,RME_CID_NULL,
+ 800461c:	e3a03000 	mov	r3, #0
+ 8004620:	e58d3004 	str	r3, [sp, #4]
+ 8004624:	e3a03002 	mov	r3, #2
+ 8004628:	e58d3000 	str	r3, [sp]
+ 800462c:	e3a03002 	mov	r3, #2
+ 8004630:	e3a02902 	mov	r2, #32768	@ 0x8000
+ 8004634:	e3a01003 	mov	r1, #3
+ 8004638:	e3a00008 	mov	r0, #8
+ 800463c:	ebffff9d 	bl	80044b8 <RME_Thd_Sched_Bind>
+ 8004640:	e50b0010 	str	r0, [fp, #-16]
+                              RME_TID_2,RME_BOOT_INIT_PRC,RME_BOOT_HYPER_KOM_VADDR);
     USR_DBG_S("\r\nBind the thread to the processor retval= ");
- 8004474:	e30408f8 	movw	r0, #18680	@ 0x48f8
- 8004478:	e3400800 	movt	r0, #2048	@ 0x800
- 800447c:	ebffffb2 	bl	800434c <USR_DBG_S>
+ 8004644:	e3040a90 	movw	r0, #19088	@ 0x4a90
+ 8004648:	e3400800 	movt	r0, #2048	@ 0x800
+ 800464c:	ebffff3e 	bl	800434c <USR_DBG_S>
     USR_DBG_I(Retval);
- 8004480:	e51b0010 	ldr	r0, [fp, #-16]
- 8004484:	ebffff0f 	bl	80040c8 <USR_DBG_I>
-    extern void RME_Deadloop(void);
+ 8004650:	e51b0010 	ldr	r0, [fp, #-16]
+ 8004654:	ebfffe9b 	bl	80040c8 <USR_DBG_I>
     /* Set the execution information */
-    Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,RME_BOOT_BENCH_THD,
- 8004488:	e3041008 	movw	r1, #16392	@ 0x4008
- 800448c:	e3401800 	movt	r1, #2048	@ 0x800
- 8004490:	e3a03002 	mov	r3, #2
- 8004494:	e51b200c 	ldr	r2, [fp, #-12]
- 8004498:	e3a00008 	mov	r0, #8
- 800449c:	e3400006 	movt	r0, #6
- 80044a0:	ebfffee2 	bl	8004030 <RME_Svc>
- 80044a4:	e50b0010 	str	r0, [fp, #-16]
-    		         (ptr_t)RME_Deadloop,//RME_Same_Prc_Thd_Switch_Test_Thd,
-					 Stack_Addr,RME_TID_2);
-    RME_Stack[2000]=1234;
- 80044a8:	e3053000 	movw	r3, #20480	@ 0x5000
- 80044ac:	e3403800 	movt	r3, #2048	@ 0x800
- 80044b0:	e2833a01 	add	r3, r3, #4096	@ 0x1000
- 80044b4:	e1a02003 	mov	r2, r3
- 80044b8:	e30034d2 	movw	r3, #1234	@ 0x4d2
- 80044bc:	e5823f40 	str	r3, [r2, #3904]	@ 0xf40
+    /*Retval=RME_CAP_OP(RME_SVC_THD_EXEC_SET,RME_BOOT_BENCH_THD,
+	         	 	 (ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
+    		         //(ptr_t)RME_Deadloop,
+					 Stack_Addr,RME_TID_2);*/
+    Retval=RME_Thd_Exec_Set(RME_BOOT_BENCH_THD,(ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,Stack_Addr,RME_TID_2);
+ 8004658:	e3041554 	movw	r1, #17748	@ 0x4554
+ 800465c:	e3401800 	movt	r1, #2048	@ 0x800
+ 8004660:	e3a03002 	mov	r3, #2
+ 8004664:	e51b200c 	ldr	r2, [fp, #-12]
+ 8004668:	e3a00008 	mov	r0, #8
+ 800466c:	ebffff71 	bl	8004438 <RME_Thd_Exec_Set>
+ 8004670:	e50b0010 	str	r0, [fp, #-16]
+    //RME_Stack[2000]=1234;
     USR_DBG_S("\r\nSet the execution information retval= ");
- 80044c0:	e3040924 	movw	r0, #18724	@ 0x4924
- 80044c4:	e3400800 	movt	r0, #2048	@ 0x800
- 80044c8:	ebffff9f 	bl	800434c <USR_DBG_S>
+ 8004674:	e3040abc 	movw	r0, #19132	@ 0x4abc
+ 8004678:	e3400800 	movt	r0, #2048	@ 0x800
+ 800467c:	ebffff32 	bl	800434c <USR_DBG_S>
     USR_DBG_I(Retval);
- 80044cc:	e51b0010 	ldr	r0, [fp, #-16]
- 80044d0:	ebfffefc 	bl	80040c8 <USR_DBG_I>
+ 8004680:	e51b0010 	ldr	r0, [fp, #-16]
+ 8004684:	ebfffe8f 	bl	80040c8 <USR_DBG_I>
     USR_DBG_S("\r\n");
- 80044d4:	e3040950 	movw	r0, #18768	@ 0x4950
- 80044d8:	e3400800 	movt	r0, #2048	@ 0x800
- 80044dc:	ebffff9a 	bl	800434c <USR_DBG_S>
-    /* Delegate some timeslice to it */
-    Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,RME_BOOT_BENCH_THD,
- 80044e0:	e3093680 	movw	r3, #38528	@ 0x9680
- 80044e4:	e3403098 	movt	r3, #152	@ 0x98
- 80044e8:	e3a02003 	mov	r2, #3
- 80044ec:	e3a01008 	mov	r1, #8
- 80044f0:	e3a00008 	mov	r0, #8
- 80044f4:	e3400008 	movt	r0, #8
- 80044f8:	ebfffecc 	bl	8004030 <RME_Svc>
- 80044fc:	e50b0010 	str	r0, [fp, #-16]
+ 8004688:	e3040ae8 	movw	r0, #19176	@ 0x4ae8
+ 800468c:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004690:	ebffff2d 	bl	800434c <USR_DBG_S>
+    /*Retval=RME_CAP_OP(RME_SVC_THD_TIME_XFER,RME_BOOT_BENCH_THD,
                       RME_BOOT_BENCH_THD,
                       RME_BOOT_INIT_THD,
-                      10000000);
-    
+                      10000000);*/
+    //Retval=RME_Thd_Time_Xfer(RME_BOOT_BENCH_THD,RME_BOOT_INIT_THD,RME_THD_INF_TIME);
+    Retval=RME_Thd_Time_Xfer(RME_BOOT_BENCH_THD,RME_BOOT_INIT_THD,1000);
+ 8004694:	e3a02ffa 	mov	r2, #1000	@ 0x3e8
+ 8004698:	e3a01003 	mov	r1, #3
+ 800469c:	e3a00008 	mov	r0, #8
+ 80046a0:	ebffff75 	bl	800447c <RME_Thd_Time_Xfer>
+ 80046a4:	e50b0010 	str	r0, [fp, #-16]
     /* Try to switch to that thread - should fail */
-    Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
- 8004500:	e3a03000 	mov	r3, #0
- 8004504:	e3a02000 	mov	r2, #0
- 8004508:	e3a01008 	mov	r1, #8
- 800450c:	e3a00809 	mov	r0, #589824	@ 0x90000
- 8004510:	ebfffec6 	bl	8004030 <RME_Svc>
- 8004514:	e50b0010 	str	r0, [fp, #-16]
+    /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
                       RME_BOOT_BENCH_THD,
                       0,
-                      0);
+                      0);*/
+    Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
+ 80046a8:	e3a01000 	mov	r1, #0
+ 80046ac:	e3a00008 	mov	r0, #8
+ 80046b0:	ebffff99 	bl	800451c <RME_Thd_Swt>
+ 80046b4:	e50b0010 	str	r0, [fp, #-16]
     USR_DBG_S("\r\nTry to switch to that thread - should fail  retval= ");
- 8004518:	e3040954 	movw	r0, #18772	@ 0x4954
- 800451c:	e3400800 	movt	r0, #2048	@ 0x800
- 8004520:	ebffff89 	bl	800434c <USR_DBG_S>
+ 80046b8:	e3040aec 	movw	r0, #19180	@ 0x4aec
+ 80046bc:	e3400800 	movt	r0, #2048	@ 0x800
+ 80046c0:	ebffff21 	bl	800434c <USR_DBG_S>
     USR_DBG_I(Retval);
- 8004524:	e51b0010 	ldr	r0, [fp, #-16]
- 8004528:	ebfffee6 	bl	80040c8 <USR_DBG_I>
-    * Performance cannot be further optimized anymore without compiler intrinsics.
-    * Something terribly wrong with systick. 38 second wrapwround
+ 80046c4:	e51b0010 	ldr	r0, [fp, #-16]
+ 80046c8:	ebfffe7e 	bl	80040c8 <USR_DBG_I>
     * This configuration, CPU works at 216MHz, correct, but the 
     * The TSC is always 8 cycles between reads.
     */
-    _RME_Tsc_Init();
- 800452c:	ebffffa5 	bl	80043c8 <_RME_Tsc_Init>
+    //_RME_Tsc_Init();
     //for(Count=0;Count<10000;Count++)
     for(Count=0;Count<10;Count++)
- 8004530:	e3a03000 	mov	r3, #0
- 8004534:	e50b3008 	str	r3, [fp, #-8]
- 8004538:	ea00000d 	b	8004574 <RME_Same_Prc_Thd_Switch_Test+0x194>
-    {
+ 80046cc:	e3a03000 	mov	r3, #0
+ 80046d0:	e50b3008 	str	r3, [fp, #-8]
+ 80046d4:	ea00000b 	b	8004708 <RME_Same_Prc_Thd_Switch_Test+0x170>
         //Temp=RME_TSC();
-        Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
- 800453c:	e3a03000 	mov	r3, #0
- 8004540:	e3a02000 	mov	r2, #0
- 8004544:	e3a01008 	mov	r1, #8
- 8004548:	e3a00809 	mov	r0, #589824	@ 0x90000
- 800454c:	ebfffeb7 	bl	8004030 <RME_Svc>
- 8004550:	e50b0010 	str	r0, [fp, #-16]
+        /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
                           RME_BOOT_BENCH_THD,
                           0,
-                          0);
+                          0);*/
+        Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
+ 80046d8:	e3a01000 	mov	r1, #0
+ 80046dc:	e3a00008 	mov	r0, #8
+ 80046e0:	ebffff8d 	bl	800451c <RME_Thd_Swt>
+ 80046e4:	e50b0010 	str	r0, [fp, #-16]
         //Temp=RME_TSC()-Temp;
        // Time[Count]=Temp-8;
         USR_DBG_S("\r\nTry to switch to that thread  retval= ");
- 8004554:	e304098c 	movw	r0, #18828	@ 0x498c
- 8004558:	e3400800 	movt	r0, #2048	@ 0x800
- 800455c:	ebffff7a 	bl	800434c <USR_DBG_S>
+ 80046e8:	e3040b24 	movw	r0, #19236	@ 0x4b24
+ 80046ec:	e3400800 	movt	r0, #2048	@ 0x800
+ 80046f0:	ebffff15 	bl	800434c <USR_DBG_S>
         USR_DBG_I(Retval);
- 8004560:	e51b0010 	ldr	r0, [fp, #-16]
- 8004564:	ebfffed7 	bl	80040c8 <USR_DBG_I>
+ 80046f4:	e51b0010 	ldr	r0, [fp, #-16]
+ 80046f8:	ebfffe72 	bl	80040c8 <USR_DBG_I>
     for(Count=0;Count<10;Count++)
- 8004568:	e51b3008 	ldr	r3, [fp, #-8]
- 800456c:	e2833001 	add	r3, r3, #1
- 8004570:	e50b3008 	str	r3, [fp, #-8]
- 8004574:	e51b3008 	ldr	r3, [fp, #-8]
- 8004578:	e3530009 	cmp	r3, #9
- 800457c:	daffffee 	ble	800453c <RME_Same_Prc_Thd_Switch_Test+0x15c>
+ 80046fc:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004700:	e2833001 	add	r3, r3, #1
+ 8004704:	e50b3008 	str	r3, [fp, #-8]
+ 8004708:	e51b3008 	ldr	r3, [fp, #-8]
+ 800470c:	e3530009 	cmp	r3, #9
+ 8004710:	dafffff0 	ble	80046d8 <RME_Same_Prc_Thd_Switch_Test+0x140>
     }
     
-    while(1);
- 8004580:	eafffffe 	b	8004580 <RME_Same_Prc_Thd_Switch_Test+0x1a0>
- 8004584:	08006f40 	.word	0x08006f40
- 8004588:	08006ffc 	.word	0x08006ffc
+    // test sig_snd/sig_rcv
 
-0800458c <RME_Benchmark>:
+    while(1);
+ 8004714:	eafffffe 	b	8004714 <RME_Same_Prc_Thd_Switch_Test+0x17c>
+ 8004718:	08006f40 	.word	0x08006f40
+ 800471c:	08006ffc 	.word	0x08006ffc
+
+08004720 <RME_Benchmark>:
 Input       : None.
 Output      : None.
 Return      : None.
 ******************************************************************************/
 void RME_Benchmark(void)
 {
- 800458c:	e92d4800 	push	{fp, lr}
- 8004590:	e28db004 	add	fp, sp, #4
+ 8004720:	e92d4800 	push	{fp, lr}
+ 8004724:	e28db004 	add	fp, sp, #4
     USR_DBG_S("\r\nbegin test ");
- 8004594:	e30409b8 	movw	r0, #18872	@ 0x49b8
- 8004598:	e3400800 	movt	r0, #2048	@ 0x800
- 800459c:	ebffff6a 	bl	800434c <USR_DBG_S>
+ 8004728:	e3040b50 	movw	r0, #19280	@ 0x4b50
+ 800472c:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004730:	ebffff05 	bl	800434c <USR_DBG_S>
     USR_DBG_H(0x111111);
- 80045a0:	e3010111 	movw	r0, #4369	@ 0x1111
- 80045a4:	e3400011 	movt	r0, #17
- 80045a8:	ebffff25 	bl	8004244 <USR_DBG_H>
+ 8004734:	e3010111 	movw	r0, #4369	@ 0x1111
+ 8004738:	e3400011 	movt	r0, #17
+ 800473c:	ebfffec0 	bl	8004244 <USR_DBG_H>
     RME_Same_Prc_Thd_Switch_Test();
- 80045ac:	ebffff8b 	bl	80043e0 <RME_Same_Prc_Thd_Switch_Test>
+ 8004740:	ebffff94 	bl	8004598 <RME_Same_Prc_Thd_Switch_Test>
 }
- 80045b0:	e320f000 	nop	{0}
- 80045b4:	e8bd8800 	pop	{fp, pc}
+ 8004744:	e320f000 	nop	{0}
+ 8004748:	e8bd8800 	pop	{fp, pc}
+ 800474c:	00000000 	andeq	r0, r0, r0
 
-080045b8 <__divsi3>:
- 80045b8:	2900      	cmp	r1, #0
- 80045ba:	f000 813e 	beq.w	800483a <.divsi3_skip_div0_test+0x27c>
+08004750 <__divsi3>:
+ 8004750:	2900      	cmp	r1, #0
+ 8004752:	f000 813e 	beq.w	80049d2 <.divsi3_skip_div0_test+0x27c>
 
-080045be <.divsi3_skip_div0_test>:
- 80045be:	ea80 0c01 	eor.w	ip, r0, r1
- 80045c2:	bf48      	it	mi
- 80045c4:	4249      	negmi	r1, r1
- 80045c6:	1e4a      	subs	r2, r1, #1
- 80045c8:	f000 811f 	beq.w	800480a <.divsi3_skip_div0_test+0x24c>
- 80045cc:	0003      	movs	r3, r0
- 80045ce:	bf48      	it	mi
- 80045d0:	4243      	negmi	r3, r0
- 80045d2:	428b      	cmp	r3, r1
- 80045d4:	f240 811e 	bls.w	8004814 <.divsi3_skip_div0_test+0x256>
- 80045d8:	4211      	tst	r1, r2
- 80045da:	f000 8123 	beq.w	8004824 <.divsi3_skip_div0_test+0x266>
- 80045de:	fab3 f283 	clz	r2, r3
- 80045e2:	fab1 f081 	clz	r0, r1
- 80045e6:	eba0 0202 	sub.w	r2, r0, r2
- 80045ea:	f1c2 021f 	rsb	r2, r2, #31
- 80045ee:	a004      	add	r0, pc, #16	@ (adr r0, 8004600 <.divsi3_skip_div0_test+0x42>)
- 80045f0:	eb00 1202 	add.w	r2, r0, r2, lsl #4
- 80045f4:	f04f 0000 	mov.w	r0, #0
- 80045f8:	4697      	mov	pc, r2
- 80045fa:	bf00      	nop
- 80045fc:	f3af 8000 	nop.w
- 8004600:	ebb3 7fc1 	cmp.w	r3, r1, lsl #31
- 8004604:	bf00      	nop
- 8004606:	eb40 0000 	adc.w	r0, r0, r0
- 800460a:	bf28      	it	cs
- 800460c:	eba3 73c1 	subcs.w	r3, r3, r1, lsl #31
- 8004610:	ebb3 7f81 	cmp.w	r3, r1, lsl #30
- 8004614:	bf00      	nop
- 8004616:	eb40 0000 	adc.w	r0, r0, r0
- 800461a:	bf28      	it	cs
- 800461c:	eba3 7381 	subcs.w	r3, r3, r1, lsl #30
- 8004620:	ebb3 7f41 	cmp.w	r3, r1, lsl #29
- 8004624:	bf00      	nop
- 8004626:	eb40 0000 	adc.w	r0, r0, r0
- 800462a:	bf28      	it	cs
- 800462c:	eba3 7341 	subcs.w	r3, r3, r1, lsl #29
- 8004630:	ebb3 7f01 	cmp.w	r3, r1, lsl #28
- 8004634:	bf00      	nop
- 8004636:	eb40 0000 	adc.w	r0, r0, r0
- 800463a:	bf28      	it	cs
- 800463c:	eba3 7301 	subcs.w	r3, r3, r1, lsl #28
- 8004640:	ebb3 6fc1 	cmp.w	r3, r1, lsl #27
- 8004644:	bf00      	nop
- 8004646:	eb40 0000 	adc.w	r0, r0, r0
- 800464a:	bf28      	it	cs
- 800464c:	eba3 63c1 	subcs.w	r3, r3, r1, lsl #27
- 8004650:	ebb3 6f81 	cmp.w	r3, r1, lsl #26
- 8004654:	bf00      	nop
- 8004656:	eb40 0000 	adc.w	r0, r0, r0
- 800465a:	bf28      	it	cs
- 800465c:	eba3 6381 	subcs.w	r3, r3, r1, lsl #26
- 8004660:	ebb3 6f41 	cmp.w	r3, r1, lsl #25
- 8004664:	bf00      	nop
- 8004666:	eb40 0000 	adc.w	r0, r0, r0
- 800466a:	bf28      	it	cs
- 800466c:	eba3 6341 	subcs.w	r3, r3, r1, lsl #25
- 8004670:	ebb3 6f01 	cmp.w	r3, r1, lsl #24
- 8004674:	bf00      	nop
- 8004676:	eb40 0000 	adc.w	r0, r0, r0
- 800467a:	bf28      	it	cs
- 800467c:	eba3 6301 	subcs.w	r3, r3, r1, lsl #24
- 8004680:	ebb3 5fc1 	cmp.w	r3, r1, lsl #23
- 8004684:	bf00      	nop
- 8004686:	eb40 0000 	adc.w	r0, r0, r0
- 800468a:	bf28      	it	cs
- 800468c:	eba3 53c1 	subcs.w	r3, r3, r1, lsl #23
- 8004690:	ebb3 5f81 	cmp.w	r3, r1, lsl #22
- 8004694:	bf00      	nop
- 8004696:	eb40 0000 	adc.w	r0, r0, r0
- 800469a:	bf28      	it	cs
- 800469c:	eba3 5381 	subcs.w	r3, r3, r1, lsl #22
- 80046a0:	ebb3 5f41 	cmp.w	r3, r1, lsl #21
- 80046a4:	bf00      	nop
- 80046a6:	eb40 0000 	adc.w	r0, r0, r0
- 80046aa:	bf28      	it	cs
- 80046ac:	eba3 5341 	subcs.w	r3, r3, r1, lsl #21
- 80046b0:	ebb3 5f01 	cmp.w	r3, r1, lsl #20
- 80046b4:	bf00      	nop
- 80046b6:	eb40 0000 	adc.w	r0, r0, r0
- 80046ba:	bf28      	it	cs
- 80046bc:	eba3 5301 	subcs.w	r3, r3, r1, lsl #20
- 80046c0:	ebb3 4fc1 	cmp.w	r3, r1, lsl #19
- 80046c4:	bf00      	nop
- 80046c6:	eb40 0000 	adc.w	r0, r0, r0
- 80046ca:	bf28      	it	cs
- 80046cc:	eba3 43c1 	subcs.w	r3, r3, r1, lsl #19
- 80046d0:	ebb3 4f81 	cmp.w	r3, r1, lsl #18
- 80046d4:	bf00      	nop
- 80046d6:	eb40 0000 	adc.w	r0, r0, r0
- 80046da:	bf28      	it	cs
- 80046dc:	eba3 4381 	subcs.w	r3, r3, r1, lsl #18
- 80046e0:	ebb3 4f41 	cmp.w	r3, r1, lsl #17
- 80046e4:	bf00      	nop
- 80046e6:	eb40 0000 	adc.w	r0, r0, r0
- 80046ea:	bf28      	it	cs
- 80046ec:	eba3 4341 	subcs.w	r3, r3, r1, lsl #17
- 80046f0:	ebb3 4f01 	cmp.w	r3, r1, lsl #16
- 80046f4:	bf00      	nop
- 80046f6:	eb40 0000 	adc.w	r0, r0, r0
- 80046fa:	bf28      	it	cs
- 80046fc:	eba3 4301 	subcs.w	r3, r3, r1, lsl #16
- 8004700:	ebb3 3fc1 	cmp.w	r3, r1, lsl #15
- 8004704:	bf00      	nop
- 8004706:	eb40 0000 	adc.w	r0, r0, r0
- 800470a:	bf28      	it	cs
- 800470c:	eba3 33c1 	subcs.w	r3, r3, r1, lsl #15
- 8004710:	ebb3 3f81 	cmp.w	r3, r1, lsl #14
- 8004714:	bf00      	nop
- 8004716:	eb40 0000 	adc.w	r0, r0, r0
- 800471a:	bf28      	it	cs
- 800471c:	eba3 3381 	subcs.w	r3, r3, r1, lsl #14
- 8004720:	ebb3 3f41 	cmp.w	r3, r1, lsl #13
- 8004724:	bf00      	nop
- 8004726:	eb40 0000 	adc.w	r0, r0, r0
- 800472a:	bf28      	it	cs
- 800472c:	eba3 3341 	subcs.w	r3, r3, r1, lsl #13
- 8004730:	ebb3 3f01 	cmp.w	r3, r1, lsl #12
- 8004734:	bf00      	nop
- 8004736:	eb40 0000 	adc.w	r0, r0, r0
- 800473a:	bf28      	it	cs
- 800473c:	eba3 3301 	subcs.w	r3, r3, r1, lsl #12
- 8004740:	ebb3 2fc1 	cmp.w	r3, r1, lsl #11
- 8004744:	bf00      	nop
- 8004746:	eb40 0000 	adc.w	r0, r0, r0
- 800474a:	bf28      	it	cs
- 800474c:	eba3 23c1 	subcs.w	r3, r3, r1, lsl #11
- 8004750:	ebb3 2f81 	cmp.w	r3, r1, lsl #10
- 8004754:	bf00      	nop
- 8004756:	eb40 0000 	adc.w	r0, r0, r0
- 800475a:	bf28      	it	cs
- 800475c:	eba3 2381 	subcs.w	r3, r3, r1, lsl #10
- 8004760:	ebb3 2f41 	cmp.w	r3, r1, lsl #9
- 8004764:	bf00      	nop
- 8004766:	eb40 0000 	adc.w	r0, r0, r0
- 800476a:	bf28      	it	cs
- 800476c:	eba3 2341 	subcs.w	r3, r3, r1, lsl #9
- 8004770:	ebb3 2f01 	cmp.w	r3, r1, lsl #8
- 8004774:	bf00      	nop
- 8004776:	eb40 0000 	adc.w	r0, r0, r0
- 800477a:	bf28      	it	cs
- 800477c:	eba3 2301 	subcs.w	r3, r3, r1, lsl #8
- 8004780:	ebb3 1fc1 	cmp.w	r3, r1, lsl #7
- 8004784:	bf00      	nop
- 8004786:	eb40 0000 	adc.w	r0, r0, r0
- 800478a:	bf28      	it	cs
- 800478c:	eba3 13c1 	subcs.w	r3, r3, r1, lsl #7
- 8004790:	ebb3 1f81 	cmp.w	r3, r1, lsl #6
- 8004794:	bf00      	nop
- 8004796:	eb40 0000 	adc.w	r0, r0, r0
- 800479a:	bf28      	it	cs
- 800479c:	eba3 1381 	subcs.w	r3, r3, r1, lsl #6
- 80047a0:	ebb3 1f41 	cmp.w	r3, r1, lsl #5
- 80047a4:	bf00      	nop
- 80047a6:	eb40 0000 	adc.w	r0, r0, r0
- 80047aa:	bf28      	it	cs
- 80047ac:	eba3 1341 	subcs.w	r3, r3, r1, lsl #5
- 80047b0:	ebb3 1f01 	cmp.w	r3, r1, lsl #4
- 80047b4:	bf00      	nop
- 80047b6:	eb40 0000 	adc.w	r0, r0, r0
- 80047ba:	bf28      	it	cs
- 80047bc:	eba3 1301 	subcs.w	r3, r3, r1, lsl #4
- 80047c0:	ebb3 0fc1 	cmp.w	r3, r1, lsl #3
- 80047c4:	bf00      	nop
- 80047c6:	eb40 0000 	adc.w	r0, r0, r0
- 80047ca:	bf28      	it	cs
- 80047cc:	eba3 03c1 	subcs.w	r3, r3, r1, lsl #3
- 80047d0:	ebb3 0f81 	cmp.w	r3, r1, lsl #2
- 80047d4:	bf00      	nop
- 80047d6:	eb40 0000 	adc.w	r0, r0, r0
- 80047da:	bf28      	it	cs
- 80047dc:	eba3 0381 	subcs.w	r3, r3, r1, lsl #2
- 80047e0:	ebb3 0f41 	cmp.w	r3, r1, lsl #1
- 80047e4:	bf00      	nop
- 80047e6:	eb40 0000 	adc.w	r0, r0, r0
- 80047ea:	bf28      	it	cs
- 80047ec:	eba3 0341 	subcs.w	r3, r3, r1, lsl #1
- 80047f0:	ebb3 0f01 	cmp.w	r3, r1
- 80047f4:	bf00      	nop
- 80047f6:	eb40 0000 	adc.w	r0, r0, r0
- 80047fa:	bf28      	it	cs
- 80047fc:	eba3 0301 	subcs.w	r3, r3, r1
- 8004800:	f1bc 0f00 	cmp.w	ip, #0
- 8004804:	bf48      	it	mi
- 8004806:	4240      	negmi	r0, r0
- 8004808:	4770      	bx	lr
- 800480a:	ea9c 0f00 	teq	ip, r0
- 800480e:	bf48      	it	mi
- 8004810:	4240      	negmi	r0, r0
- 8004812:	4770      	bx	lr
- 8004814:	bf38      	it	cc
- 8004816:	2000      	movcc	r0, #0
- 8004818:	bf04      	itt	eq
- 800481a:	ea4f 70ec 	moveq.w	r0, ip, asr #31
- 800481e:	f040 0001 	orreq.w	r0, r0, #1
- 8004822:	4770      	bx	lr
- 8004824:	fab1 f281 	clz	r2, r1
- 8004828:	f1c2 021f 	rsb	r2, r2, #31
- 800482c:	f1bc 0f00 	cmp.w	ip, #0
- 8004830:	fa23 f002 	lsr.w	r0, r3, r2
- 8004834:	bf48      	it	mi
- 8004836:	4240      	negmi	r0, r0
- 8004838:	4770      	bx	lr
- 800483a:	2800      	cmp	r0, #0
- 800483c:	bfc8      	it	gt
- 800483e:	f06f 4000 	mvngt.w	r0, #2147483648	@ 0x80000000
- 8004842:	bfb8      	it	lt
- 8004844:	f04f 4000 	movlt.w	r0, #2147483648	@ 0x80000000
- 8004848:	f000 b80e 	b.w	8004868 <__aeabi_idiv0>
+08004756 <.divsi3_skip_div0_test>:
+ 8004756:	ea80 0c01 	eor.w	ip, r0, r1
+ 800475a:	bf48      	it	mi
+ 800475c:	4249      	negmi	r1, r1
+ 800475e:	1e4a      	subs	r2, r1, #1
+ 8004760:	f000 811f 	beq.w	80049a2 <.divsi3_skip_div0_test+0x24c>
+ 8004764:	0003      	movs	r3, r0
+ 8004766:	bf48      	it	mi
+ 8004768:	4243      	negmi	r3, r0
+ 800476a:	428b      	cmp	r3, r1
+ 800476c:	f240 811e 	bls.w	80049ac <.divsi3_skip_div0_test+0x256>
+ 8004770:	4211      	tst	r1, r2
+ 8004772:	f000 8123 	beq.w	80049bc <.divsi3_skip_div0_test+0x266>
+ 8004776:	fab3 f283 	clz	r2, r3
+ 800477a:	fab1 f081 	clz	r0, r1
+ 800477e:	eba0 0202 	sub.w	r2, r0, r2
+ 8004782:	f1c2 021f 	rsb	r2, r2, #31
+ 8004786:	a004      	add	r0, pc, #16	@ (adr r0, 8004798 <.divsi3_skip_div0_test+0x42>)
+ 8004788:	eb00 1202 	add.w	r2, r0, r2, lsl #4
+ 800478c:	f04f 0000 	mov.w	r0, #0
+ 8004790:	4697      	mov	pc, r2
+ 8004792:	bf00      	nop
+ 8004794:	f3af 8000 	nop.w
+ 8004798:	ebb3 7fc1 	cmp.w	r3, r1, lsl #31
+ 800479c:	bf00      	nop
+ 800479e:	eb40 0000 	adc.w	r0, r0, r0
+ 80047a2:	bf28      	it	cs
+ 80047a4:	eba3 73c1 	subcs.w	r3, r3, r1, lsl #31
+ 80047a8:	ebb3 7f81 	cmp.w	r3, r1, lsl #30
+ 80047ac:	bf00      	nop
+ 80047ae:	eb40 0000 	adc.w	r0, r0, r0
+ 80047b2:	bf28      	it	cs
+ 80047b4:	eba3 7381 	subcs.w	r3, r3, r1, lsl #30
+ 80047b8:	ebb3 7f41 	cmp.w	r3, r1, lsl #29
+ 80047bc:	bf00      	nop
+ 80047be:	eb40 0000 	adc.w	r0, r0, r0
+ 80047c2:	bf28      	it	cs
+ 80047c4:	eba3 7341 	subcs.w	r3, r3, r1, lsl #29
+ 80047c8:	ebb3 7f01 	cmp.w	r3, r1, lsl #28
+ 80047cc:	bf00      	nop
+ 80047ce:	eb40 0000 	adc.w	r0, r0, r0
+ 80047d2:	bf28      	it	cs
+ 80047d4:	eba3 7301 	subcs.w	r3, r3, r1, lsl #28
+ 80047d8:	ebb3 6fc1 	cmp.w	r3, r1, lsl #27
+ 80047dc:	bf00      	nop
+ 80047de:	eb40 0000 	adc.w	r0, r0, r0
+ 80047e2:	bf28      	it	cs
+ 80047e4:	eba3 63c1 	subcs.w	r3, r3, r1, lsl #27
+ 80047e8:	ebb3 6f81 	cmp.w	r3, r1, lsl #26
+ 80047ec:	bf00      	nop
+ 80047ee:	eb40 0000 	adc.w	r0, r0, r0
+ 80047f2:	bf28      	it	cs
+ 80047f4:	eba3 6381 	subcs.w	r3, r3, r1, lsl #26
+ 80047f8:	ebb3 6f41 	cmp.w	r3, r1, lsl #25
+ 80047fc:	bf00      	nop
+ 80047fe:	eb40 0000 	adc.w	r0, r0, r0
+ 8004802:	bf28      	it	cs
+ 8004804:	eba3 6341 	subcs.w	r3, r3, r1, lsl #25
+ 8004808:	ebb3 6f01 	cmp.w	r3, r1, lsl #24
+ 800480c:	bf00      	nop
+ 800480e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004812:	bf28      	it	cs
+ 8004814:	eba3 6301 	subcs.w	r3, r3, r1, lsl #24
+ 8004818:	ebb3 5fc1 	cmp.w	r3, r1, lsl #23
+ 800481c:	bf00      	nop
+ 800481e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004822:	bf28      	it	cs
+ 8004824:	eba3 53c1 	subcs.w	r3, r3, r1, lsl #23
+ 8004828:	ebb3 5f81 	cmp.w	r3, r1, lsl #22
+ 800482c:	bf00      	nop
+ 800482e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004832:	bf28      	it	cs
+ 8004834:	eba3 5381 	subcs.w	r3, r3, r1, lsl #22
+ 8004838:	ebb3 5f41 	cmp.w	r3, r1, lsl #21
+ 800483c:	bf00      	nop
+ 800483e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004842:	bf28      	it	cs
+ 8004844:	eba3 5341 	subcs.w	r3, r3, r1, lsl #21
+ 8004848:	ebb3 5f01 	cmp.w	r3, r1, lsl #20
+ 800484c:	bf00      	nop
+ 800484e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004852:	bf28      	it	cs
+ 8004854:	eba3 5301 	subcs.w	r3, r3, r1, lsl #20
+ 8004858:	ebb3 4fc1 	cmp.w	r3, r1, lsl #19
+ 800485c:	bf00      	nop
+ 800485e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004862:	bf28      	it	cs
+ 8004864:	eba3 43c1 	subcs.w	r3, r3, r1, lsl #19
+ 8004868:	ebb3 4f81 	cmp.w	r3, r1, lsl #18
+ 800486c:	bf00      	nop
+ 800486e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004872:	bf28      	it	cs
+ 8004874:	eba3 4381 	subcs.w	r3, r3, r1, lsl #18
+ 8004878:	ebb3 4f41 	cmp.w	r3, r1, lsl #17
+ 800487c:	bf00      	nop
+ 800487e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004882:	bf28      	it	cs
+ 8004884:	eba3 4341 	subcs.w	r3, r3, r1, lsl #17
+ 8004888:	ebb3 4f01 	cmp.w	r3, r1, lsl #16
+ 800488c:	bf00      	nop
+ 800488e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004892:	bf28      	it	cs
+ 8004894:	eba3 4301 	subcs.w	r3, r3, r1, lsl #16
+ 8004898:	ebb3 3fc1 	cmp.w	r3, r1, lsl #15
+ 800489c:	bf00      	nop
+ 800489e:	eb40 0000 	adc.w	r0, r0, r0
+ 80048a2:	bf28      	it	cs
+ 80048a4:	eba3 33c1 	subcs.w	r3, r3, r1, lsl #15
+ 80048a8:	ebb3 3f81 	cmp.w	r3, r1, lsl #14
+ 80048ac:	bf00      	nop
+ 80048ae:	eb40 0000 	adc.w	r0, r0, r0
+ 80048b2:	bf28      	it	cs
+ 80048b4:	eba3 3381 	subcs.w	r3, r3, r1, lsl #14
+ 80048b8:	ebb3 3f41 	cmp.w	r3, r1, lsl #13
+ 80048bc:	bf00      	nop
+ 80048be:	eb40 0000 	adc.w	r0, r0, r0
+ 80048c2:	bf28      	it	cs
+ 80048c4:	eba3 3341 	subcs.w	r3, r3, r1, lsl #13
+ 80048c8:	ebb3 3f01 	cmp.w	r3, r1, lsl #12
+ 80048cc:	bf00      	nop
+ 80048ce:	eb40 0000 	adc.w	r0, r0, r0
+ 80048d2:	bf28      	it	cs
+ 80048d4:	eba3 3301 	subcs.w	r3, r3, r1, lsl #12
+ 80048d8:	ebb3 2fc1 	cmp.w	r3, r1, lsl #11
+ 80048dc:	bf00      	nop
+ 80048de:	eb40 0000 	adc.w	r0, r0, r0
+ 80048e2:	bf28      	it	cs
+ 80048e4:	eba3 23c1 	subcs.w	r3, r3, r1, lsl #11
+ 80048e8:	ebb3 2f81 	cmp.w	r3, r1, lsl #10
+ 80048ec:	bf00      	nop
+ 80048ee:	eb40 0000 	adc.w	r0, r0, r0
+ 80048f2:	bf28      	it	cs
+ 80048f4:	eba3 2381 	subcs.w	r3, r3, r1, lsl #10
+ 80048f8:	ebb3 2f41 	cmp.w	r3, r1, lsl #9
+ 80048fc:	bf00      	nop
+ 80048fe:	eb40 0000 	adc.w	r0, r0, r0
+ 8004902:	bf28      	it	cs
+ 8004904:	eba3 2341 	subcs.w	r3, r3, r1, lsl #9
+ 8004908:	ebb3 2f01 	cmp.w	r3, r1, lsl #8
+ 800490c:	bf00      	nop
+ 800490e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004912:	bf28      	it	cs
+ 8004914:	eba3 2301 	subcs.w	r3, r3, r1, lsl #8
+ 8004918:	ebb3 1fc1 	cmp.w	r3, r1, lsl #7
+ 800491c:	bf00      	nop
+ 800491e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004922:	bf28      	it	cs
+ 8004924:	eba3 13c1 	subcs.w	r3, r3, r1, lsl #7
+ 8004928:	ebb3 1f81 	cmp.w	r3, r1, lsl #6
+ 800492c:	bf00      	nop
+ 800492e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004932:	bf28      	it	cs
+ 8004934:	eba3 1381 	subcs.w	r3, r3, r1, lsl #6
+ 8004938:	ebb3 1f41 	cmp.w	r3, r1, lsl #5
+ 800493c:	bf00      	nop
+ 800493e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004942:	bf28      	it	cs
+ 8004944:	eba3 1341 	subcs.w	r3, r3, r1, lsl #5
+ 8004948:	ebb3 1f01 	cmp.w	r3, r1, lsl #4
+ 800494c:	bf00      	nop
+ 800494e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004952:	bf28      	it	cs
+ 8004954:	eba3 1301 	subcs.w	r3, r3, r1, lsl #4
+ 8004958:	ebb3 0fc1 	cmp.w	r3, r1, lsl #3
+ 800495c:	bf00      	nop
+ 800495e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004962:	bf28      	it	cs
+ 8004964:	eba3 03c1 	subcs.w	r3, r3, r1, lsl #3
+ 8004968:	ebb3 0f81 	cmp.w	r3, r1, lsl #2
+ 800496c:	bf00      	nop
+ 800496e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004972:	bf28      	it	cs
+ 8004974:	eba3 0381 	subcs.w	r3, r3, r1, lsl #2
+ 8004978:	ebb3 0f41 	cmp.w	r3, r1, lsl #1
+ 800497c:	bf00      	nop
+ 800497e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004982:	bf28      	it	cs
+ 8004984:	eba3 0341 	subcs.w	r3, r3, r1, lsl #1
+ 8004988:	ebb3 0f01 	cmp.w	r3, r1
+ 800498c:	bf00      	nop
+ 800498e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004992:	bf28      	it	cs
+ 8004994:	eba3 0301 	subcs.w	r3, r3, r1
+ 8004998:	f1bc 0f00 	cmp.w	ip, #0
+ 800499c:	bf48      	it	mi
+ 800499e:	4240      	negmi	r0, r0
+ 80049a0:	4770      	bx	lr
+ 80049a2:	ea9c 0f00 	teq	ip, r0
+ 80049a6:	bf48      	it	mi
+ 80049a8:	4240      	negmi	r0, r0
+ 80049aa:	4770      	bx	lr
+ 80049ac:	bf38      	it	cc
+ 80049ae:	2000      	movcc	r0, #0
+ 80049b0:	bf04      	itt	eq
+ 80049b2:	ea4f 70ec 	moveq.w	r0, ip, asr #31
+ 80049b6:	f040 0001 	orreq.w	r0, r0, #1
+ 80049ba:	4770      	bx	lr
+ 80049bc:	fab1 f281 	clz	r2, r1
+ 80049c0:	f1c2 021f 	rsb	r2, r2, #31
+ 80049c4:	f1bc 0f00 	cmp.w	ip, #0
+ 80049c8:	fa23 f002 	lsr.w	r0, r3, r2
+ 80049cc:	bf48      	it	mi
+ 80049ce:	4240      	negmi	r0, r0
+ 80049d0:	4770      	bx	lr
+ 80049d2:	2800      	cmp	r0, #0
+ 80049d4:	bfc8      	it	gt
+ 80049d6:	f06f 4000 	mvngt.w	r0, #2147483648	@ 0x80000000
+ 80049da:	bfb8      	it	lt
+ 80049dc:	f04f 4000 	movlt.w	r0, #2147483648	@ 0x80000000
+ 80049e0:	f000 b80e 	b.w	8004a00 <__aeabi_idiv0>
 
-0800484c <__aeabi_idivmod>:
- 800484c:	2900      	cmp	r1, #0
- 800484e:	d0f4      	beq.n	800483a <.divsi3_skip_div0_test+0x27c>
- 8004850:	e92d 4003 	stmdb	sp!, {r0, r1, lr}
- 8004854:	f7ff feb3 	bl	80045be <.divsi3_skip_div0_test>
- 8004858:	e8bd 4006 	ldmia.w	sp!, {r1, r2, lr}
- 800485c:	fb02 f300 	mul.w	r3, r2, r0
- 8004860:	eba1 0103 	sub.w	r1, r1, r3
- 8004864:	4770      	bx	lr
- 8004866:	bf00      	nop
+080049e4 <__aeabi_idivmod>:
+ 80049e4:	2900      	cmp	r1, #0
+ 80049e6:	d0f4      	beq.n	80049d2 <.divsi3_skip_div0_test+0x27c>
+ 80049e8:	e92d 4003 	stmdb	sp!, {r0, r1, lr}
+ 80049ec:	f7ff feb3 	bl	8004756 <.divsi3_skip_div0_test>
+ 80049f0:	e8bd 4006 	ldmia.w	sp!, {r1, r2, lr}
+ 80049f4:	fb02 f300 	mul.w	r3, r2, r0
+ 80049f8:	eba1 0103 	sub.w	r1, r1, r3
+ 80049fc:	4770      	bx	lr
+ 80049fe:	bf00      	nop
 
-08004868 <__aeabi_idiv0>:
- 8004868:	4770      	bx	lr
- 800486a:	bf00      	nop
+08004a00 <__aeabi_idiv0>:
+ 8004a00:	4770      	bx	lr
+ 8004a02:	bf00      	nop

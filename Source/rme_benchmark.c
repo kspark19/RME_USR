@@ -59,6 +59,64 @@ void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1)
 /* End Function:RME_Same_Prc_Thd_Switch_Test_Thd ****************************/
 
 /* Function:RME_Same_Prc_Thd_Switch_Test *************************************
+Description : The same-process thread signal send and receive test code.
+Input       : None.
+Output      : None.
+Return      : None.
+******************************************************************************/
+void RME_Same_Prc_Thd_Sig_Test(void)
+{
+	    USR_DBG_S("\r\n");
+	    USR_DBG_S("\r\n/****************");
+		USR_DBG_S("begin RME_Same_Prc_Thd_Switch_Test");
+		USR_DBG_S("****************/");
+		USR_DBG_S("\r\n");
+		ret_t Retval;
+		    cnt_t Count;
+		    ptr_t Stack_Addr;
+		    ptr_t Temp;
+		    /* Initialize the thread's stack before entering it */
+		    Stack_Addr=(ptr_t)&RME_Stack[2000];/* _RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
+		                               (ptr_t)RME_Thd_Stub,
+		                               1, 2, 3, 4); */
+
+		    USR_DBG_S("\r\n(ptr_t)(&RME_Stack[2047])= ");
+		    USR_DBG_H((ptr_t)(&RME_Stack[2047]));
+		    USR_DBG_S("\r\nInitialize the thread's stack Stack_Addr= ");
+		    USR_DBG_H(Stack_Addr);
+
+		    /* create a thread */
+		    Retval=RME_Thd_Crt(RME_BOOT_INIT_CPT,RME_BOOT_INIT_KOM,RME_BOOT_BENCH_THD,
+		                       RME_BOOT_INIT_PRC,RME_THD_PRIO_MAX,RME_BOOT_BENCH_KOM_FRONTIER,0);
+		    USR_DBG_S("\r\ncreate a thread      retval= ");
+		    USR_DBG_I(Retval);
+
+		    /* Bind the thread to the processor */
+		    Retval=RME_Thd_Sched_Bind(RME_BOOT_BENCH_THD,RME_BOOT_INIT_THD,RME_CID_NULL,
+		                              RME_TID_1,1,RME_BOOT_HYPER_KOM_VADDR);
+		    USR_DBG_S("\r\nBind the thread to the processor retval= ");
+		    USR_DBG_I(Retval);
+		    /* Set the execution information */
+
+		    Retval=RME_Thd_Exec_Set(RME_BOOT_BENCH_THD,(ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,Stack_Addr,RME_TID_2);
+		    //RME_Stack[2000]=1234;
+		    USR_DBG_S("\r\nSet the execution information retval= ");
+		    USR_DBG_I(Retval);
+		    USR_DBG_S("\r\n");
+		    /* Delegate some timeslice to it */
+
+		    Retval=RME_Thd_Time_Xfer(RME_BOOT_BENCH_THD,RME_BOOT_INIT_THD,RME_THD_INF_TIME);
+
+		    //Retval=RME_Thd_Time_Xfer(RME_BOOT_BENCH_THD,RME_BOOT_INIT_THD,1000);
+		    USR_DBG_S("\r\nDelegate some timeslice to it retval= ");
+		    USR_DBG_I(Retval);
+
+		    Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
+		    USR_DBG_S("\r\nTry to switch to that thread - should fail  retval= ");
+		    USR_DBG_I(Retval);
+
+}
+/* Function:RME_Same_Prc_Thd_Switch_Test *************************************
 Description : The same-process thread switch test code.
 Input       : None.
 Output      : None.
@@ -66,6 +124,9 @@ Return      : None.
 ******************************************************************************/
 void RME_Same_Prc_Thd_Switch_Test(void)
 {
+	USR_DBG_S("\r\n/****************");
+	USR_DBG_S("begin RME_Same_Prc_Thd_Switch_Test");
+	USR_DBG_S("****************/");
     /* Intra-process thread switching time */
     ret_t Retval;
     cnt_t Count;
@@ -98,7 +159,7 @@ void RME_Same_Prc_Thd_Switch_Test(void)
 					  RME_PARAM_D1(RME_TID_2)|RME_PARAM_D0(RME_BOOT_INIT_PRC),
 					  RME_BOOT_HYPER_KOM_VADDR);*/
     Retval=RME_Thd_Sched_Bind(RME_BOOT_BENCH_THD,RME_BOOT_INIT_THD,RME_CID_NULL,
-                              RME_TID_2,RME_BOOT_INIT_PRC,RME_BOOT_HYPER_KOM_VADDR);
+                              RME_TID_2,0,RME_BOOT_HYPER_KOM_VADDR);
     USR_DBG_S("\r\nBind the thread to the processor retval= ");
     USR_DBG_I(Retval);
     extern void RME_Deadloop(void);
@@ -118,12 +179,11 @@ void RME_Same_Prc_Thd_Switch_Test(void)
                       RME_BOOT_INIT_THD,
                       10000000);*/
     Retval=RME_Thd_Time_Xfer(RME_BOOT_BENCH_THD,RME_BOOT_INIT_THD,RME_THD_INF_TIME);
-    
-    /* Try to switch to that thread - should fail */
-    /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
-                      RME_BOOT_BENCH_THD,
-                      0,
-                      0);*/
+
+    //Retval=RME_Thd_Time_Xfer(RME_BOOT_BENCH_THD,RME_BOOT_INIT_THD,1000);
+    USR_DBG_S("\r\nDelegate some timeslice to it retval= ");
+         USR_DBG_I(Retval);
+
     Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
     USR_DBG_S("\r\nTry to switch to that thread - should fail  retval= ");
     USR_DBG_I(Retval);
@@ -151,7 +211,7 @@ void RME_Same_Prc_Thd_Switch_Test(void)
                           RME_BOOT_BENCH_THD,
                           0,
                           0);*/
-        Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
+        //Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
         //Temp=RME_TSC()-Temp;
        // Time[Count]=Temp-8;
         USR_DBG_S("\r\nTry to switch to that thread  retval= ");
@@ -159,6 +219,8 @@ void RME_Same_Prc_Thd_Switch_Test(void)
     }
     
     // test sig_snd/sig_rcv
+
+
 
     while(1);
 }
