@@ -25,7 +25,7 @@
 #define RME_A7A_UART_BRDIV        					(*((volatile unsigned int*)(0xE0001034)))
 #define RME_A7A_UART_STATUS_TXE   					(1U<<3)
 //#define RME_DBG_S(STR)                              RME_Str_Print((const signed char*)(STR))
-/*NULL*/
+/* NULL */
 #define RME_NULL 									0
 
 #define RME_A7A_PUTCHAR(CHAR) \
@@ -35,7 +35,6 @@ do \
 	RME_A7A_UART_FIFO=(CHAR); \
 } \
 while(0)
-
 
 /* Define ********************************************************************/
 /* Types */
@@ -106,9 +105,14 @@ typedef s32                        			ret_t;
 #define RME_BOOT_BENCH_THD       				8
 #define RME_BOOT_BENCH_PGT_TOP   				9
 #define RME_BOOT_BENCH_PGT_SRAM  				10
+#define RME_BOOT_BENCH_SEN_THD					14
+#define RME_BOOT_BENCH_RCV_THD					15
+#define RME_BOOT_BENCH_THD_MAIN					16
 /* The top-level page table of the init process's SRAM */
 #define RME_BOOT_INIT_PGT_SRAM    				11
-
+/* the signal capability */
+#define RME_BOOT_SIG_CPT						12
+#define RME_BOOT_SIG_BENCH						13
 /* Power of 2 */
 #define RME_FIELD(VAL,POW)                      (((ptr_t)(VAL))<<(POW))
 #define RME_POW2(POW)                           RME_FIELD(1U,POW)
@@ -119,9 +123,9 @@ typedef s32                        			ret_t;
 /* Need to export the memory frontier! */
 /* Need to export the flags as well ! */
 /* Export the errno too */
-#define RME_BOOT_BENCH_KOM_FRONTIER 			0x00009000
+#define RME_BOOT_BENCH_KOM_FRONTIER 			0x00009000U
 /* The kernel-accessible virtual memory address,for this thread's register sets */
-#define RME_BOOT_HYPER_KOM_VADDR                0x00000000
+#define RME_BOOT_HYPER_KOM_VADDR                0x00000000U
 //0x10005000
 /* The stack safe size */
 #define RME_STACK_SAFE_SIZE 					16
