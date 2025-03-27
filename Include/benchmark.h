@@ -111,7 +111,6 @@ typedef s32                        			ret_t;
 /* The top-level page table of the init process's SRAM */
 #define RME_BOOT_INIT_PGT_SRAM    				11
 /* the signal capability */
-#define RME_BOOT_SIG_CPT						12
 #define RME_BOOT_SIG_BENCH						13
 /* Power of 2 */
 #define RME_FIELD(VAL,POW)                      (((ptr_t)(VAL))<<(POW))
@@ -146,7 +145,11 @@ typedef s32                        			ret_t;
 
 /* Private Variables *********************************************************/
 /* The stack of the threads - enough for 4 threads */
-ptr_t RME_Stack[2048];
+ptr_t RME_Stack1[2048];
+ptr_t RME_Stack2[2048];
+ptr_t RME_Stack3[2048];
+ptr_t RME_Stack4[2048];
+ptr_t RME_Stack5[2048];
 u16 Time[10000];
 s8 RME_Bench_Buf[1024];
 /* End Private Variables *****************************************************/

@@ -61,60 +61,67 @@ void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1)
 /* End Function:RME_Same_Prc_Thd_Switch_Test_Thd ****************************/
 
 
-void RME_Thd_Create(cid_t Cap_Thd,ptr_t Tid,ptr_t Prc,ptr_t Entry,ptr_t Raddr,cid_t Cap_Sig,ptr_t Time,cid_t Cap_Thd_Sched)
+void RME_Thd_Create(cid_t Cap_Thd,ptr_t Tid,ptr_t Prc,ptr_t Entry,ptr_t Raddr,cid_t Cap_Sig,ptr_t Time, ptr_t Stack)
 {
-	            ret_t Retval;
-			    cnt_t Count;
-			    ptr_t Stack_Addr;
-			    ptr_t Temp;
-			    USR_DBG_S("\r\n-----create a thread , TID= ");
-			    USR_DBG_H(Tid);
-			    /* Initialize the thread's stack before entering it */
-			    Stack_Addr=(ptr_t)&RME_Stack[2000];/* _RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
-			                               (ptr_t)RME_Thd_Stub,
-			                               1, 2, 3, 4); */
+	ret_t Retval;
+	cnt_t Count;
+	ptr_t Stack_Addr;
+	ptr_t Temp;
+	USR_DBG_S("\r\n-----create a thread , TID= ");
+	USR_DBG_H(Tid);
+	/* Initialize the thread's stack before entering it */
+	Stack_Addr=(ptr_t)Stack;
 
-			    USR_DBG_S("\r\n(ptr_t)(&RME_Stack[2047])= ");
-			    USR_DBG_H((ptr_t)(&RME_Stack[2047]));
-			    USR_DBG_S("\r\nInitialize the thread's stack Stack_Addr= ");
-			    USR_DBG_H(Stack_Addr);
+	/* create a thread */
+	Retval=RME_Thd_Crt(RME_BOOT_INIT_CPT,RME_BOOT_INIT_KOM,Cap_Thd,
+					   RME_BOOT_INIT_PRC,RME_THD_PRIO_MAX,Raddr,0);
+	USR_DBG_S("\r\ncreate a thread      retval= ");
+	USR_DBG_I(Retval);
 
-			    /* create a thread */
-			    Retval=RME_Thd_Crt(RME_BOOT_INIT_CPT,RME_BOOT_INIT_KOM,Cap_Thd,
-			                       RME_BOOT_INIT_PRC,RME_THD_PRIO_MAX,Raddr,0);
-			    USR_DBG_S("\r\ncreate a thread      retval= ");
-			    USR_DBG_I(Retval);
+	/* Bind the thread to the processor */
+	Retval=RME_Thd_Sched_Bind(Cap_Thd,RME_BOOT_INIT_THD,Cap_Sig,
+							  Tid,Prc,RME_BOOT_HYPER_KOM_VADDR);
+	USR_DBG_S("\r\nBind the thread to the processor retval= ");
+	USR_DBG_I(Retval);
+	/* Set the execution information */
 
-			    /* Bind the thread to the processor */
-			    Retval=RME_Thd_Sched_Bind(Cap_Thd,Cap_Thd_Sched,RME_CID_NULL,
-			    		  	  	  	  	  Tid,Prc,RME_BOOT_HYPER_KOM_VADDR);
-			    USR_DBG_S("\r\nBind the thread to the processor retval= ");
-			    USR_DBG_I(Retval);
-			    /* Set the execution information */
+	Retval=RME_Thd_Exec_Set(Cap_Thd,Entry,Stack_Addr,Tid);
+	//RME_Stack[2000]=1234;
+	USR_DBG_S("\r\nSet the execution information retval= ");
+	USR_DBG_I(Retval);
+	USR_DBG_S("\r\n");
+	/* Delegate some timeslice to it */
+	Retval=RME_Thd_Time_Xfer(Cap_Thd,RME_BOOT_INIT_THD,Time);
+	USR_DBG_S("\r\nDelegate some timeslice to it retval= ");
+	USR_DBG_I(Retval);
+}
 
-			    Retval=RME_Thd_Exec_Set(Cap_Thd,Entry,Stack_Addr,Tid);
-			    //RME_Stack[2000]=1234;
-			    USR_DBG_S("\r\nSet the execution information retval= ");
-			    USR_DBG_I(Retval);
-			    USR_DBG_S("\r\n");
-			    /* Delegate some timeslice to it */
-			    Retval=RME_Thd_Time_Xfer(Cap_Thd,Cap_Thd_Sched,Time);
-			    USR_DBG_S("\r\nDelegate some timeslice to it retval= ");
-			    USR_DBG_I(Retval);
+void RME_Same_Prc_Thd_Sig_Test_Thd_send(void) //low prio 4
+{
+	USR_DBG_S("\r\nEntering send thread!");
+
+
+	while(1)
+	{
+		USR_DBG_S("\r\nSend!");
+		RME_Sig_Snd(RME_BOOT_SIG_BENCH);
+	}
 
 }
 
-void RME_Same_Prc_Thd_Sig_Test_Thd_send(void)
+void RME_Same_Prc_Thd_Sig_Test_Thd_recv(void) // high prio 5
 {
-	USR_DBG_S("\r\nHello this is thread send");
-	RME_Sig_Snd(RME_BOOT_SIG_BENCH);
-	RME_Thd_Swt(RME_BOOT_BENCH_RCV_THD,0);
-}
-void RME_Same_Prc_Thd_Sig_Test_Thd_recv(void)
-{
-	USR_DBG_S("\r\nHello this is thread recv");
-	RME_Sig_Rcv(RME_BOOT_SIG_BENCH,RME_RCV_BS);
-	RME_Thd_Swt(RME_BOOT_BENCH_SEN_THD,0);
+	USR_DBG_S("\r\nEntering receive thread!");
+
+	while(1)
+	{
+		if(RME_Sig_Rcv(RME_BOOT_SIG_BENCH,RME_RCV_BS)!=1)
+		{
+			USR_DBG_S("\r\nReceived wrong number!");
+			while(1);
+		}
+		USR_DBG_S("\r\nReceived!");
+	}
 }
 
 
@@ -128,39 +135,19 @@ Return      : None.
 ******************************************************************************/
 void RME_Same_Prc_Thd_Sig_Test_Thd_main(ptr_t TID)
 {
-				USR_DBG_S("\r\n");
-		    	USR_DBG_S("\r\n/****************");
-		    	USR_DBG_S("begin RME_Same_Prc_Thd_Sig_Test_Thd_main");
-		    	USR_DBG_S("****************/");
-		    	USR_DBG_S("\r\nHello this is thread main");
-		    	ret_t Retval;
-		    	/* create a signal end point */
-		    	Retval=RME_Sig_Crt(RME_BOOT_SIG_CPT,RME_BOOT_SIG_BENCH);
-		    	USR_DBG_S("\r\ncreate a signal end point      retval= ");
-		    	USR_DBG_I(Retval);
-			    /* create signal test thread */
-		    	//void RME_Thd_Create(cid_t Cap_Thd,ptr_t Tid,ptr_t Prc,ptr_t Entry,ptr_t Raddr,cid_t Cap_Sig,ptr_t Time)
-			    RME_Thd_Create(RME_BOOT_BENCH_SEN_THD,RME_TID_3,2,(ptr_t)RME_Same_Prc_Thd_Sig_Test_Thd_send,
-			    			   Cur_addr,RME_BOOT_SIG_BENCH,RME_THD_INF_TIME);
-			    Cur_addr+=512;
-			    RME_Thd_Create(RME_BOOT_BENCH_RCV_THD,RME_TID_4,2,(ptr_t)RME_Same_Prc_Thd_Sig_Test_Thd_send,
-			    			   Cur_addr,RME_BOOT_SIG_BENCH,RME_THD_INF_TIME);
-			    RME_Thd_Swt(RME_BOOT_BENCH_SEN_THD,0);
+	USR_DBG_S("\r\n");
+	USR_DBG_S("\r\n/****************");
+	USR_DBG_S("begin RME_Same_Prc_Thd_Sig_Test_Thd_main");
+	USR_DBG_S("****************/");
+	USR_DBG_S("\r\nHello this is thread main");
+	ret_t Retval;
 
 
-}
+	/* send the begin signal */
+	RME_Sig_Snd(RME_BOOT_SIG_BENCH);
+	RME_Thd_Swt(RME_BOOT_BENCH_SEN_THD,0);
 
-void RME_Same_Prc_Thd_Sig_Test_Thd_init(void)
-{
-	                USR_DBG_S("\r\n");
-			    	USR_DBG_S("\r\n/****************");
-			    	USR_DBG_S("begin RME_Same_Prc_Thd_Sig_Test_Thd_init");
-			    	USR_DBG_S("****************/");
-			    	USR_DBG_S("\r\nHello this is thread init");
-			    	RME_Thd_Create(RME_BOOT_BENCH_THD_MAIN,RME_TID_2,1,(ptr_t)RME_Same_Prc_Thd_Sig_Test_Thd_main,
-				    Cur_addr,RME_CID_NULL,RME_THD_INF_TIME);
-			    	Cur_addr+=512;
-			    	RME_Thd_Swt(RME_BOOT_BENCH_THD_MAIN,0);
+	while(1);
 }
 /* Function:RME_Same_Prc_Thd_Switch_Testinit *************************************
 Description : The same-process thread signal send and receive test code.
@@ -170,60 +157,22 @@ Return      : None.
 ******************************************************************************/
 void RME_Same_Prc_Thd_Sig_Testinit(void)
 {
-	    	USR_DBG_S("\r\n");
-	    	USR_DBG_S("\r\n/****************");
-	    	USR_DBG_S("begin RME_Same_Prc_Thd_Sig_Testinit");
-	    	USR_DBG_S("****************/");
-	    	USR_DBG_S("\r\n");
-		    ret_t Retval;
-		    cnt_t Count;
-		    ptr_t Stack_Addr;
-		    ptr_t Temp;
-		    /* Initialize the thread's stack before entering it */
-		    Stack_Addr=(ptr_t)&RME_Stack[2000];/* _RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
-		                               (ptr_t)RME_Thd_Stub,
-		                               1, 2, 3, 4); */
+	ret_t Retval;
 
-		    USR_DBG_S("\r\n(ptr_t)(&RME_Stack[2047])= ");
-		    USR_DBG_H((ptr_t)(&RME_Stack[2047]));
-		    USR_DBG_S("\r\nInitialize the thread's stack Stack_Addr= ");
-		    USR_DBG_H(Stack_Addr);
-
-		    /* create a main thread */
-		    Retval=RME_Thd_Crt(RME_BOOT_INIT_CPT,RME_BOOT_INIT_KOM,RME_BOOT_BENCH_THD,
-		                       RME_BOOT_INIT_PRC,RME_THD_PRIO_MAX,Cur_addr,0);
-		    Cur_addr+=512;
-		    USR_DBG_S("\r\ncreate a thread      retval= ");
-		    USR_DBG_I(Retval);
-
-		    /* Bind the thread to the processor */
-		    Retval=RME_Thd_Sched_Bind(RME_BOOT_BENCH_THD,RME_BOOT_INIT_THD,RME_CID_NULL,
-		                              RME_TID_1,0,RME_BOOT_HYPER_KOM_VADDR);
-		    USR_DBG_S("\r\nBind the thread to the processor retval= ");
-		    USR_DBG_I(Retval);
-		    /* Set the execution information */
-
-		    Retval=RME_Thd_Exec_Set(RME_BOOT_BENCH_THD,(ptr_t)RME_Same_Prc_Thd_Sig_Test_Thd_init,Stack_Addr,RME_TID_1);
-		    //RME_Stack[2000]=1234;
-		    USR_DBG_S("\r\nSet the execution information retval= ");
-		    USR_DBG_I(Retval);
-		    USR_DBG_S("\r\n");
-		    /* Delegate some timeslice to it */
-
-		    Retval=RME_Thd_Time_Xfer(RME_BOOT_BENCH_THD,RME_BOOT_INIT_THD,RME_THD_INF_TIME);
-
-
-		    USR_DBG_S("\r\nDelegate some timeslice to it retval= ");
-		    USR_DBG_I(Retval);
-
-
-		    /* switch to main test thd  */
-		    //RME_Thd_Create(ptr_t Tid,ptr_t Prc,ptr_t Entry,ptr_t Raddr,cid_t Cap_Sig,ptr_t Time)
-		    Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
-		    USR_DBG_S("\r\nTry to switch to main thread - should fail  retval= ");
-		    USR_DBG_I(Retval);
-
+	/* create a signal end point */
+	Retval=RME_Sig_Crt(RME_BOOT_INIT_CPT,RME_BOOT_SIG_BENCH);
+	USR_DBG_S("\r\ncreate a signal end point      retval= ");
+	USR_DBG_I(Retval);
+	/* create signal test thread */
+	//void RME_Thd_Create(cid_t Cap_Thd,ptr_t Tid,ptr_t Prc,ptr_t Entry,ptr_t Raddr,cid_t Cap_Sig,ptr_t Time)
+	RME_Thd_Create(RME_BOOT_BENCH_RCV_THD,RME_TID_4,5,(ptr_t)RME_Same_Prc_Thd_Sig_Test_Thd_recv,
+                   Cur_addr,RME_BOOT_SIG_BENCH,RME_THD_INF_TIME,(ptr_t)&RME_Stack3[2000]);
+	Cur_addr+=512;
+	RME_Thd_Create(RME_BOOT_BENCH_SEN_THD,RME_TID_3,4,(ptr_t)RME_Same_Prc_Thd_Sig_Test_Thd_send,
+				   Cur_addr,RME_BOOT_SIG_BENCH,RME_THD_INF_TIME,(ptr_t)&RME_Stack2[2000]);
+	Cur_addr+=512;
 }
+
 /* Function:RME_Same_Prc_Thd_Switch_Test *************************************
 Description : The same-process thread switch test code.
 Input       : None.
@@ -241,12 +190,12 @@ void RME_Same_Prc_Thd_Switch_Test(void)
     ptr_t Stack_Addr;
     ptr_t Temp;
     /* Initialize the thread's stack before entering it */
-    Stack_Addr=(ptr_t)&RME_Stack[2000];/* _RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
+    Stack_Addr=(ptr_t)&RME_Stack1[2000];/* _RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
                                (ptr_t)RME_Thd_Stub,
                                1, 2, 3, 4); */
 
     USR_DBG_S("\r\n(ptr_t)(&RME_Stack[2047])= ");
-    USR_DBG_H((ptr_t)(&RME_Stack[2047]));
+    USR_DBG_H((ptr_t)(&RME_Stack1[2047]));
     USR_DBG_S("\r\nInitialize the thread's stack Stack_Addr= ");
     USR_DBG_H(Stack_Addr);
 
@@ -372,7 +321,7 @@ void RME_Diff_Prc_Thd_Switch_Test(void)
     
     Frontier=RME_BOOT_BENCH_KOM_FRONTIER;
     /* Initialize the thread's stack before entering it */
-    Stack_Addr=_RME_Stack_Init((ptr_t)(&RME_Stack[2047]),
+    Stack_Addr=_RME_Stack_Init((ptr_t)(&RME_Stack1[2047]),
                                (ptr_t)RME_Thd_Stub,
                                1, 2, 3, 4);
     
@@ -468,9 +417,10 @@ Return      : None.
 void RME_Benchmark(void)
 {
 	Cur_addr=RME_BOOT_BENCH_KOM_FRONTIER;
-    USR_DBG_S("\r\nbegin test ");
-    USR_DBG_H(0x111111);
+    USR_DBG_S("\r\nTest begin!");
     RME_Same_Prc_Thd_Sig_Testinit();
+    USR_DBG_S("\r\nTest done!");
+    while(1);
 }
 /* End Function:RME_Benchmark ************************************************/
 
