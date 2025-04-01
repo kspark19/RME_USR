@@ -10,7 +10,8 @@ Description : The benchmark file for RME.
 #include"benchmark.h"
 
 ptr_t Cur_addr;
-
+ptr_t start;
+ptr_t end;
 /* Need to export error codes, and size of each object, in words! */
 /* End Include ***************************************************************/
 
@@ -22,7 +23,7 @@ Return      : None.
 ******************************************************************************/
 void _RME_Tsc_Init(void)
 {
-//    TIM_HandleTypeDef TIM2_Handle;
+ //   TIM_HandleTypeDef TIM2_Handle;
 //    
 //    /* Initialize timer 2 to run at the same speed as the CPU */
 //    TIM2_Handle.Instance=TIM2;
@@ -46,8 +47,8 @@ void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1)
 {
     ret_t Retval;
 
-    USR_DBG_S("\r\n hello! this is thread ");
-    USR_DBG_I(Param1);
+    /*USR_DBG_S("\r\n hello! this is thread ");
+    USR_DBG_I(Param1);*/
     /* Now we switch back to the init thread, immediately */
     while(1)
     {
@@ -261,8 +262,9 @@ void RME_Same_Prc_Thd_Switch_Test(void)
     */
     //_RME_Tsc_Init();
     //for(Count=0;Count<10000;Count++)
-    for(Count=0;Count<10;Count++)
+    for(Count=0;Count<1000;Count++)
     {
+         RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
         //Temp=RME_TSC();
         /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
                           RME_BOOT_BENCH_THD,
@@ -271,10 +273,15 @@ void RME_Same_Prc_Thd_Switch_Test(void)
         //Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
         //Temp=RME_TSC()-Temp;
        // Time[Count]=Temp-8;
-        USR_DBG_S("\r\nTry to switch to that thread  retval= ");
-        USR_DBG_I(Retval);
+        //USR_DBG_S("\r\nTry to switch to that thread  retval= ");
+        //USR_DBG_I(Retval);
     }
     
+    end=get_time();
+    USR_DBG_S("\r\ntime= ");
+    USR_DBG_I(end-start);
+    USR_DBG_S("\r\ntest done ");
+
     // test sig_snd/sig_rcv
 
 
@@ -403,7 +410,8 @@ void RME_Diff_Prc_Thd_Switch_Test(void)
         //Temp=RME_TSC()-Temp;
         //Time[Count]=Temp-8;
     }
-    
+
+
     while(1);
 }
 /* End Function:RME_Diff_Prc_Thd_Switch_Test ********************************/
@@ -418,7 +426,9 @@ void RME_Benchmark(void)
 {
 	Cur_addr=RME_BOOT_BENCH_KOM_FRONTIER;
     USR_DBG_S("\r\nTest begin!");
-    RME_Same_Prc_Thd_Sig_Testinit();
+    start=get_time();
+    //RME_Same_Prc_Thd_Sig_Testinit();
+    RME_Same_Prc_Thd_Switch_Test();
     USR_DBG_S("\r\nTest done!");
     while(1);
 }

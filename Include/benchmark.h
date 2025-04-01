@@ -139,6 +139,34 @@ typedef s32                        			ret_t;
 #define RME_TID_4                               4
 #define RME_TID_6                               6
 
+#define RME_A7A_SFR(BASE,OFFSET)        (*((volatile ptr_t*)((ptr_t)((BASE)+(OFFSET)))))
+
+/* Private timer and watchdog block base */
+#define RME_A7A_PTWD_BASE           0xF8F00600
+/* global timer base */
+#define RME_A7A_GTWD_BASE           0xF8F00200/* Timer definitions */
+#define RME_A7A_SYSTICK_VAL        (7670000U/2U)
+/* global timer count register 0 */
+#define RME_A7A_GTWD_GTCR0              RME_A7A_SFR(RME_A7A_GTWD_BASE,0x0000)
+/* global timer count register 1 ,not need to use */
+#define RME_A7A_GTWD_GTCR1              RME_A7A_SFR(RME_A7A_GTWD_BASE,0x0004)
+/* global timer control register */
+#define RME_A7A_GTWD_GTCTLR             RME_A7A_SFR(RME_A7A_GTWD_BASE,0x0008)
+/* global timer is enabled and the counter increments normally */
+#define RME_A7A_GTWD_GTCTLR_TIMEN       (1U<<0U)
+/* Private timer load register */
+#define RME_A7A_PTWD_PTLR               RME_A7A_SFR(RME_A7A_PTWD_BASE,0x0000)
+/* Private timer counter register */
+#define RME_A7A_PTWD_PTCNTR             RME_A7A_SFR(RME_A7A_PTWD_BASE,0x0004)
+/* Private timer control register */
+#define RME_A7A_PTWD_PTCTLR             RME_A7A_SFR(RME_A7A_PTWD_BASE,0x0008)
+#define RME_A7A_PTWD_PTCTLR_PRESC(X)    ((X)<<8U)
+#define RME_A7A_PTWD_PTCTLR_IRQEN       (1U<<2U)
+#define RME_A7A_PTWD_PTCTLR_AUTOREL     (1U<<1U)
+#define RME_A7A_PTWD_PTCTLR_TIMEN       (1U<<0U)
+/* Private timer interrupt status register */
+#define RME_A7A_PTWD_PTISR              RME_A7A_SFR(RME_A7A_PTWD_BASE,0x000C)
+
 /* End Define ****************************************************************/
 
 
@@ -166,6 +194,9 @@ void RME_Benchmark(void);
 void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1);
 void RME_Same_Prc_Thd_Switch_Test(void);
 /* End Function Prototypes ***************************************************/
+
+/* Register access */
+#define RME_A7A_REG(X)                          (*((volatile ptr_t*)(X)))
 
 /* Function:__USR_Putchar *****************************************************
 Description : Output a character to console. In Cortex-M, under most circumstances,
@@ -344,6 +375,18 @@ cnt_t USR_DBG_S(const s8* String)
     return (cnt_t)Count;
 }
 
+/* get current time */
+ptr_t get_time(void)
+{
+	ptr_t temp;
+	temp=RME_A7A_REG(&RME_A7A_GTWD_GTCR0);
+	return temp;
+    /*USR_DBG_S("\r\n time=");
+	double time =(double)temp/RME_A7A_SYSTICK_VAL;
+	time =time*1000;
+    USR_DBG_I(time);
+    USR_DBG_S(" ms");*/
+}
 
 
 /* Function:RME_Thd_Crt *******************************************************

@@ -62,7 +62,7 @@ Description : The configuration file for XC7Z020, with 1MB memory.
 /* Processor type - This can make a huge difference when it comes
  * to timer configurations, as Cortex-A5/9 use private timer and
  * Cortex-A7/15/17 use generic timer. Cortex-A8 doesn't have a timer */
-#define RME_A7A_CPU_TYPE			 RME_A7A_CPU_CORTEX_A9
+#define RME_A7A_CPU_TYPE			RME_A7A_CPU_CORTEX_A9
 /* What is the FPU type? */
 #define RME_A7A_FPU_TYPE            RME_A7A_FPU_VFPV3U
 /* What is the GIC type? */

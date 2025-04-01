@@ -71,7 +71,9 @@ Discarded input sections
  .text          0x00000000        0x0 Object/rme_benchmark.o
  .data          0x00000000        0x0 Object/rme_benchmark.o
  .bss           0x00000000        0x0 Object/rme_benchmark.o
- .bss.RME_Stack1
+ .bss.RME_Stack2
+                0x00000000     0x2000 Object/rme_benchmark.o
+ .bss.RME_Stack3
                 0x00000000     0x2000 Object/rme_benchmark.o
  .bss.RME_Stack4
                 0x00000000     0x2000 Object/rme_benchmark.o
@@ -80,18 +82,26 @@ Discarded input sections
  .bss.Time      0x00000000     0x4e20 Object/rme_benchmark.o
  .bss.RME_Bench_Buf
                 0x00000000      0x400 Object/rme_benchmark.o
- .text.RME_Thd_Swt
-                0x00000000       0x38 Object/rme_benchmark.o
+ .text.RME_Sig_Crt
+                0x00000000       0x3c Object/rme_benchmark.o
  .text.RME_Sig_Del
                 0x00000000       0x3c Object/rme_benchmark.o
+ .text.RME_Sig_Snd
+                0x00000000       0x34 Object/rme_benchmark.o
+ .text.RME_Sig_Rcv
+                0x00000000       0x38 Object/rme_benchmark.o
  .text._RME_Tsc_Init
                 0x00000000       0x18 Object/rme_benchmark.o
- .text.RME_Same_Prc_Thd_Switch_Test_Thd
-                0x00000000       0x3c Object/rme_benchmark.o
+ .text.RME_Thd_Create
+                0x00000000      0x128 Object/rme_benchmark.o
+ .text.RME_Same_Prc_Thd_Sig_Test_Thd_send
+                0x00000000       0x2c Object/rme_benchmark.o
+ .text.RME_Same_Prc_Thd_Sig_Test_Thd_recv
+                0x00000000       0x4c Object/rme_benchmark.o
  .text.RME_Same_Prc_Thd_Sig_Test_Thd_main
                 0x00000000       0x64 Object/rme_benchmark.o
- .text.RME_Same_Prc_Thd_Switch_Test
-                0x00000000      0x1b0 Object/rme_benchmark.o
+ .text.RME_Same_Prc_Thd_Sig_Testinit
+                0x00000000      0x104 Object/rme_benchmark.o
  .text.RME_Diff_Prc_Thd_Switch_Test_Thd
                 0x00000000       0x30 Object/rme_benchmark.o
  .text.RME_Diff_Prc_Thd_Switch_Test
@@ -353,7 +363,7 @@ LOAD C:/Toolchain/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi/bin
 END GROUP
                 0x08004000                        . = 0x8004000
 
-.text           0x08004000      0xb54
+.text           0x08004000      0xac4
  *rme_benchmark_asm.o(.text .text.*)
  .text          0x08004000       0x78 Object/rme_benchmark_asm.o
                 0x08004000                RME_Entry
@@ -375,71 +385,63 @@ END GROUP
  .text.USR_DBG_S
                 0x0800434c       0x7c Object/rme_benchmark.o
                 0x0800434c                USR_DBG_S
+ .text.get_time
+                0x080043c8       0x30 Object/rme_benchmark.o
+                0x080043c8                get_time
  .text.RME_Thd_Crt
-                0x080043c8       0x70 Object/rme_benchmark.o
-                0x080043c8                RME_Thd_Crt
+                0x080043f8       0x70 Object/rme_benchmark.o
+                0x080043f8                RME_Thd_Crt
  .text.RME_Thd_Exec_Set
-                0x08004438       0x44 Object/rme_benchmark.o
-                0x08004438                RME_Thd_Exec_Set
+                0x08004468       0x44 Object/rme_benchmark.o
+                0x08004468                RME_Thd_Exec_Set
  .text.RME_Thd_Time_Xfer
-                0x0800447c       0x3c Object/rme_benchmark.o
-                0x0800447c                RME_Thd_Time_Xfer
+                0x080044ac       0x3c Object/rme_benchmark.o
+                0x080044ac                RME_Thd_Time_Xfer
  .text.RME_Thd_Sched_Bind
-                0x080044b8       0x64 Object/rme_benchmark.o
-                0x080044b8                RME_Thd_Sched_Bind
- .text.RME_Sig_Crt
-                0x0800451c       0x3c Object/rme_benchmark.o
-                0x0800451c                RME_Sig_Crt
- .text.RME_Sig_Snd
-                0x08004558       0x34 Object/rme_benchmark.o
-                0x08004558                RME_Sig_Snd
- .text.RME_Sig_Rcv
-                0x0800458c       0x38 Object/rme_benchmark.o
-                0x0800458c                RME_Sig_Rcv
- .text.RME_Thd_Create
-                0x080045c4      0x128 Object/rme_benchmark.o
-                0x080045c4                RME_Thd_Create
- .text.RME_Same_Prc_Thd_Sig_Test_Thd_send
-                0x080046ec       0x2c Object/rme_benchmark.o
-                0x080046ec                RME_Same_Prc_Thd_Sig_Test_Thd_send
- .text.RME_Same_Prc_Thd_Sig_Test_Thd_recv
-                0x08004718       0x4c Object/rme_benchmark.o
-                0x08004718                RME_Same_Prc_Thd_Sig_Test_Thd_recv
- .text.RME_Same_Prc_Thd_Sig_Testinit
-                0x08004764      0x104 Object/rme_benchmark.o
-                0x08004764                RME_Same_Prc_Thd_Sig_Testinit
+                0x080044e8       0x64 Object/rme_benchmark.o
+                0x080044e8                RME_Thd_Sched_Bind
+ .text.RME_Thd_Swt
+                0x0800454c       0x38 Object/rme_benchmark.o
+                0x0800454c                RME_Thd_Swt
+ .text.RME_Same_Prc_Thd_Switch_Test_Thd
+                0x08004584       0x3c Object/rme_benchmark.o
+                0x08004584                RME_Same_Prc_Thd_Switch_Test_Thd
+ .text.RME_Same_Prc_Thd_Switch_Test
+                0x080045c0      0x200 Object/rme_benchmark.o
+                0x080045c0                RME_Same_Prc_Thd_Switch_Test
  .text.RME_Benchmark
-                0x08004868       0x38 Object/rme_benchmark.o
-                0x08004868                RME_Benchmark
- .text          0x080048a0      0x2b0 C:/Toolchain/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-a+simd/softfp\libgcc.a(_divsi3.o)
-                0x080048a0                __divsi3
-                0x080048a0                __aeabi_idiv
-                0x08004b34                __aeabi_idivmod
- .text          0x08004b50        0x4 C:/Toolchain/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-a+simd/softfp\libgcc.a(_dvmd_tls.o)
-                0x08004b50                __aeabi_idiv0
-                0x08004b50                __aeabi_ldiv0
+                0x080047c0       0x4c Object/rme_benchmark.o
+                0x080047c0                RME_Benchmark
+ *fill*         0x0800480c        0x4 
+ .text          0x08004810      0x2b0 C:/Toolchain/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-a+simd/softfp\libgcc.a(_divsi3.o)
+                0x08004810                __divsi3
+                0x08004810                __aeabi_idiv
+                0x08004aa4                __aeabi_idivmod
+ .text          0x08004ac0        0x4 C:/Toolchain/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-a+simd/softfp\libgcc.a(_dvmd_tls.o)
+                0x08004ac0                __aeabi_idiv0
+                0x08004ac0                __aeabi_ldiv0
                 [!provide]                        PROVIDE (etext = .)
 
-.rodata         0x08004b54      0x2d9
- .rodata        0x08004b54      0x2d9 Object/rme_benchmark.o
+.rodata         0x08004ac4      0x2f5
+ .rodata        0x08004ac4      0x2f5 Object/rme_benchmark.o
 
-.glue_7         0x08004e30        0x0
- .glue_7        0x08004e30        0x0 linker stubs
+.glue_7         0x08004dbc        0x0
+ .glue_7        0x08004dbc        0x0 linker stubs
 
-.glue_7t        0x08004e30        0x0
- .glue_7t       0x08004e30        0x0 linker stubs
+.glue_7t        0x08004dbc        0x0
+ .glue_7t       0x08004dbc        0x0 linker stubs
 
-.vfp11_veneer   0x08004e30        0x0
- .vfp11_veneer  0x08004e30        0x0 linker stubs
+.vfp11_veneer   0x08004dbc        0x0
+ .vfp11_veneer  0x08004dbc        0x0 linker stubs
 
-.v4_bx          0x08004e30        0x0
- .v4_bx         0x08004e30        0x0 linker stubs
+.v4_bx          0x08004dbc        0x0
+ .v4_bx         0x08004dbc        0x0 linker stubs
 
-.iplt           0x08004e30        0x0
- .iplt          0x08004e30        0x0 Object/rme_benchmark.o
+.iplt           0x08004dbc        0x0
+ .iplt          0x08004dbc        0x0 Object/rme_benchmark.o
 
-.rel.dyn        0x08004e30        0x0
- .rel.iplt      0x08004e30        0x0 Object/rme_benchmark.o
+.rel.dyn        0x08004dbc        0x0
+ .rel.iplt      0x08004dbc        0x0 Object/rme_benchmark.o
                 0x08005000                        . = ALIGN (0x1000)
 
 .data
@@ -448,54 +450,55 @@ END GROUP
 .igot.plt       0x08005000        0x0
  .igot.plt      0x08005000        0x0 Object/rme_benchmark.o
 
-.bss            0x08005000     0x4004
+.bss            0x08005000     0x200c
  *(.bss .bss.*)
- .bss.RME_Stack2
+ .bss.RME_Stack1
                 0x08005000     0x2000 Object/rme_benchmark.o
-                0x08005000                RME_Stack2
- .bss.RME_Stack3
-                0x08007000     0x2000 Object/rme_benchmark.o
-                0x08007000                RME_Stack3
- .bss.Cur_addr  0x08009000        0x4 Object/rme_benchmark.o
-                0x08009000                Cur_addr
+                0x08005000                RME_Stack1
+ .bss.Cur_addr  0x08007000        0x4 Object/rme_benchmark.o
+                0x08007000                Cur_addr
+ .bss.start     0x08007004        0x4 Object/rme_benchmark.o
+                0x08007004                start
+ .bss.end       0x08007008        0x4 Object/rme_benchmark.o
+                0x08007008                end
                 [!provide]                        PROVIDE (edata = .)
-                0x0800a000                        . = ALIGN (0x1000)
+                0x08008000                        . = ALIGN (0x1000)
                 [!provide]                        PROVIDE (end = .)
                 0x00000001                        ASSERT ((. < 0x80f00000), Kernel size exceeded the limit, may need to adjust memory configs)
 OUTPUT(Object/BENCHMARK.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x00000000      0x889
- .debug_info    0x00000000      0x865 Object/rme_benchmark.o
- .debug_info    0x00000865       0x24 Object/rme_benchmark_asm.o
+.debug_info     0x00000000      0x8e0
+ .debug_info    0x00000000      0x8bc Object/rme_benchmark.o
+ .debug_info    0x000008bc       0x24 Object/rme_benchmark_asm.o
 
-.debug_abbrev   0x00000000      0x254
- .debug_abbrev  0x00000000      0x240 Object/rme_benchmark.o
- .debug_abbrev  0x00000240       0x14 Object/rme_benchmark_asm.o
+.debug_abbrev   0x00000000      0x283
+ .debug_abbrev  0x00000000      0x26f Object/rme_benchmark.o
+ .debug_abbrev  0x0000026f       0x14 Object/rme_benchmark_asm.o
 
-.debug_aranges  0x00000000       0xf8
+.debug_aranges  0x00000000      0x100
  .debug_aranges
-                0x00000000       0xd8 Object/rme_benchmark.o
+                0x00000000       0xe0 Object/rme_benchmark.o
  .debug_aranges
-                0x000000d8       0x20 Object/rme_benchmark_asm.o
+                0x000000e0       0x20 Object/rme_benchmark_asm.o
 
 .debug_rnglists
-                0x00000000       0xa2
+                0x00000000       0xa8
  .debug_rnglists
-                0x00000000       0xa2 Object/rme_benchmark.o
+                0x00000000       0xa8 Object/rme_benchmark.o
 
-.debug_macro    0x00000000      0x204
+.debug_macro    0x00000000      0x27b
  .debug_macro   0x00000000       0x23 Object/rme_benchmark.o
- .debug_macro   0x00000023      0x1e1 Object/rme_benchmark.o
+ .debug_macro   0x00000023      0x258 Object/rme_benchmark.o
 
-.debug_line     0x00000000      0x4d7
- .debug_line    0x00000000      0x464 Object/rme_benchmark.o
- .debug_line    0x00000464       0x73 Object/rme_benchmark_asm.o
+.debug_line     0x00000000      0x517
+ .debug_line    0x00000000      0x4a4 Object/rme_benchmark.o
+ .debug_line    0x000004a4       0x73 Object/rme_benchmark_asm.o
 
-.debug_str      0x00000000     0x5d45
- .debug_str     0x00000000     0x5d45 Object/rme_benchmark.o
-                               0x5d65 (size before relaxing)
- .debug_str     0x00005d45       0x42 Object/rme_benchmark_asm.o
+.debug_str      0x00000000     0x606e
+ .debug_str     0x00000000     0x606e Object/rme_benchmark.o
+                               0x608e (size before relaxing)
+ .debug_str     0x0000606e       0x42 Object/rme_benchmark_asm.o
 
 .comment        0x00000000       0x45
  .comment       0x00000000       0x45 Object/rme_benchmark.o
@@ -512,9 +515,9 @@ LOAD linker stubs
  .ARM.attributes
                 0x00000083       0x23 C:/Toolchain/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-a+simd/softfp\libgcc.a(_dvmd_tls.o)
 
-.debug_frame    0x00000000      0x310
- .debug_frame   0x00000000      0x2f0 Object/rme_benchmark.o
- .debug_frame   0x000002f0       0x20 C:/Toolchain/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-a+simd/softfp\libgcc.a(_divsi3.o)
+.debug_frame    0x00000000      0x330
+ .debug_frame   0x00000000      0x310 Object/rme_benchmark.o
+ .debug_frame   0x00000310       0x20 C:/Toolchain/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-a+simd/softfp\libgcc.a(_divsi3.o)
 
 .debug_line_str
                 0x00000000      0x108
@@ -655,4 +658,7 @@ __aeabi_ldiv0                                     C:/Toolchain/arm-gnu-toolchain
 __divsi3                                          C:/Toolchain/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v7-a+simd/softfp\libgcc.a(_divsi3.o)
 __user_setup_stackheap                            Object/rme_benchmark_asm.o
 _start                                            Object/u.o
+end                                               Object/rme_benchmark.o
+get_time                                          Object/rme_benchmark.o
 main                                              Object/main.o
+start                                             Object/rme_benchmark.o
