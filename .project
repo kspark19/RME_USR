@@ -50,6 +50,11 @@
 			<locationURI>PROJECT_LOC/Include/rme_platform_xc7z020.h</locationURI>
 		</link>
 		<link>
+			<name>Include/sys.h</name>
+			<type>1</type>
+			<location>E:/share/useproject/user/Include/sys.h</location>
+		</link>
+		<link>
 			<name>Source/rme_benchmark.c</name>
 			<type>1</type>
 			<locationURI>PROJECT_LOC/Source/rme_benchmark.c</locationURI>

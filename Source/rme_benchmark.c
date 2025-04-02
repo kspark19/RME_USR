@@ -7,8 +7,7 @@ Description : The benchmark file for RME.
 ******************************************************************************/
 
 /* Include *******************************************************************/
-#include"benchmark.h"
-
+#include"sys.h"
 ptr_t Cur_addr;
 ptr_t start;
 ptr_t end;
@@ -418,6 +417,31 @@ void RME_Diff_Prc_Thd_Switch_Test(void)
 }
 /* End Function:RME_Diff_Prc_Thd_Switch_Test ********************************/
 
+/* Function:RME_Same_Prc_Switch_Test *************************************
+Description : The same-process switch test code.
+Input       : None.
+Output      : None.
+Return      : None.
+******************************************************************************/
+void RME_Same_Prc_Switch_Test(void)
+{
+	//ret_t RME_Pgt_Crt(cid_t Cap_Cpt,cid_t Cap_Kom,cid_t Cap_Pgt,
+	//ptr_t Raddr,ptr_t Base,
+    //ptr_t Is_Top,
+    //ptr_t Size_Order,
+    //ptr_t Num_Order)
+	// create benchmark page table
+	ret_t Retval;
+	Retval=RME_Pgt_Crt(RME_BOOT_INIT_CPT,RME_BOOT_INIT_KOM,RME_BOOT_BENCH_PGT,
+			    	   Cur_addr,0x00000000U,RME_PGT_TOP,RME_PGT_SIZE_1M,RME_PGT_NUM_4K);
+	USR_DBG_S("\r\ncreate benchmark page table  retval= ");
+	USR_DBG_I(Retval);
+	// add page to benchmark pgt
+	//创建新进程 create benchmark prc
+	//创建新线程 create new thread
+	//切换到新线程 switch to new prc
+}
+
 /* Function:RME_Benchmark *****************************************************
 Description : The benchmark entry, also the init thread.
 Input       : None.
@@ -430,7 +454,8 @@ void RME_Benchmark(void)
     USR_DBG_S("\r\nTest begin!");
 
     //RME_Same_Prc_Thd_Sig_Testinit();
-    RME_Same_Prc_Thd_Switch_Test();
+    //RME_Same_Prc_Thd_Switch_Test();
+    RME_Same_Prc_Switch_Test();
     USR_DBG_S("\r\nTest done!");
     while(1);
 }

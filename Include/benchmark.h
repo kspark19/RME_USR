@@ -103,11 +103,12 @@ typedef s32                        			ret_t;
 #define RME_BOOT_INIT_TIMER      				6
 /* The test objects */
 #define RME_BOOT_BENCH_THD       				8
-#define RME_BOOT_BENCH_PGT_TOP   				9
+#define RME_BOOT_BENCH_PGT   				    9
 #define RME_BOOT_BENCH_PGT_SRAM  				10
 #define RME_BOOT_BENCH_SEN_THD					14
 #define RME_BOOT_BENCH_RCV_THD					15
 #define RME_BOOT_BENCH_THD_MAIN					16
+#define RME_BOOT_BENCH_PRC                 		17
 /* The top-level page table of the init process's SRAM */
 #define RME_BOOT_INIT_PGT_SRAM    				11
 /* the signal capability */
@@ -115,6 +116,12 @@ typedef s32                        			ret_t;
 /* Power of 2 */
 #define RME_FIELD(VAL,POW)                      (((ptr_t)(VAL))<<(POW))
 #define RME_POW2(POW)                           RME_FIELD(1U,POW)
+/* Page table base address/top-level attributes */
+#define RME_PGT_BASE(X)                             ((X)&RME_MASK_BEGIN(1U))
+#define RME_PGT_TOP                                 (1U)
+#define RME_PGT_NOM                                 (0U)
+/* Page table */
+#define RME_PGT_SVC(NUM_ORDER,SVC)                  (RME_FIELD(NUM_ORDER,RME_WORD_BIT_Q1)|(SVC))
 /* The order of bits in one CPU machine word */
 #define RME_WORD_ORDER            				(5U)
 /* Word size */
@@ -389,263 +396,3 @@ ptr_t get_time(void)
 }
 
 
-/* Function:RME_Thd_Crt *******************************************************
-Description : Create a thread. A thread is the minimal kernel-level execution
-              unit.
-Input       : RME_cid_t Cap_Cpt - The capability to the capability table.
-                                  2-Level.
-              RME_cid_t Cap_Kom - The kernel memory capability.
-                                  2-Level.
-              RME_cid_t Cap_Thd - The capability slot that you want this newly
-                                  created thread capability to be in.
-                                  1-Level.
-              RME_cid_t Cap_Prc - The capability to the process that it is in.
-                                  2-Level.
-              RME_ptr_t Prio_Max - The maximum priority allowed for this
-                                   thread. Once set, this cannot be changed.
-              RME_ptr_t Raddr - The relative virtual address to store the
-                                thread kernel object.
-              RME_ptr_t Attr - The context attributes.
-Output      : None.
-Return      : RME_ret_t - If successful, the Thread ID; or an error code.
-******************************************************************************/
-ret_t RME_Thd_Crt(cid_t Cap_Cpt,
-                      cid_t Cap_Kom,
-                      cid_t Cap_Thd,
-                      cid_t Cap_Prc,
-                      ptr_t Prio_Max,
-                      ptr_t Raddr,
-                      ptr_t Attr)
-{
-    return RME_SVC(RME_THD_SVC(Attr,0U,RME_SVC_THD_CRT),
-                   Cap_Cpt,
-                   RME_PARAM_D1(Cap_Kom)|RME_PARAM_D0(Cap_Thd),
-                   RME_PARAM_D1(Cap_Prc)|RME_PARAM_D0(Prio_Max),
-                   Raddr);
-}
-/* End Function:RME_Thd_Crt **************************************************/
-
-/* Function:RME_Thd_Exec_Set **************************************************
-Description : Set a thread's entry point and stack. The registers will be
-              initialized with these contents.
-Input       : RME_cid_t Cap_Thd - The capability to the thread.
-                                  2-Level.
-              void* Entry - The entry address of the thread.
-              void* Stack - The stack address to use for execution.
-              void* Param - The parameter to pass to the thread.
-Output      : None.
-Return      : RME_ret_t - If successful, 0; or an error code.
-******************************************************************************/
-ret_t RME_Thd_Exec_Set(cid_t Cap_Thd,
-                           ptr_t Entry,
-                           ptr_t Stack,
-                           ptr_t Param)
-{
-    return RME_SVC(RME_SVC_THD_EXEC_SET,
-                   Cap_Thd,
-                   (ptr_t)Entry,
-                   (ptr_t)Stack,
-                   (ptr_t)Param);
-}
-/* End Function:RME_Thd_Exec_Set *********************************************/
-
-/* Function:RME_Thd_Time_Xfer *************************************************
-Description : Transfer time from one thread to another. This can only be called
-              from the core that the thread is on, and the the two threads
-              involved in the time transfer must be on the same core.
-              If the time transfered is more than or equal to what the source
-              have, the source will be out of time or blocked. If the source is
-              both out of time and blocked, we do not send the notification;
-              Instead, we send the notification when the receive endpoint
-              actually receive something.
-              It is possible to transfer time to threads have a lower priority,
-              and it is also possible to transfer time to threads that have a
-              higher priority. In the latter case, and if the source is
-              currently running, a preemption will occur.
-Input       : RME_cid_t Cap_Thd_Dst - The destination thread.
-                                      2-Level.
-              RME_cid_t Cap_Thd_Src - The source thread.
-                                      2-Level.
-              RME_ptr_t Time - The time to transfer, in slices. A slice is the
-                               minimal amount of time transfered in the system
-                               usually on the order of 100us or 1ms.
-                               Use RME_THD_INIT_TIME for revoking transfer.
-                               Use RME_THD_INF_TIME for infinite trasnfer.
-Output      : None.
-Return      : RME_ret_t - If successful, the destination time amount; or an
-                          error code.
-******************************************************************************/
-ret_t RME_Thd_Time_Xfer(cid_t Cap_Thd_Dst,
-                        cid_t Cap_Thd_Src,
-                        ptr_t Time)
-{
-    return RME_SVC(RME_SVC_THD_TIME_XFER,
-                   0U,
-                   Cap_Thd_Dst,
-                   Cap_Thd_Src,
-                   Time);
-}
-/* End Function:RME_Thd_Time_Xfer ********************************************/
-
-
-/* Function:RME_Thd_Sched_Bind ************************************************
-Description : Set a thread's priority level, and its scheduler thread. When
-              there are any state changes on this thread, a notification will
-              be sent to its scheduler thread. If the state of the thread
-              changes for multiple times, then only the most recent state will
-              be reflected in the scheduler's receive queue.
-              The scheduler and the threads that it schedule must be on the
-              same core. When a thread wants to go from one core to another,
-              its notification to the scheduler must all be processed, and it
-              must have no scheduler notifications in itself.
-              This must be called on the same core with the Cap_Thd_Sched, and
-              the Cap_Thd itself must be free.
-              It is impossible to set a thread's priority beyond its maximum
-              priority.
-Input       : RME_cid_t Cap_Thd - The capability to the thread.
-                                  2-Level.
-              RME_cid_t Cap_Thd_Sched - The scheduler thread.
-                                        2-Level.
-              RME_cid_t Cap_Sig - The signal endpoint for scheduler
-                                  notifications. This signal endpoint will be
-                                  sent to whenever this thread has a fault, or
-                                  timeouts. This is purely optional; if it is
-                                  not needed, pass in RME_CID_NULL.
-              RME_tid_t TID - The thread ID. This is user-supplied, and the
-                              kernel will not check whether there are two
-                              threads that have the same TID.
-              RME_ptr_t Prio - The priority level, higher is more critical.
-              rme_ptr_t Haddr - The kernel-accessible virtual memory address
-                                for this thread's register sets, only used by
-                                hypervisor-managed threads. For other threads,
-                                please pass in NULL instead.
-
-Output      : None.
-Return      : RME_ret_t - If successful, 0; or an error code.
-******************************************************************************/
-ret_t RME_Thd_Sched_Bind(cid_t Cap_Thd,
-                         cid_t Cap_Thd_Sched,
-                         cid_t Cap_Sig,
-                         tid_t TID,
-                         ptr_t Prio,
-                         ptr_t Haddr)
-{
-    return RME_SVC(RME_SVC_THD_SCHED_BIND,
-                   Cap_Thd,
-                   RME_PARAM_D1(Cap_Thd_Sched)|RME_PARAM_D0(Cap_Sig),
-                   RME_PARAM_D1(TID)|RME_PARAM_D0(Prio),
-                   Haddr);
-}
-/* End Function:RME_Thd_Sched_Bind *******************************************/
-
-
-/* Function:RME_Thd_Swt *******************************************************
-Description : Switch to another thread. The thread to switch to must have the
-              same preemptive priority as this thread, and have time, and not
-              blocked.
-Input       : RME_cid_t Cap_Thd - The capability to the thread. If this is -1,
-                                  the kernel will pickup whatever thread that
-                                  has the highest priority and time to run.
-                                  2-Level.
-              RME_ptr_t Is_Yield - This is a flag to indicate whether this
-                                   is a full yield. If it is, the kernel will
-                                   discard all the time alloted on this
-                                   thread.
-Output      : None.
-Return      : RME_ret_t - If successful, 0; or an error code.
-******************************************************************************/
-ret_t RME_Thd_Swt(cid_t Cap_Thd,
-                  ptr_t Is_Yield)
-{
-    return RME_SVC(RME_SVC_THD_SWT,
-                   0U,
-                   Cap_Thd,
-                   Is_Yield,
-                   0U);
-}
-/* End Function:RME_Thd_Swt **************************************************/
-/*asynchronous communication function*/
-/* Function:RME_Sig_Crt *******************************************************
-Description : Create a signal endpoint.
-Input       : RME_cid_t Cap_Cpt - The capability to the capability table to use
-                                  for this signal.
-                                  2-Level.
-              RME_cid_t Cap_Sig - The capability slot that you want this newly
-                                  created signal capability to be in.
-                                  1-Level.
-Output      : None.
-Return      : RME_ret_t - If successful, 0; or an error code.
-******************************************************************************/
-ret_t RME_Sig_Crt(cid_t Cap_Cpt,
-                  cid_t Cap_Sig)
-{
-    return RME_SVC(RME_SVC_SIG_CRT,
-                   Cap_Cpt,
-                   Cap_Sig,
-                   0U,
-                   0U);
-}
-/* End Function:RME_Sig_Crt **************************************************/
-/* Function:RME_Sig_Del *******************************************************
-Description : Delete a signal endpoint.
-Input       : RME_cid_t Cap_Cpt - The capability to the capability table to
-                                  delete from.
-                                  2-Level.
-              RME_cid_t Cap_Sig - The capability to the signal.
-                                  1-Level.
-Output      : None.
-Return      : RME_ret_t - If successful, 0; or an error code.
-******************************************************************************/
-ret_t RME_Sig_Del(cid_t Cap_Cpt,
-                  cid_t Cap_Sig)
-{
-    return RME_SVC(RME_SVC_SIG_DEL,
-                   Cap_Cpt,
-                   Cap_Sig,
-                   0U,
-                   0U);
-}
-/* End Function:RME_Sig_Del **************************************************/
-/* Function:RME_Sig_Snd ******************************************************
-Description : Try to send to a signal endpoint. This system call can cause
-              a potential context switch.
-Input       : RME_cid_t Cap_Sig - The capability to the signal.
-                                  2-Level.
-Output      : None.
-Return      : RME_ret_t - If successful, 0, or an error code.
-******************************************************************************/
-ret_t RME_Sig_Snd(cid_t Cap_Sig)
-{
-    return RME_SVC(RME_SVC_SIG_SND,
-                   0U,
-                   Cap_Sig,
-                   0U,
-                   0U);
-}
-/* End Function:RME_Sig_Snd **************************************************/
-/* Function:RME_Sig_Rcv *******************************************************
-Description : Try to receive from a signal endpoint. The rules for signal
-              endpoint receive is:
-              1.If a receive endpoint have many send endpoints, everyone can
-                send to it, and sending to it will increase the count by 1.
-              2.If some thread blocks on a receive endpoint, the wakeup is only
-                possible from the same core that thread is on.
-              3.It is not recommended to let 2 cores operate on the rcv
-                endpoint simutaneously.
-              This system call can potentially trigger a context switch.
-Input       : RME_cid_t Cap_Sig - The capability to the signal.
-                                  2-Level.
-              RME_ptr_t Option - The receive option.
-Output      : None.
-Return      : RME_ret_t - If successful, a non-negative number containing the
-                          number of signals received; or an error code.
-******************************************************************************/
-ret_t RME_Sig_Rcv(cid_t Cap_Sig,
-                  ptr_t Option)
-{
-    return RME_SVC(RME_SVC_SIG_RCV,
-                   0U,
-                   Cap_Sig,
-                   Option,
-                   0U);
-}
