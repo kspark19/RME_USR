@@ -117,9 +117,9 @@ typedef s32                        			ret_t;
 #define RME_FIELD(VAL,POW)                      (((ptr_t)(VAL))<<(POW))
 #define RME_POW2(POW)                           RME_FIELD(1U,POW)
 /* Page table base address/top-level attributes */
-#define RME_PGT_BASE(X)                             ((X)&RME_MASK_BEGIN(1U))
-#define RME_PGT_TOP                                 (1U)
-#define RME_PGT_NOM                                 (0U)
+#define RME_PGT_BASE(X)                         ((X)&RME_MASK_BEGIN(1U))
+#define RME_PGT_TOP                             (1U)
+#define RME_PGT_NOM                             (0U)
 /* Page table */
 #define RME_PGT_SVC(NUM_ORDER,SVC)                  (RME_FIELD(NUM_ORDER,RME_WORD_BIT_Q1)|(SVC))
 /* The order of bits in one CPU machine word */
@@ -129,9 +129,13 @@ typedef s32                        			ret_t;
 /* Need to export the memory frontier! */
 /* Need to export the flags as well ! */
 /* Export the errno too */
-#define RME_BOOT_BENCH_KOM_FRONTIER 			0x00009000U
+#define RME_BOOT_BENCH_KOM_FRONTIER 			0x00008000U
+/* Bench process page table real address */
+#define RME_BOOT_BENCH_PGT_RADDR 				0x00060000U
 /* The kernel-accessible virtual memory address,for this thread's register sets */
 #define RME_BOOT_HYPER_KOM_VADDR                0x00000000U
+/* The virtual memory start address for the kernel objects */
+#define RME_KOM_VA_BASE              0x81000000U
 //0x10005000
 /* The stack safe size */
 #define RME_STACK_SAFE_SIZE 					16

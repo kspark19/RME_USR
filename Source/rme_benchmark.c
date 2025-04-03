@@ -46,8 +46,8 @@ void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1)
 {
     ret_t Retval;
 
-    /*USR_DBG_S("\r\n hello! this is thread ");
-    USR_DBG_I(Param1);*/
+    USR_DBG_S("\r\n hello! this is thread ");
+    USR_DBG_I(Param1);
     /* Now we switch back to the init thread, immediately */
     while(1)
     {
@@ -61,7 +61,7 @@ void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1)
 /* End Function:RME_Same_Prc_Thd_Switch_Test_Thd ****************************/
 
 
-void RME_Thd_Create(cid_t Cap_Thd,ptr_t Tid,ptr_t Prc,ptr_t Entry,ptr_t Raddr,cid_t Cap_Sig,ptr_t Time, ptr_t Stack)
+void RME_Thd_Create(cid_t Cap_Thd,ptr_t Tid,ptr_t Prio,ptr_t Entry,ptr_t Raddr,cid_t Cap_Sig,ptr_t Time, ptr_t Stack)
 {
 	ret_t Retval;
 	cnt_t Count;
@@ -80,7 +80,7 @@ void RME_Thd_Create(cid_t Cap_Thd,ptr_t Tid,ptr_t Prc,ptr_t Entry,ptr_t Raddr,ci
 
 	/* Bind the thread to the processor */
 	Retval=RME_Thd_Sched_Bind(Cap_Thd,RME_BOOT_INIT_THD,Cap_Sig,
-							  Tid,Prc,RME_BOOT_HYPER_KOM_VADDR);
+							  Tid,Prio,RME_BOOT_HYPER_KOM_VADDR);
 	USR_DBG_S("\r\nBind the thread to the processor retval= ");
 	USR_DBG_I(Retval);
 	/* Set the execution information */
@@ -432,14 +432,89 @@ void RME_Same_Prc_Switch_Test(void)
     //ptr_t Num_Order)
 	// create benchmark page table
 	ret_t Retval;
+	ptr_t Count;
+	Cur_addr=RME_BOOT_BENCH_PGT_RADDR;
+	USR_DBG_S(" \r\nCur_addr= ");
+    USR_DBG_H(Cur_addr);
 	Retval=RME_Pgt_Crt(RME_BOOT_INIT_CPT,RME_BOOT_INIT_KOM,RME_BOOT_BENCH_PGT,
 			    	   Cur_addr,0x00000000U,RME_PGT_TOP,RME_PGT_SIZE_1M,RME_PGT_NUM_4K);
 	USR_DBG_S("\r\ncreate benchmark page table  retval= ");
 	USR_DBG_I(Retval);
 	// add page to benchmark pgt
+	for(Count=0U;Count<0x400U;Count++)
+	    {
+		Retval=RME_Pgt_Add(RME_BOOT_BENCH_PGT,Count,RME_PGT_ALL_DYN,
+										 RME_BOOT_INIT_PGT,
+										 Count,
+										 0);
+		    /*USR_DBG_S("\r\nadd page to benchmark pgt  retval= ");
+			USR_DBG_I(Retval);*/
+	    }
+		/* Device memory 1, 512MiB 0x40000000 -> 0x40000000 */
+	    for(Count=0U;Count<0x200U;Count++)
+	    {
+	    	Retval=RME_Pgt_Add(RME_BOOT_BENCH_PGT,(Count+0x400U),
+										 RME_PGT_READ|RME_PGT_WRITE,
+										 RME_BOOT_INIT_PGT,
+										 (Count+0x400U),
+										 0);
+			/*USR_DBG_S("\r\nadd page to benchmark pgt  retval= ");
+						USR_DBG_I(Retval);*/
+	    }
+
+	    /* Device memory 2, 512MiB 0x60000000 -> 0xE0000000 */
+	    for(Count=0U;Count<0x200U;Count++)
+	    {
+	    	Retval=RME_Pgt_Add(RME_BOOT_BENCH_PGT,(Count+0x600U),
+	    								 RME_PGT_READ|RME_PGT_WRITE,
+										 RME_BOOT_INIT_PGT,
+										 (Count+0x600U),
+										 0);
+			/*USR_DBG_S("\r\nadd page to benchmark pgt  retval= ");
+									USR_DBG_I(Retval);*/
+	    }
+	    USR_DBG_S("\r\nFirst section's first entry ");
+	    USR_DBG_H(RME_A7A_REG(Cur_addr+RME_KOM_VA_BASE));
+	    USR_DBG_S(" @ ");
+	    USR_DBG_H(Cur_addr+RME_KOM_VA_BASE);
+
+	    USR_DBG_S("\r\nFirst section's 0x080th entry ");
+	    USR_DBG_H(RME_A7A_REG(Cur_addr+0x080*RME_WORD_BYTE+RME_KOM_VA_BASE));
+	    USR_DBG_S(" @ ");
+	    USR_DBG_H(Cur_addr+0x080*RME_WORD_BYTE+RME_KOM_VA_BASE);
+
+	    USR_DBG_S("\r\nSecond section's first entry ");
+	    USR_DBG_H(RME_A7A_REG(Cur_addr+0x400*RME_WORD_BYTE+RME_KOM_VA_BASE));
+	    USR_DBG_S(" @ ");
+	    USR_DBG_H(Cur_addr+0x400*RME_WORD_BYTE+RME_KOM_VA_BASE);
+
+	    USR_DBG_S("\r\nThird section's first entry ");
+	    USR_DBG_H(RME_A7A_REG(Cur_addr+0x600*RME_WORD_BYTE+RME_KOM_VA_BASE));
+	    USR_DBG_S(" @ ");
+	    USR_DBG_H(Cur_addr+0x600*RME_WORD_BYTE+RME_KOM_VA_BASE);
+
+	    /*USR_DBG_S("\r\nKernel pgtbl's 80th entry ");
+	    USR_DBG_H(RME_A7A_REG(((ptr_t)(&__RME_A7A_Kern_Pgt))+0x080*RME_WORD_BYTE));
+	    USR_DBG_S(" @ ");
+	    USR_DBG_H(((ptr_t)(&__RME_A7A_Kern_Pgt))+0x080*RME_WORD_BYTE);*/
 	//创建新进程 create benchmark prc
+	    Retval=RME_Prc_Crt(RME_BOOT_INIT_CPT,RME_BOOT_BENCH_PRC,RME_BOOT_INIT_CPT,
+	    				   RME_BOOT_BENCH_PGT);
+	    USR_DBG_S("\r\n create benchmark prc  retval= ");
+	    						USR_DBG_I(Retval);
 	//创建新线程 create new thread
+//void RME_Thd_Create(cid_t Cap_Thd,ptr_t Tid,ptr_t Prio,ptr_t Entry,ptr_t Raddr,cid_t Cap_Sig,ptr_t Time, ptr_t Stack)
+	    		RME_Thd_Create(RME_BOOT_BENCH_THD,RME_TID_4,0,
+	    		(ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
+				RME_BOOT_BENCH_KOM_FRONTIER,
+				RME_CID_NULL,RME_THD_INF_TIME,
+				(ptr_t)&RME_Stack3[2000]);
+
+
 	//切换到新线程 switch to new prc
+	    	    Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
+	    	    USR_DBG_S("\r\n switch to new prc  retval= ");
+	    	    USR_DBG_I(Retval);
 }
 
 /* Function:RME_Benchmark *****************************************************
