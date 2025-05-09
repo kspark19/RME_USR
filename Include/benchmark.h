@@ -109,6 +109,7 @@ typedef s32                        			ret_t;
 #define RME_BOOT_BENCH_RCV_THD					15
 #define RME_BOOT_BENCH_THD_MAIN					16
 #define RME_BOOT_BENCH_PRC                 		17
+#define RME_BOOT_BENCH_INV						18
 /* The top-level page table of the init process's SRAM */
 #define RME_BOOT_INIT_PGT_SRAM    				11
 /* the signal capability */
@@ -135,7 +136,7 @@ typedef s32                        			ret_t;
 /* The kernel-accessible virtual memory address,for this thread's register sets */
 #define RME_BOOT_HYPER_KOM_VADDR                0x00000000U
 /* The virtual memory start address for the kernel objects */
-#define RME_KOM_VA_BASE              0x81000000U
+#define RME_KOM_VA_BASE              			0x81000000U
 //0x10005000
 /* The stack safe size */
 #define RME_STACK_SAFE_SIZE 					16

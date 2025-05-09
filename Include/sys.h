@@ -463,3 +463,46 @@ ret_t RME_Pgt_Add(cid_t Cap_Pgt_Dst,
 }
 /* End Function:RME_Pgt_Add **************************************************/
 
+ret_t RME_Inv_Crt(cid_t Cap_Cpt,
+                      cid_t Cap_Kom,
+                      cid_t Cap_Inv,
+                      cid_t Cap_Prc,
+                      ptr_t Raddr)
+{
+    return RME_SVC(RME_SVC_INV_CRT,
+                   Cap_Cpt,
+                   RME_PARAM_D1(Cap_Kom)|RME_PARAM_D0(Cap_Inv),
+                   Cap_Prc,
+                   Raddr);
+}
+
+ret_t RME_Inv_Set(cid_t Cap_Inv,
+                      ptr_t Entry,
+                      ptr_t Stack,
+                      ptr_t Is_Exc_Ret)
+{
+    return RME_SVC(RME_SVC_INV_SET,
+                   0U,
+                   RME_PARAM_D1(Is_Exc_Ret)|RME_PARAM_D0(Cap_Inv),
+                   Entry,
+                   Stack);
+}
+
+ret_t RME_Inv_Act(cid_t Cap_Inv,
+				  ptr_t Param,
+				  ptr_t* Retval);
+/*{
+	return RME_SVC(RME_SVC_INV_ACT,
+					   0U,
+					   (cid_t)Cap_Inv,
+					   Param,
+	                   0U);
+}*/
+ret_t RME_Inv_Ret(ptr_t Retval);
+/*{
+	return RME_SVC(RME_SVC_INV_RET,
+						   0U,
+						   Retval,
+						   0U,
+		                   0U);
+}*/

@@ -14,27 +14,6 @@ ptr_t end;
 /* Need to export error codes, and size of each object, in words! */
 /* End Include ***************************************************************/
 
-/* Function:_RME_Tsc_Init *****************************************************
-Description : The initialization of timestamp counter. 19 secs before overflowing.
-Input       : None.
-Output      : None.
-Return      : None.
-******************************************************************************/
-void _RME_Tsc_Init(void)
-{
- //   TIM_HandleTypeDef TIM2_Handle;
-//    
-//    /* Initialize timer 2 to run at the same speed as the CPU */
-//    TIM2_Handle.Instance=TIM2;
-//    TIM2_Handle.Init.Prescaler=0;
-//    TIM2_Handle.Init.CounterMode=TIM_COUNTERMODE_UP;
-//    TIM2_Handle.Init.Period=(ptr_t)(-1);
-//    TIM2_Handle.Init.ClockDivision=TIM_CLOCKDIVISION_DIV1;
-//    HAL_TIM_Base_Init(&TIM2_Handle);
-//    __HAL_RCC_TIM2_CLK_ENABLE();
-//    __HAL_TIM_ENABLE(&TIM2_Handle);
-}
-/* End Function:_RME_Tsc_Init ************************************************/
 
 /* Function:RME_Same_Prc_Thd_Switch_Test_Thd *********************************
 Description : The thread for testing same-process thread switching performance.
@@ -46,8 +25,29 @@ void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1)
 {
     ret_t Retval;
 
-    /*USR_DBG_S("\r\n hello! this is thread ");
-    USR_DBG_I(Param1);*/
+
+    /* Now we switch back to the init thread, immediately */
+    while(1)
+    {
+        /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
+                          RME_BOOT_INIT_THD,
+                          0,
+                          0);*/
+    	/*USR_DBG_S("\r\n hello! this is thread ");
+    	    USR_DBG_I(Param1);*/
+        Retval=RME_Thd_Swt(RME_BOOT_INIT_THD,0);
+    }
+}
+/* End Function:RME_Same_Prc_Thd_Switch_Test_Thd ****************************/
+/* Function:RME_Diff_Prc_Thd_Switch_Test_Thd *********************************
+Description : The thread for testing same-process thread switching performance.
+Input       : None.
+Output      : None.
+Return      : None.
+******************************************************************************/
+void RME_Diff_Prc_Thd_Switch_Test_Thd(ptr_t Param1)
+{
+    ret_t Retval;
     /* Now we switch back to the init thread, immediately */
     while(1)
     {
@@ -58,7 +58,8 @@ void RME_Same_Prc_Thd_Switch_Test_Thd(ptr_t Param1)
         Retval=RME_Thd_Swt(RME_BOOT_INIT_THD,0);
     }
 }
-/* End Function:RME_Same_Prc_Thd_Switch_Test_Thd ****************************/
+/* End Function:RME_Diff_Prc_Thd_Switch_Test_Thd ****************************/
+
 
 
 void RME_Thd_Create(cid_t Cap_Prc,cid_t Cap_Thd,ptr_t Tid,ptr_t Prio,ptr_t Entry,ptr_t Raddr,cid_t Cap_Sig,ptr_t Time, ptr_t Stack)
@@ -104,6 +105,7 @@ void RME_Same_Prc_Thd_Sig_Test_Thd_send(void) //low prio 4
 	while(1)
 	{
 		USR_DBG_S("\r\nSend!");
+		start=get_time();
 		RME_Sig_Snd(RME_BOOT_SIG_BENCH);
 	}
 
@@ -120,20 +122,51 @@ void RME_Same_Prc_Thd_Sig_Test_Thd_recv(void) // high prio 5
 			USR_DBG_S("\r\nReceived wrong number!");
 			while(1);
 		}
+		end=get_time();
 		USR_DBG_S("\r\nReceived!");
+		USR_DBG_S("\r\n same prc sig send take time");
+		USR_DBG_I((end-start)*2);
+	}
+}
+void RME_Diff_Prc_Thd_Sig_Test_Thd_send(void) //low prio 4
+{
+	USR_DBG_S("\r\nEntering diff send thread!");
+
+	while(1)
+	{
+		USR_DBG_S("\r\nSend!");
+		start=get_time();
+		RME_Sig_Snd(RME_BOOT_SIG_BENCH);
+	}
+
+}
+
+void RME_Diff_Prc_Thd_Sig_Test_Thd_recv(void) // high prio 5
+{
+	USR_DBG_S("\r\nEntering diff receive thread!");
+
+	while(1)
+	{
+		if(RME_Sig_Rcv(RME_BOOT_SIG_BENCH,RME_RCV_BS)!=1)
+		{
+			USR_DBG_S("\r\nReceived wrong number!");
+			while(1);
+		}
+		end=get_time();
+		USR_DBG_S("\r\nReceived!");
+		USR_DBG_S("\r\n diff prc sig send take time");
+		USR_DBG_I((end-start)*2);
 	}
 }
 
 
 
-
-/* Function:RME_Same_Prc_Thd_Switch_Test_Thd *********************************
-Description : The thread for testing same-process thread signal send and receive performance.
+/* Description : The thread for testing same-process thread signal send and receive performance.
 Input       : None.
 Output      : None.
 Return      : None.
 ******************************************************************************/
-void RME_Same_Prc_Thd_Sig_Test_Thd_main(ptr_t TID)
+void RME_Same_Prc_Thd_Sig_Test_Thd_main_nouse(ptr_t TID)
 {
 	USR_DBG_S("\r\n");
 	USR_DBG_S("\r\n/****************");
@@ -171,6 +204,117 @@ void RME_Same_Prc_Thd_Sig_Testinit(void)
 	RME_Thd_Create(RME_BOOT_INIT_PRC,RME_BOOT_BENCH_SEN_THD,RME_TID_3,4,(ptr_t)RME_Same_Prc_Thd_Sig_Test_Thd_send,
 				   Cur_addr,RME_BOOT_SIG_BENCH,RME_THD_INF_TIME,(ptr_t)&RME_Stack2[2000]);
 	Cur_addr+=512;
+}
+
+
+void RME_Diff_Prc_Thd_Sig_Testinit(void)
+{
+	ret_t Retval;
+	//Cur_addr=RME_BOOT_BENCH_PGT_RADDR;
+	/* create a signal end point */
+	Retval=RME_Sig_Crt(RME_BOOT_INIT_CPT,RME_BOOT_SIG_BENCH);
+	USR_DBG_S("\r\ncreate a signal end point      retval= ");
+	USR_DBG_I(Retval);
+	/* create signal test thread */
+	//void RME_Thd_Create(cid_t Cap_Thd,ptr_t Tid,ptr_t Prc,ptr_t Entry,ptr_t Raddr,cid_t Cap_Sig,ptr_t Time)
+	RME_Thd_Create(RME_BOOT_INIT_PRC,RME_BOOT_BENCH_RCV_THD,RME_TID_4,5,(ptr_t)RME_Diff_Prc_Thd_Sig_Test_Thd_recv,
+                   Cur_addr,RME_BOOT_SIG_BENCH,RME_THD_INF_TIME,(ptr_t)&RME_Stack3[2000]);
+	Cur_addr=RME_BOOT_BENCH_PGT_RADDR;
+
+	    ptr_t Count;
+
+
+		USR_DBG_S(" \r\nCur_addr= ");
+	    USR_DBG_H(Cur_addr);
+		Retval=RME_Pgt_Crt(RME_BOOT_INIT_CPT,RME_BOOT_INIT_KOM,RME_BOOT_BENCH_PGT,
+				RME_BOOT_BENCH_PGT_RADDR,0x00000000U,RME_PGT_TOP,RME_PGT_SIZE_1M,RME_PGT_NUM_4K);
+
+		USR_DBG_S("\r\ncreate rcv page table  retval= ");
+		USR_DBG_I(Retval);
+
+		// add page to benchmark pgt
+		for(Count=0U;Count<0x400U;Count++)
+		    {
+			Retval=RME_Pgt_Add(RME_BOOT_BENCH_PGT,Count,RME_PGT_ALL_DYN,
+											 RME_BOOT_INIT_PGT,
+											 Count,
+											 0);
+			    /*USR_DBG_S("\r\nadd page to benchmark pgt  retval= ");
+				USR_DBG_I(Retval);*/
+		    }
+			/* Device memory 1, 512MiB 0x40000000 -> 0x40000000 */
+		    for(Count=0U;Count<0x200U;Count++)
+		    {
+		    	Retval=RME_Pgt_Add(RME_BOOT_BENCH_PGT,(Count+0x400U),
+											 RME_PGT_READ|RME_PGT_WRITE,
+											 RME_BOOT_INIT_PGT,
+											 (Count+0x400U),
+											 0);
+				/*USR_DBG_S("\r\nadd page to benchmark pgt  retval= ");
+							USR_DBG_I(Retval);*/
+		    }
+
+		    /* Device memory 2, 512MiB 0x60000000 -> 0xE0000000 */
+		    for(Count=0U;Count<0x200U;Count++)
+		    {
+		    	Retval=RME_Pgt_Add(RME_BOOT_BENCH_PGT,(Count+0x600U),
+		    								 RME_PGT_READ|RME_PGT_WRITE,
+											 RME_BOOT_INIT_PGT,
+											 (Count+0x600U),
+											 0);
+				/*USR_DBG_S("\r\nadd page to benchmark pgt  retval= ");
+										USR_DBG_I(Retval);*/
+		    }
+		    USR_DBG_S("\r\nFirst section's first entry ");
+		    USR_DBG_H(RME_A7A_REG(Cur_addr+RME_KOM_VA_BASE));
+		    USR_DBG_S(" @ ");
+		    USR_DBG_H(Cur_addr+RME_KOM_VA_BASE);
+
+		    USR_DBG_S("\r\nFirst section's 0x080th entry ");
+		    USR_DBG_H(RME_A7A_REG(Cur_addr+0x080*RME_WORD_BYTE+RME_KOM_VA_BASE));
+		    USR_DBG_S(" @ ");
+		    USR_DBG_H(Cur_addr+0x080*RME_WORD_BYTE+RME_KOM_VA_BASE);
+
+		    USR_DBG_S("\r\nSecond section's first entry ");
+		    USR_DBG_H(RME_A7A_REG(Cur_addr+0x400*RME_WORD_BYTE+RME_KOM_VA_BASE));
+		    USR_DBG_S(" @ ");
+		    USR_DBG_H(Cur_addr+0x400*RME_WORD_BYTE+RME_KOM_VA_BASE);
+
+		    USR_DBG_S("\r\nThird section's first entry ");
+		    USR_DBG_H(RME_A7A_REG(Cur_addr+0x600*RME_WORD_BYTE+RME_KOM_VA_BASE));
+		    USR_DBG_S(" @ ");
+		    USR_DBG_H(Cur_addr+0x600*RME_WORD_BYTE+RME_KOM_VA_BASE);
+
+		    /*USR_DBG_S("\r\nKernel pgtbl's 80th entry ");
+		    USR_DBG_H(RME_A7A_REG(((ptr_t)(&__RME_A7A_Kern_Pgt))+0x080*RME_WORD_BYTE));
+		    USR_DBG_S(" @ ");
+		    USR_DBG_H(((ptr_t)(&__RME_A7A_Kern_Pgt))+0x080*RME_WORD_BYTE);*/
+
+		//创建新进程 create benchmark prc
+		    Retval=RME_Prc_Crt(RME_BOOT_INIT_CPT,RME_BOOT_BENCH_PRC,RME_BOOT_INIT_CPT,
+		    				   RME_BOOT_BENCH_PGT);
+		    USR_DBG_S("\r\n create benchmark prc  retval= ");
+		    						USR_DBG_I(Retval);
+
+		    		//创建新线程 create new thread
+
+	  /*RME_Thd_Create(RME_BOOT_BENCH_PRC,RME_BOOT_BENCH_THD,RME_TID_4,0,
+		    		(ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
+					RME_BOOT_BENCH_KOM_FRONTIER,
+					RME_CID_NULL,RME_THD_INF_TIME,
+					(ptr_t)&RME_Stack3[2000]);*/
+		    						Cur_addr=RME_BOOT_BENCH_KOM_FRONTIER+512;
+		    						USR_DBG_S(" \r\nCur_addr= ");
+		    							    USR_DBG_H(Cur_addr);
+		 RME_Thd_Create(RME_BOOT_BENCH_PRC,RME_BOOT_BENCH_SEN_THD,RME_TID_3,4,(ptr_t)RME_Diff_Prc_Thd_Sig_Test_Thd_send,
+	  				   Cur_addr,RME_BOOT_SIG_BENCH,RME_THD_INF_TIME,(ptr_t)&RME_Stack2[2000]);
+	  	  	  	  	 USR_DBG_S("\r\n create send thd  retval= ");
+	  	  	  	  	 USR_DBG_I(Retval);
+
+		    		//切换到新线程 switch to new prc
+		    	    Retval=RME_Thd_Swt(RME_BOOT_BENCH_SEN_THD,0);
+	  	  	  	  	 while(1);
+
 }
 
 /* Function:RME_Same_Prc_Thd_Switch_Test *************************************
@@ -243,44 +387,32 @@ void RME_Same_Prc_Thd_Switch_Test(void)
     Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
     /*USR_DBG_S("\r\nTry to switch to that thread - should fail  retval= ");
     USR_DBG_I(Retval);*/
-    /* Test result: intra-process ctxsw 358cycles/1.657us, frt w/mpu 163cycles/0.754us,
-    * composite 324. opted max:323
-    * all:33.0
-    * empty: 4.09 - 0.409us, most time spent on internals
-    * w/selections: 7.15 - maybe no need to check frozen cap from the proc.
-    * w/checkings:10.926 - 317us.
-    * total:16.57
-    * 16.2us now, after cleaning up two bad things
-    * 14.7us after CPUID optimizations. The quiescence hardly worked.
-    * no cache - 3 times slower, mainly due to the flash. ART does not really help.
-    * Performance cannot be further optimized anymore without compiler intrinsics.
-    * Something terribly wrong with systick. 38 second wrapwround
-    * This configuration, CPU works at 216MHz, correct, but the 
-    * The TSC is always 8 cycles between reads.
-    */
     //_RME_Tsc_Init();
     //for(Count=0;Count<10000;Count++)
+    /*start=get_time();
+
+    RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
+    end=get_time();
+    USR_DBG_S("\r\n swt 1 times time= ");
+    USR_DBG_I(end-start);*/
+
+
     start=get_time();
     for(Count=0;Count<10000;Count++)
     {
-         RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
-        //Temp=RME_TSC();
-        /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
-                          RME_BOOT_BENCH_THD,
-                          0,
-                          0);*/
-        //Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
-        //Temp=RME_TSC()-Temp;
-       // Time[Count]=Temp-8;
-        //USR_DBG_S("\r\nTry to switch to that thread  retval= ");
-        //USR_DBG_I(Retval);
+    	//start=get_time();
+
+    	    RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
+    	    /*end=get_time();
+    	    USR_DBG_S("\r\n swt 1 times time= ");
+    	    USR_DBG_I(end-start);*/
+
     }
     
     end=get_time();
-    USR_DBG_S("\r\n swt 10000 times time= ");
-    USR_DBG_I((end-start)*2);
-    USR_DBG_S("\r\n swt 1 times time= ");
-    USR_DBG_I((end-start)/20000*2);
+    USR_DBG_S("\r\n swt 10000 times time avg = ");
+    USR_DBG_I((end-start)/10000);
+
     USR_DBG_S("\r\ntest done ");
 
     // test sig_snd/sig_rcv
@@ -291,26 +423,7 @@ void RME_Same_Prc_Thd_Switch_Test(void)
 }
 /* End Function:RME_Same_Prc_Thd_Switch_Test ********************************/
 
-/* Function:RME_Diff_Prc_Thd_Switch_Test_Thd *********************************
-Description : The thread for testing same-process thread switching performance.
-Input       : None.
-Output      : None.
-Return      : None.
-******************************************************************************/
-void RME_Diff_Prc_Thd_Switch_Test_Thd(ptr_t Param1, ptr_t Param2, ptr_t Param3, ptr_t Param4)
-{
-    ret_t Retval;
-    /* Now we switch back to the init thread, immediately */
-    while(1)
-    {
-        /*Retval=RME_CAP_OP(RME_SVC_THD_SWT,0,
-                          RME_BOOT_INIT_THD,
-                          0,
-                          0);*/
-        Retval=RME_Thd_Swt(RME_BOOT_INIT_THD,0);
-    }
-}
-/* End Function:RME_Diff_Prc_Thd_Switch_Test_Thd ****************************/
+
 
 /* Function:RME_Diff_Prc_Thd_Switch_Test *************************************
 Description : The same-process thread switch test code.
@@ -318,7 +431,7 @@ Input       : None.
 Output      : None.
 Return      : None.
 ******************************************************************************/
-void RME_Diff_Prc_Thd_Switch_Test(void)
+void RME_Diff_Prc_Thd_Switch_Test_noused(void)
 {
     /* Intra-process thread switching time */
     ret_t Retval;
@@ -400,7 +513,6 @@ void RME_Diff_Prc_Thd_Switch_Test(void)
     * This configuration, CPU works at 216MHz, correct, but the 
     * The TSC is always 8 cycles between reads.
     */
-    _RME_Tsc_Init();
     for(Count=0;Count<10000;Count++)
     {
         //Temp=RME_TSC();
@@ -417,13 +529,13 @@ void RME_Diff_Prc_Thd_Switch_Test(void)
 }
 /* End Function:RME_Diff_Prc_Thd_Switch_Test ********************************/
 
-/* Function:RME_Same_Prc_Switch_Test *************************************
+/* Function:RME_Diff_Prc_Switch_Test *************************************
 Description : The same-process switch test code.
 Input       : None.
 Output      : None.
 Return      : None.
 ******************************************************************************/
-void RME_Same_Prc_Switch_Test(void)
+void RME_Diff_Prc_Switch_Test(void)
 {
 	// create benchmark page table
 	ret_t Retval;
@@ -495,32 +607,171 @@ void RME_Same_Prc_Switch_Test(void)
 	    USR_DBG_H(RME_A7A_REG(((ptr_t)(&__RME_A7A_Kern_Pgt))+0x080*RME_WORD_BYTE));
 	    USR_DBG_S(" @ ");
 	    USR_DBG_H(((ptr_t)(&__RME_A7A_Kern_Pgt))+0x080*RME_WORD_BYTE);*/
-	//创建新进程 create benchmark prc
+
+	    //创建新进程 create benchmark prc
 	    Retval=RME_Prc_Crt(RME_BOOT_INIT_CPT,RME_BOOT_BENCH_PRC,RME_BOOT_INIT_CPT,
 	    				   RME_BOOT_BENCH_PGT);
 	    /*USR_DBG_S("\r\n create benchmark prc  retval= ");
 	    						USR_DBG_I(Retval);*/
-	//创建新线程 create new thread
-//void RME_Thd_Create(cid_t Cap_Thd,ptr_t Tid,ptr_t Prio,ptr_t Entry,ptr_t Raddr,cid_t Cap_Sig,ptr_t Time, ptr_t Stack)
+
+	    		//创建新线程 create new thread
+
 	    		RME_Thd_Create(RME_BOOT_BENCH_PRC,RME_BOOT_BENCH_THD,RME_TID_4,0,
-	    		(ptr_t)RME_Same_Prc_Thd_Switch_Test_Thd,
+	    		(ptr_t)RME_Diff_Prc_Thd_Switch_Test_Thd,
 				RME_BOOT_BENCH_KOM_FRONTIER,
 				RME_CID_NULL,RME_THD_INF_TIME,
 				(ptr_t)&RME_Stack3[2000]);
 
 
-	//切换到新线程 switch to new prc
+	    		//切换到新线程 switch to new prc
+
 	    		start=get_time();
-	    	    Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
+	    		for(Count=0;Count<10000;Count++)
+	    		    {
+	    				start=get_time();
+	    				Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
+	    				end=get_time();
+	    				USR_DBG_S("\r\n switch to new prc time= ");
+	    				USR_DBG_I(end-start);
+	    				/*USR_DBG_S("\r\n swt benchmark prc  retval= ");
+	    				USR_DBG_I(Retval);*/
+	    		    }
 	    	    //calculate time
 	    	    end=get_time();
-	    	    USR_DBG_S("\r\n switch to new prc time= ");
-	    	    USR_DBG_I((end-start)*2);
+	    	    USR_DBG_S("\r\n switch to new prc 10000 time  = ");
+	    	    	    	    USR_DBG_I(end-start);
+	    	    USR_DBG_S("\r\n switch to new prc 10000 time avg = ");
+	    	    USR_DBG_I((end-start)/10000);
 
-	    	    USR_DBG_S("\r\n switch to new prc  retval= ");
-	    	    USR_DBG_I(Retval);
+	    	    /*USR_DBG_S("\r\n switch to new prc  retval= ");
+	    	    USR_DBG_I(Retval);*/
 	    	    USR_DBG_S("\r\nTest done!");
 	    	    while(1);
+}
+
+void RME_Inv_test_fuction(int param)//迁移调用函数
+{
+	USR_DBG_S("\r\n inv fuction!");
+	//while(1)
+	//{
+		//同步迁移调用返回
+		RME_Inv_Ret(param);
+		//USR_DBG_S("\r\n inv fuction return!");
+		//为什么每次都只是返回到这里
+	//}
+}
+
+void RME_Deadloop(void);
+
+void RME_Diff_Inv_test(void)
+{
+
+	ret_t Retval;
+	ptr_t Count;
+	Cur_addr=RME_BOOT_BENCH_PGT_RADDR;
+	//创建添加页表
+	Retval=RME_Pgt_Crt(RME_BOOT_INIT_CPT,RME_BOOT_INIT_KOM,RME_BOOT_BENCH_PGT,
+				       Cur_addr,0x00000000U,RME_PGT_TOP,RME_PGT_SIZE_1M,RME_PGT_NUM_4K);
+
+	USR_DBG_S("\r\ncreate benchmark page table  retval= ");
+	USR_DBG_I(Retval);
+
+	// add page to benchmark pgt
+	for(Count=0U;Count<0x400U;Count++)
+	{
+			Retval=RME_Pgt_Add(RME_BOOT_BENCH_PGT,Count,RME_PGT_ALL_DYN,
+											 RME_BOOT_INIT_PGT,
+											 Count,
+											 0);
+			    /*USR_DBG_S("\r\nadd page to benchmark pgt  retval= ");
+				USR_DBG_I(Retval);*/
+	}
+			/* Device memory 1, 512MiB 0x40000000 -> 0x40000000 */
+	for(Count=0U;Count<0x200U;Count++)
+	{
+		    	Retval=RME_Pgt_Add(RME_BOOT_BENCH_PGT,(Count+0x400U),
+											 RME_PGT_READ|RME_PGT_WRITE,
+											 RME_BOOT_INIT_PGT,
+											 (Count+0x400U),
+											 0);
+				/*USR_DBG_S("\r\nadd page to benchmark pgt  retval= ");
+							USR_DBG_I(Retval);*/
+	}
+
+		    /* Device memory 2, 512MiB 0x60000000 -> 0xE0000000 */
+	for(Count=0U;Count<0x200U;Count++)
+	{
+		    	Retval=RME_Pgt_Add(RME_BOOT_BENCH_PGT,(Count+0x600U),
+		    								 RME_PGT_READ|RME_PGT_WRITE,
+											 RME_BOOT_INIT_PGT,
+											 (Count+0x600U),
+											 0);
+				/*USR_DBG_S("\r\nadd page to benchmark pgt  retval= ");
+										USR_DBG_I(Retval);*/
+	}
+
+	USR_DBG_S("\r\nFirst section's first entry ");
+	USR_DBG_H(RME_A7A_REG(Cur_addr+RME_KOM_VA_BASE));
+	USR_DBG_S(" @ ");
+	USR_DBG_H(Cur_addr+RME_KOM_VA_BASE);
+
+	USR_DBG_S("\r\nFirst section's 0x080th entry ");
+	USR_DBG_H(RME_A7A_REG(Cur_addr+0x080*RME_WORD_BYTE+RME_KOM_VA_BASE));
+	USR_DBG_S(" @ ");
+	USR_DBG_H(Cur_addr+0x080*RME_WORD_BYTE+RME_KOM_VA_BASE);
+
+	USR_DBG_S("\r\nSecond section's first entry ");
+	USR_DBG_H(RME_A7A_REG(Cur_addr+0x400*RME_WORD_BYTE+RME_KOM_VA_BASE));
+	USR_DBG_S(" @ ");
+	USR_DBG_H(Cur_addr+0x400*RME_WORD_BYTE+RME_KOM_VA_BASE);
+
+	USR_DBG_S("\r\nThird section's first entry ");
+	USR_DBG_H(RME_A7A_REG(Cur_addr+0x600*RME_WORD_BYTE+RME_KOM_VA_BASE));
+	USR_DBG_S(" @ ");
+	USR_DBG_H(Cur_addr+0x600*RME_WORD_BYTE+RME_KOM_VA_BASE);
+
+	/*USR_DBG_S("\r\nKernel pgtbl's 80th entry ");
+	USR_DBG_H(RME_A7A_REG(((ptr_t)(&__RME_A7A_Kern_Pgt))+0x080*RME_WORD_BYTE));
+	USR_DBG_S(" @ ");
+	USR_DBG_H(((ptr_t)(&__RME_A7A_Kern_Pgt))+0x080*RME_WORD_BYTE);*/
+
+	//创建测试进程
+	Retval=RME_Prc_Crt(RME_BOOT_INIT_CPT,RME_BOOT_BENCH_PRC,RME_BOOT_INIT_CPT,
+		    			RME_BOOT_BENCH_PGT);
+	USR_DBG_S("\r\n create benchmark prc  retval= ");
+	USR_DBG_I(Retval);
+
+
+	//创建同步迁移调用
+	//0x00009000U
+	Retval=RME_Inv_Crt(RME_BOOT_INIT_CPT,
+			           RME_BOOT_INIT_KOM,
+					   RME_BOOT_BENCH_INV,
+					   RME_BOOT_BENCH_PRC,
+					   Cur_addr+0x10000);
+	USR_DBG_S("\r\n create benchmark thd  retval= ");
+	USR_DBG_I(Retval);
+	//设置同步迁移调用
+	Retval=RME_Inv_Set(RME_BOOT_BENCH_INV,
+					    (ptr_t)&RME_Inv_test_fuction,
+						(ptr_t)&RME_Stack3[2000],
+						0);
+	USR_DBG_S("\r\n create benchmark INV  retval= ");
+	USR_DBG_I(Retval);
+	start=get_time();
+	for(int Count=0;Count<10;Count++)
+	{
+		//迁移调用
+		Retval=RME_Inv_Act(RME_BOOT_BENCH_INV,0,0);
+		USR_DBG_S("\r\n  RME_Inv_Act  retval= ");
+		USR_DBG_I(Retval);
+	}
+	end=get_time();
+	USR_DBG_S("\r\n inv 10000 time  = ");
+	USR_DBG_I(end-start);
+	USR_DBG_S("\r\n inv 10000 time avg = ");
+	USR_DBG_I((end-start)/10000);
+	while(1);
 }
 
 /* Function:RME_Benchmark *****************************************************
@@ -532,12 +783,14 @@ Return      : None.
 void RME_Benchmark(void)
 {
 	Cur_addr=RME_BOOT_BENCH_KOM_FRONTIER;
-    USR_DBG_S("\r\nTest begin!");
+    USR_DBG_S("\r\nhello this is User level!");
 
     //RME_Same_Prc_Thd_Sig_Testinit();
+    RME_Diff_Prc_Thd_Sig_Testinit();
+    //RME_Diff_Inv_test();
     //RME_Same_Prc_Thd_Switch_Test();
-    RME_Same_Prc_Switch_Test();
-    USR_DBG_S("\r\nTest done!");
+    //RME_Diff_Prc_Switch_Test();
+    //USR_DBG_S("\r\nTest done!");
     while(1);
 }
 /* End Function:RME_Benchmark ************************************************/

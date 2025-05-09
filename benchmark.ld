@@ -43,7 +43,7 @@ SECTIONS
 
     . = ALIGN(0x1000);
     PROVIDE (end = .);
-    ASSERT(. < 0x80F00000, "Kernel size exceeded the limit, may need to adjust memory configs")
+    ASSERT(. < 0x08F00000, "Kernel size exceeded the limit, may need to adjust memory configs")
 }
 
 /* End Of File ***************************************************************/

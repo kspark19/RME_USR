@@ -1,0 +1,1383 @@
+
+BENCHMARK.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+08004000 <RME_Entry>:
+//Description : The entry of the process.
+//Input       : None.
+//Output      : None.
+//*****************************************************************************/
+RME_Entry:
+                 LDR     R0, =RME_Benchmark
+ 8004000:	e59f0080 	ldr	r0, [pc, #128]	@ 8004088 <__user_setup_stackheap+0x10>
+                 BX      R0
+ 8004004:	e12fff10 	bx	r0
+
+08004008 <RME_Deadloop>:
+///* End Function:RME_Entry ***************************************************/
+
+RME_Deadloop:
+				NOP
+ 8004008:	e320f000 	nop	{0}
+				NOP
+ 800400c:	e320f000 	nop	{0}
+				NOP
+ 8004010:	e320f000 	nop	{0}
+				MOV		R0,R1
+ 8004014:	e1a00001 	mov	r0, r1
+				PUSH	{R0}
+ 8004018:	e52d0004 	push	{r0}		@ (str r0, [sp, #-4]!)
+				B   .
+ 800401c:	eafffffe 	b	800401c <RME_Deadloop+0x14>
+
+08004020 <RME_Thd_Stub>:
+//Input       : R4 - The entry address.
+//              R5 - The stack address that we are using now.
+//Output      : None.
+//*****************************************************************************/
+RME_Thd_Stub:
+                BLX      R4                 // Branch to the actual entry address
+ 8004020:	e12fff34 	blx	r4
+                //B        RME_Thd_Finish     // Jump to exiting code, should never return.
+                B        .                  // Capture faults.
+ 8004024:	eafffffe 	b	8004024 <RME_Thd_Stub+0x4>
+
+08004028 <RME_Inv_Stub>:
+//Input       : R4 - The entry address.
+//              R5 - The stack address that we are using now.
+//Output      : None.
+//*****************************************************************************/
+RME_Inv_Stub:
+                BLX      R4                 // Branch to the actual entry address
+ 8004028:	e12fff34 	blx	r4
+                //BX       RME_Inv_Finish     // Jump to exiting code, should never return.
+                B        .                  // Capture faults.
+ 800402c:	eafffffe 	b	800402c <RME_Inv_Stub+0x4>
+
+08004030 <RME_Svc>:
+//Output      : None.
+//*****************************************************************************/
+RME_Svc:
+                // Manually pass the parameters according to ARM calling convention
+                //a7a put parameters in r0-r3,so we do nothing
+                SVC        #0x00   
+ 8004030:	ef000000 	svc	0x00000000
+                BX         LR
+ 8004034:	e12fff1e 	bx	lr
+                B          .        // Shouldn't reach here.
+ 8004038:	eafffffe 	b	8004038 <RME_Svc+0x8>
+
+0800403c <RME_Inv_Act>:
+              R1 - rvm_ptr_t Param - The parameter for the call.
+Output      : R2 - rvm_ptr_t* Retval - The return value from the call.
+Return      : R0 - rvm_ptr_t - The return value of the system call itself.
+******************************************************************************/
+RME_Inv_Act:
+    PUSH                {LR}            /* Save registers */
+ 800403c:	e52de004 	push	{lr}		@ (str lr, [sp, #-4]!)
+    PUSH                {R2-R12}            /* Save registers */
+ 8004040:	e92d1ffc 	push	{r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip}
+
+    MOV                 R2,R1               /* Parameter */
+ 8004044:	e1a02001 	mov	r2, r1
+    MOV                 R1,R0
+ 8004048:	e1a01000 	mov	r1, r0
+    MOV                 R0,#0x10000         /* RVM_SVC_INV_ACT */
+ 800404c:	e3a00801 	mov	r0, #65536	@ 0x10000
+
+    SVC                 #0x00               /* System call */
+ 8004050:	ef000000 	svc	0x00000000
+
+    POP                 {R2-R12}             /* Restore registers */
+ 8004054:	e8bd1ffc 	pop	{r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip}
+
+    CMP               	R2,#0x00              /* Invocation return value*/
+ 8004058:	e3520000 	cmp	r2, #0
+    STRNE				R1,[R2]
+ 800405c:	15821000 	strne	r1, [r2]
+
+	POP					{LR}
+ 8004060:	e49de004 	pop	{lr}		@ (ldr lr, [sp], #4)
+    BX                  LR
+ 8004064:	e12fff1e 	bx	lr
+
+08004068 <RME_Inv_Ret>:
+Input       : R0 - The returning result from the invocation.
+Output      : None.
+Return      : None.
+******************************************************************************/
+RME_Inv_Ret:
+	MOV                 R1,R0               /* Set return value */
+ 8004068:	e1a01000 	mov	r1, r0
+    MOV                 R0,#0x00            /* RVM_SVC_INV_RET */
+ 800406c:	e3a00000 	mov	r0, #0
+
+    SVC                 #0x00               /* System call */
+ 8004070:	ef000000 	svc	0x00000000
+
+    BX                  LR					/* Return failed if we reach here */
+ 8004074:	e12fff1e 	bx	lr
+
+08004078 <__user_setup_stackheap>:
+//Description : We place the function here to shut the SEMIHOSTING up.
+//Input       : None.
+//Output      : None.
+//*****************************************************************************/
+__user_setup_stackheap:
+                MOV      R0,R1     // Stack as where we came in, and definitely no heap
+ 8004078:	e1a00001 	mov	r0, r1
+                MOV      R2,R1
+ 800407c:	e1a02001 	mov	r2, r1
+                BX       LR
+ 8004080:	e12fff1e 	bx	lr
+                B        .         // Capture faults
+ 8004084:	eafffffe 	b	8004084 <__user_setup_stackheap+0xc>
+                 LDR     R0, =RME_Benchmark
+ 8004088:	08004a20 	.word	0x08004a20
+
+0800408c <__USR_Putchar>:
+Input       : char Char - The character to print.
+Output      : None.
+Return      : rme_ptr_t - Always 0.
+******************************************************************************/
+ptr_t __USR_Putchar(char Char)
+{
+ 800408c:	e52db004 	push	{fp}		@ (str fp, [sp, #-4]!)
+ 8004090:	e28db000 	add	fp, sp, #0
+ 8004094:	e24dd00c 	sub	sp, sp, #12
+ 8004098:	e1a03000 	mov	r3, r0
+ 800409c:	e54b3005 	strb	r3, [fp, #-5]
+    RME_A7A_PUTCHAR(Char);
+ 80040a0:	e301302c 	movw	r3, #4140	@ 0x102c
+ 80040a4:	e34e3000 	movt	r3, #57344	@ 0xe000
+ 80040a8:	e5933000 	ldr	r3, [r3]
+ 80040ac:	e2033008 	and	r3, r3, #8
+ 80040b0:	e3530000 	cmp	r3, #0
+ 80040b4:	0afffff9 	beq	80040a0 <__USR_Putchar+0x14>
+ 80040b8:	e3013030 	movw	r3, #4144	@ 0x1030
+ 80040bc:	e34e3000 	movt	r3, #57344	@ 0xe000
+ 80040c0:	e15b20d5 	ldrsb	r2, [fp, #-5]
+ 80040c4:	e5832000 	str	r2, [r3]
+    return 0;
+ 80040c8:	e3a03000 	mov	r3, #0
+}
+ 80040cc:	e1a00003 	mov	r0, r3
+ 80040d0:	e28bd000 	add	sp, fp, #0
+ 80040d4:	e49db004 	pop	{fp}		@ (ldr fp, [sp], #4)
+ 80040d8:	e12fff1e 	bx	lr
+
+080040dc <USR_DBG_I>:
+Input       : rme_cnt_t Int - The integer to print.
+Output      : None.
+Return      : rme_cnt_t - The length of the string printed.
+******************************************************************************/
+cnt_t USR_DBG_I(cnt_t Int)
+{
+ 80040dc:	e92d4800 	push	{fp, lr}
+ 80040e0:	e28db004 	add	fp, sp, #4
+ 80040e4:	e24dd020 	sub	sp, sp, #32
+ 80040e8:	e50b0020 	str	r0, [fp, #-32]	@ 0xffffffe0
+    cnt_t Iter;
+    cnt_t Count;
+    cnt_t Div;
+
+    /* Exit on zero */
+    if(Int==0)
+ 80040ec:	e51b3020 	ldr	r3, [fp, #-32]	@ 0xffffffe0
+ 80040f0:	e3530000 	cmp	r3, #0
+ 80040f4:	1a000003 	bne	8004108 <USR_DBG_I+0x2c>
+    {
+
+
+        __USR_Putchar('0');
+ 80040f8:	e3a00030 	mov	r0, #48	@ 0x30
+ 80040fc:	ebffffe2 	bl	800408c <__USR_Putchar>
+        return 1;
+ 8004100:	e3a03001 	mov	r3, #1
+ 8004104:	ea000050 	b	800424c <USR_DBG_I+0x170>
+        /* No action required */
+    }
+
+
+    /* Correct all negatives into positives */
+    if(Int<0)
+ 8004108:	e51b3020 	ldr	r3, [fp, #-32]	@ 0xffffffe0
+ 800410c:	e3530000 	cmp	r3, #0
+ 8004110:	aa000007 	bge	8004134 <USR_DBG_I+0x58>
+    {
+
+
+        __USR_Putchar('-');
+ 8004114:	e3a0002d 	mov	r0, #45	@ 0x2d
+ 8004118:	ebffffdb 	bl	800408c <__USR_Putchar>
+        Abs=-Int;
+ 800411c:	e51b3020 	ldr	r3, [fp, #-32]	@ 0xffffffe0
+ 8004120:	e2633000 	rsb	r3, r3, #0
+ 8004124:	e50b300c 	str	r3, [fp, #-12]
+        Num=1;
+ 8004128:	e3a03001 	mov	r3, #1
+ 800412c:	e50b3008 	str	r3, [fp, #-8]
+ 8004130:	ea000003 	b	8004144 <USR_DBG_I+0x68>
+    }
+    else
+    {
+
+
+        Abs=Int;
+ 8004134:	e51b3020 	ldr	r3, [fp, #-32]	@ 0xffffffe0
+ 8004138:	e50b300c 	str	r3, [fp, #-12]
+        Num=0;
+ 800413c:	e3a03000 	mov	r3, #0
+ 8004140:	e50b3008 	str	r3, [fp, #-8]
+    }
+
+    /* How many digits are there? */
+    Count=0;
+ 8004144:	e3a03000 	mov	r3, #0
+ 8004148:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+    Div=1;
+ 800414c:	e3a03001 	mov	r3, #1
+ 8004150:	e50b3018 	str	r3, [fp, #-24]	@ 0xffffffe8
+    Iter=Abs;
+ 8004154:	e51b300c 	ldr	r3, [fp, #-12]
+ 8004158:	e50b3010 	str	r3, [fp, #-16]
+    while(1U)
+    {
+        Iter/=10;
+ 800415c:	e51b2010 	ldr	r2, [fp, #-16]
+ 8004160:	e3063667 	movw	r3, #26215	@ 0x6667
+ 8004164:	e3463666 	movt	r3, #26214	@ 0x6666
+ 8004168:	e0c31293 	smull	r1, r3, r3, r2
+ 800416c:	e1a01143 	asr	r1, r3, #2
+ 8004170:	e1a03fc2 	asr	r3, r2, #31
+ 8004174:	e0413003 	sub	r3, r1, r3
+ 8004178:	e50b3010 	str	r3, [fp, #-16]
+        Count++;
+ 800417c:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 8004180:	e2833001 	add	r3, r3, #1
+ 8004184:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+        if(Iter!=0)
+ 8004188:	e51b3010 	ldr	r3, [fp, #-16]
+ 800418c:	e3530000 	cmp	r3, #0
+ 8004190:	0a000006 	beq	80041b0 <USR_DBG_I+0xd4>
+        {
+
+
+            Div*=10;
+ 8004194:	e51b2018 	ldr	r2, [fp, #-24]	@ 0xffffffe8
+ 8004198:	e1a03002 	mov	r3, r2
+ 800419c:	e1a03103 	lsl	r3, r3, #2
+ 80041a0:	e0833002 	add	r3, r3, r2
+ 80041a4:	e1a03083 	lsl	r3, r3, #1
+ 80041a8:	e50b3018 	str	r3, [fp, #-24]	@ 0xffffffe8
+        Iter/=10;
+ 80041ac:	eaffffea 	b	800415c <USR_DBG_I+0x80>
+        }
+        else
+        {
+
+
+            break;
+ 80041b0:	e320f000 	nop	{0}
+        }
+    }
+    Num+=Count;
+ 80041b4:	e51b2008 	ldr	r2, [fp, #-8]
+ 80041b8:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 80041bc:	e0823003 	add	r3, r2, r3
+ 80041c0:	e50b3008 	str	r3, [fp, #-8]
+
+    /* Print the integer */
+    Iter=Abs;
+ 80041c4:	e51b300c 	ldr	r3, [fp, #-12]
+ 80041c8:	e50b3010 	str	r3, [fp, #-16]
+
+    while(Count>0)
+ 80041cc:	ea00001a 	b	800423c <USR_DBG_I+0x160>
+    {
+        Count--;
+ 80041d0:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 80041d4:	e2433001 	sub	r3, r3, #1
+ 80041d8:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+        __USR_Putchar((s8)(Iter/Div)+'0');
+ 80041dc:	e51b1018 	ldr	r1, [fp, #-24]	@ 0xffffffe8
+ 80041e0:	e51b0010 	ldr	r0, [fp, #-16]
+ 80041e4:	fa000219 	blx	8004a50 <__divsi3>
+ 80041e8:	e1a03000 	mov	r3, r0
+ 80041ec:	e6ef3073 	uxtb	r3, r3
+ 80041f0:	e2833030 	add	r3, r3, #48	@ 0x30
+ 80041f4:	e6ef3073 	uxtb	r3, r3
+ 80041f8:	e6af3073 	sxtb	r3, r3
+ 80041fc:	e1a00003 	mov	r0, r3
+ 8004200:	ebffffa1 	bl	800408c <__USR_Putchar>
+        Iter=Iter%Div;
+ 8004204:	e51b3010 	ldr	r3, [fp, #-16]
+ 8004208:	e51b1018 	ldr	r1, [fp, #-24]	@ 0xffffffe8
+ 800420c:	e1a00003 	mov	r0, r3
+ 8004210:	fa0002b3 	blx	8004ce4 <__aeabi_idivmod>
+ 8004214:	e1a03001 	mov	r3, r1
+ 8004218:	e50b3010 	str	r3, [fp, #-16]
+        Div/=10;
+ 800421c:	e51b2018 	ldr	r2, [fp, #-24]	@ 0xffffffe8
+ 8004220:	e3063667 	movw	r3, #26215	@ 0x6667
+ 8004224:	e3463666 	movt	r3, #26214	@ 0x6666
+ 8004228:	e0c31293 	smull	r1, r3, r3, r2
+ 800422c:	e1a01143 	asr	r1, r3, #2
+ 8004230:	e1a03fc2 	asr	r3, r2, #31
+ 8004234:	e0413003 	sub	r3, r1, r3
+ 8004238:	e50b3018 	str	r3, [fp, #-24]	@ 0xffffffe8
+    while(Count>0)
+ 800423c:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 8004240:	e3530000 	cmp	r3, #0
+ 8004244:	caffffe1 	bgt	80041d0 <USR_DBG_I+0xf4>
+    }
+
+    return Num;
+ 8004248:	e51b3008 	ldr	r3, [fp, #-8]
+}
+ 800424c:	e1a00003 	mov	r0, r3
+ 8004250:	e24bd004 	sub	sp, fp, #4
+ 8004254:	e8bd8800 	pop	{fp, pc}
+
+08004258 <USR_DBG_H>:
+Input       : rme_ptr_t Uint - The unsigned integer to print.
+Output      : None.
+Return      : rme_cnt_t - The length of the string printed.
+******************************************************************************/
+cnt_t USR_DBG_H(ptr_t Uint)
+{
+ 8004258:	e92d4800 	push	{fp, lr}
+ 800425c:	e28db004 	add	fp, sp, #4
+ 8004260:	e24dd018 	sub	sp, sp, #24
+ 8004264:	e50b0018 	str	r0, [fp, #-24]	@ 0xffffffe8
+    ptr_t Iter;
+    ptr_t Count;
+    ptr_t Num;
+
+    /* Exit on zero */
+    if(Uint==0U)
+ 8004268:	e51b3018 	ldr	r3, [fp, #-24]	@ 0xffffffe8
+ 800426c:	e3530000 	cmp	r3, #0
+ 8004270:	1a000003 	bne	8004284 <USR_DBG_H+0x2c>
+    {
+        __USR_Putchar('0');
+ 8004274:	e3a00030 	mov	r0, #48	@ 0x30
+ 8004278:	ebffff83 	bl	800408c <__USR_Putchar>
+        return 1;
+ 800427c:	e3a03001 	mov	r3, #1
+ 8004280:	ea000033 	b	8004354 <USR_DBG_H+0xfc>
+    {
+        /* No action required */
+    }
+
+    /* Filter out all the zeroes */
+    Count=0U;
+ 8004284:	e3a03000 	mov	r3, #0
+ 8004288:	e50b300c 	str	r3, [fp, #-12]
+    Iter=Uint;
+ 800428c:	e51b3018 	ldr	r3, [fp, #-24]	@ 0xffffffe8
+ 8004290:	e50b3008 	str	r3, [fp, #-8]
+    while((Iter>>(RME_WORD_BIT-4U))==0U)
+ 8004294:	ea000005 	b	80042b0 <USR_DBG_H+0x58>
+    {
+        Iter<<=4;
+ 8004298:	e51b3008 	ldr	r3, [fp, #-8]
+ 800429c:	e1a03203 	lsl	r3, r3, #4
+ 80042a0:	e50b3008 	str	r3, [fp, #-8]
+        Count++;
+ 80042a4:	e51b300c 	ldr	r3, [fp, #-12]
+ 80042a8:	e2833001 	add	r3, r3, #1
+ 80042ac:	e50b300c 	str	r3, [fp, #-12]
+    while((Iter>>(RME_WORD_BIT-4U))==0U)
+ 80042b0:	e51b3008 	ldr	r3, [fp, #-8]
+ 80042b4:	e1a03e23 	lsr	r3, r3, #28
+ 80042b8:	e3530000 	cmp	r3, #0
+ 80042bc:	0afffff5 	beq	8004298 <USR_DBG_H+0x40>
+    }
+
+    /* Count is the number of pts to print */
+    Count=RME_POW2(RME_WORD_ORDER-2U)-Count;
+ 80042c0:	e51b300c 	ldr	r3, [fp, #-12]
+ 80042c4:	e2633008 	rsb	r3, r3, #8
+ 80042c8:	e50b300c 	str	r3, [fp, #-12]
+    Num=Count;
+ 80042cc:	e51b300c 	ldr	r3, [fp, #-12]
+ 80042d0:	e50b3010 	str	r3, [fp, #-16]
+    while(Count>0U)
+ 80042d4:	ea00001a 	b	8004344 <USR_DBG_H+0xec>
+    {
+        Count--;
+ 80042d8:	e51b300c 	ldr	r3, [fp, #-12]
+ 80042dc:	e2433001 	sub	r3, r3, #1
+ 80042e0:	e50b300c 	str	r3, [fp, #-12]
+        Iter=(Uint>>(Count<<2U))&0x0FU;
+ 80042e4:	e51b300c 	ldr	r3, [fp, #-12]
+ 80042e8:	e1a03103 	lsl	r3, r3, #2
+ 80042ec:	e51b2018 	ldr	r2, [fp, #-24]	@ 0xffffffe8
+ 80042f0:	e1a03332 	lsr	r3, r2, r3
+ 80042f4:	e203300f 	and	r3, r3, #15
+ 80042f8:	e50b3008 	str	r3, [fp, #-8]
+        if(Iter<10U)
+ 80042fc:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004300:	e3530009 	cmp	r3, #9
+ 8004304:	8a000007 	bhi	8004328 <USR_DBG_H+0xd0>
+        {
+
+            __USR_Putchar((s8)Iter+'0');
+ 8004308:	e51b3008 	ldr	r3, [fp, #-8]
+ 800430c:	e6ef3073 	uxtb	r3, r3
+ 8004310:	e2833030 	add	r3, r3, #48	@ 0x30
+ 8004314:	e6ef3073 	uxtb	r3, r3
+ 8004318:	e6af3073 	sxtb	r3, r3
+ 800431c:	e1a00003 	mov	r0, r3
+ 8004320:	ebffff59 	bl	800408c <__USR_Putchar>
+ 8004324:	ea000006 	b	8004344 <USR_DBG_H+0xec>
+        }
+        else
+        {
+
+            __USR_Putchar((s8)Iter+'A'-10);
+ 8004328:	e51b3008 	ldr	r3, [fp, #-8]
+ 800432c:	e6ef3073 	uxtb	r3, r3
+ 8004330:	e2833037 	add	r3, r3, #55	@ 0x37
+ 8004334:	e6ef3073 	uxtb	r3, r3
+ 8004338:	e6af3073 	sxtb	r3, r3
+ 800433c:	e1a00003 	mov	r0, r3
+ 8004340:	ebffff51 	bl	800408c <__USR_Putchar>
+    while(Count>0U)
+ 8004344:	e51b300c 	ldr	r3, [fp, #-12]
+ 8004348:	e3530000 	cmp	r3, #0
+ 800434c:	1affffe1 	bne	80042d8 <USR_DBG_H+0x80>
+        }
+    }
+
+    return (cnt_t)Num;
+ 8004350:	e51b3010 	ldr	r3, [fp, #-16]
+}
+ 8004354:	e1a00003 	mov	r0, r3
+ 8004358:	e24bd004 	sub	sp, fp, #4
+ 800435c:	e8bd8800 	pop	{fp, pc}
+
+08004360 <USR_DBG_S>:
+/* End Function:USR_DBG_H ************************************************/
+cnt_t USR_DBG_S(const s8* String)
+{
+ 8004360:	e92d4800 	push	{fp, lr}
+ 8004364:	e28db004 	add	fp, sp, #4
+ 8004368:	e24dd010 	sub	sp, sp, #16
+ 800436c:	e50b0010 	str	r0, [fp, #-16]
+    ptr_t Count;
+
+    for(Count=0U;Count<255;Count++)
+ 8004370:	e3a03000 	mov	r3, #0
+ 8004374:	e50b3008 	str	r3, [fp, #-8]
+ 8004378:	ea00000e 	b	80043b8 <USR_DBG_S+0x58>
+    {
+        if(String[Count]==(s8)'\0')
+ 800437c:	e51b2010 	ldr	r2, [fp, #-16]
+ 8004380:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004384:	e0823003 	add	r3, r2, r3
+ 8004388:	e1d330d0 	ldrsb	r3, [r3]
+ 800438c:	e3530000 	cmp	r3, #0
+ 8004390:	0a00000c 	beq	80043c8 <USR_DBG_S+0x68>
+        else
+        {
+            /* No action required */
+        }
+
+        __USR_Putchar(String[Count]);
+ 8004394:	e51b2010 	ldr	r2, [fp, #-16]
+ 8004398:	e51b3008 	ldr	r3, [fp, #-8]
+ 800439c:	e0823003 	add	r3, r2, r3
+ 80043a0:	e1d330d0 	ldrsb	r3, [r3]
+ 80043a4:	e1a00003 	mov	r0, r3
+ 80043a8:	ebffff37 	bl	800408c <__USR_Putchar>
+    for(Count=0U;Count<255;Count++)
+ 80043ac:	e51b3008 	ldr	r3, [fp, #-8]
+ 80043b0:	e2833001 	add	r3, r3, #1
+ 80043b4:	e50b3008 	str	r3, [fp, #-8]
+ 80043b8:	e51b3008 	ldr	r3, [fp, #-8]
+ 80043bc:	e35300fe 	cmp	r3, #254	@ 0xfe
+ 80043c0:	9affffed 	bls	800437c <USR_DBG_S+0x1c>
+ 80043c4:	ea000000 	b	80043cc <USR_DBG_S+0x6c>
+            break;
+ 80043c8:	e320f000 	nop	{0}
+    }
+
+    return (cnt_t)Count;
+ 80043cc:	e51b3008 	ldr	r3, [fp, #-8]
+}
+ 80043d0:	e1a00003 	mov	r0, r3
+ 80043d4:	e24bd004 	sub	sp, fp, #4
+ 80043d8:	e8bd8800 	pop	{fp, pc}
+
+080043dc <get_time>:
+
+/* get current time */
+ptr_t get_time(void)
+{
+ 80043dc:	e52db004 	push	{fp}		@ (str fp, [sp, #-4]!)
+ 80043e0:	e28db000 	add	fp, sp, #0
+ 80043e4:	e24dd00c 	sub	sp, sp, #12
+	ptr_t temp;
+	temp=RME_A7A_REG(&RME_A7A_GTWD_GTCR0);
+ 80043e8:	e3a03c02 	mov	r3, #512	@ 0x200
+ 80043ec:	e34f38f0 	movt	r3, #63728	@ 0xf8f0
+ 80043f0:	e5933000 	ldr	r3, [r3]
+ 80043f4:	e50b3008 	str	r3, [fp, #-8]
+	return temp;
+ 80043f8:	e51b3008 	ldr	r3, [fp, #-8]
+    /*USR_DBG_S("\r\n time=");
+	double time =(double)temp/RME_A7A_SYSTICK_VAL;
+	time =time*1000;
+    USR_DBG_I(time);
+    USR_DBG_S(" ms");*/
+}
+ 80043fc:	e1a00003 	mov	r0, r3
+ 8004400:	e28bd000 	add	sp, fp, #0
+ 8004404:	e49db004 	pop	{fp}		@ (ldr fp, [sp], #4)
+ 8004408:	e12fff1e 	bx	lr
+
+0800440c <RME_Prc_Crt>:
+******************************************************************************/
+ret_t RME_Prc_Crt(cid_t Cap_Cpt_Crt,
+                      cid_t Cap_Prc,
+                      cid_t Cap_Cpt,
+                      cid_t Cap_Pgt)
+{
+ 800440c:	e92d4800 	push	{fp, lr}
+ 8004410:	e28db004 	add	fp, sp, #4
+ 8004414:	e24dd010 	sub	sp, sp, #16
+ 8004418:	e50b0008 	str	r0, [fp, #-8]
+ 800441c:	e50b100c 	str	r1, [fp, #-12]
+ 8004420:	e50b2010 	str	r2, [fp, #-16]
+ 8004424:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+    return RME_SVC(RME_SVC_PRC_CRT,
+ 8004428:	e51b3008 	ldr	r3, [fp, #-8]
+ 800442c:	e3830815 	orr	r0, r3, #1376256	@ 0x150000
+ 8004430:	e51b100c 	ldr	r1, [fp, #-12]
+ 8004434:	e51b2010 	ldr	r2, [fp, #-16]
+ 8004438:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 800443c:	ebfffefb 	bl	8004030 <RME_Svc>
+ 8004440:	e1a03000 	mov	r3, r0
+                   Cap_Cpt_Crt,
+                   Cap_Prc,
+                   Cap_Cpt,
+                   Cap_Pgt);
+}
+ 8004444:	e1a00003 	mov	r0, r3
+ 8004448:	e24bd004 	sub	sp, fp, #4
+ 800444c:	e8bd8800 	pop	{fp, pc}
+
+08004450 <RME_Pgt_Crt>:
+                      ptr_t Raddr,
+                      ptr_t Base,
+                      ptr_t Is_Top,
+                      ptr_t Size_Order,
+                      ptr_t Num_Order)
+{
+ 8004450:	e92d4800 	push	{fp, lr}
+ 8004454:	e28db004 	add	fp, sp, #4
+ 8004458:	e24dd010 	sub	sp, sp, #16
+ 800445c:	e50b0008 	str	r0, [fp, #-8]
+ 8004460:	e50b100c 	str	r1, [fp, #-12]
+ 8004464:	e50b2010 	str	r2, [fp, #-16]
+ 8004468:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+
+    return RME_SVC(RME_PGT_SVC(Num_Order,RME_SVC_PGT_CRT),
+ 800446c:	e59b3010 	ldr	r3, [fp, #16]
+ 8004470:	e1a02c03 	lsl	r2, r3, #24
+ 8004474:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004478:	e1823003 	orr	r3, r2, r3
+ 800447c:	e383080f 	orr	r0, r3, #983040	@ 0xf0000
+ 8004480:	e51b300c 	ldr	r3, [fp, #-12]
+ 8004484:	e1a02803 	lsl	r2, r3, #16
+ 8004488:	e51b3010 	ldr	r3, [fp, #-16]
+ 800448c:	e1a03403 	lsl	r3, r3, #8
+ 8004490:	e6ff3073 	uxth	r3, r3
+ 8004494:	e1822003 	orr	r2, r2, r3
+ 8004498:	e59b300c 	ldr	r3, [fp, #12]
+ 800449c:	e6ef3073 	uxtb	r3, r3
+ 80044a0:	e1821003 	orr	r1, r2, r3
+ 80044a4:	e59b2004 	ldr	r2, [fp, #4]
+ 80044a8:	e59b3008 	ldr	r3, [fp, #8]
+ 80044ac:	e1823003 	orr	r3, r2, r3
+ 80044b0:	e51b2014 	ldr	r2, [fp, #-20]	@ 0xffffffec
+ 80044b4:	ebfffedd 	bl	8004030 <RME_Svc>
+ 80044b8:	e1a03000 	mov	r3, r0
+                   Cap_Cpt,
+                   RME_PARAM_D1(Cap_Kom)|RME_PARAM_Q1(Cap_Pgt)|RME_PARAM_Q0(Size_Order),
+                   Raddr,
+                   Base|Is_Top);
+}
+ 80044bc:	e1a00003 	mov	r0, r3
+ 80044c0:	e24bd004 	sub	sp, fp, #4
+ 80044c4:	e8bd8800 	pop	{fp, pc}
+
+080044c8 <RME_Pgt_Add>:
+                      ptr_t Pos_Dst,
+                      ptr_t Flag_Dst,
+                      cid_t Cap_Pgt_Src,
+                      ptr_t Pos_Src,
+                      ptr_t Index)
+{
+ 80044c8:	e92d4800 	push	{fp, lr}
+ 80044cc:	e28db004 	add	fp, sp, #4
+ 80044d0:	e24dd010 	sub	sp, sp, #16
+ 80044d4:	e50b0008 	str	r0, [fp, #-8]
+ 80044d8:	e50b100c 	str	r1, [fp, #-12]
+ 80044dc:	e50b2010 	str	r2, [fp, #-16]
+ 80044e0:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+    return RME_SVC(RME_SVC_PGT_ADD,
+ 80044e4:	e51b3010 	ldr	r3, [fp, #-16]
+ 80044e8:	e6ff3073 	uxth	r3, r3
+ 80044ec:	e3830811 	orr	r0, r3, #1114112	@ 0x110000
+ 80044f0:	e51b3008 	ldr	r3, [fp, #-8]
+ 80044f4:	e1a02803 	lsl	r2, r3, #16
+ 80044f8:	e51b300c 	ldr	r3, [fp, #-12]
+ 80044fc:	e6ff3073 	uxth	r3, r3
+ 8004500:	e1821003 	orr	r1, r2, r3
+ 8004504:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 8004508:	e1a02803 	lsl	r2, r3, #16
+ 800450c:	e59b3004 	ldr	r3, [fp, #4]
+ 8004510:	e6ff3073 	uxth	r3, r3
+ 8004514:	e1822003 	orr	r2, r2, r3
+ 8004518:	e59b3008 	ldr	r3, [fp, #8]
+ 800451c:	ebfffec3 	bl	8004030 <RME_Svc>
+ 8004520:	e1a03000 	mov	r3, r0
+                   RME_PARAM_D0(Flag_Dst),
+                   RME_PARAM_D1(Cap_Pgt_Dst)|RME_PARAM_D0(Pos_Dst),
+                   RME_PARAM_D1(Cap_Pgt_Src)|RME_PARAM_D0(Pos_Src),
+                   Index);
+}
+ 8004524:	e1a00003 	mov	r0, r3
+ 8004528:	e24bd004 	sub	sp, fp, #4
+ 800452c:	e8bd8800 	pop	{fp, pc}
+
+08004530 <RME_Inv_Crt>:
+ret_t RME_Inv_Crt(cid_t Cap_Cpt,
+                      cid_t Cap_Kom,
+                      cid_t Cap_Inv,
+                      cid_t Cap_Prc,
+                      ptr_t Raddr)
+{
+ 8004530:	e92d4800 	push	{fp, lr}
+ 8004534:	e28db004 	add	fp, sp, #4
+ 8004538:	e24dd010 	sub	sp, sp, #16
+ 800453c:	e50b0008 	str	r0, [fp, #-8]
+ 8004540:	e50b100c 	str	r1, [fp, #-12]
+ 8004544:	e50b2010 	str	r2, [fp, #-16]
+ 8004548:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+    return RME_SVC(RME_SVC_INV_CRT,
+ 800454c:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004550:	e383081f 	orr	r0, r3, #2031616	@ 0x1f0000
+ 8004554:	e51b300c 	ldr	r3, [fp, #-12]
+ 8004558:	e1a02803 	lsl	r2, r3, #16
+ 800455c:	e51b3010 	ldr	r3, [fp, #-16]
+ 8004560:	e6ff3073 	uxth	r3, r3
+ 8004564:	e1821003 	orr	r1, r2, r3
+ 8004568:	e51b2014 	ldr	r2, [fp, #-20]	@ 0xffffffec
+ 800456c:	e59b3004 	ldr	r3, [fp, #4]
+ 8004570:	ebfffeae 	bl	8004030 <RME_Svc>
+ 8004574:	e1a03000 	mov	r3, r0
+                   Cap_Cpt,
+                   RME_PARAM_D1(Cap_Kom)|RME_PARAM_D0(Cap_Inv),
+                   Cap_Prc,
+                   Raddr);
+}
+ 8004578:	e1a00003 	mov	r0, r3
+ 800457c:	e24bd004 	sub	sp, fp, #4
+ 8004580:	e8bd8800 	pop	{fp, pc}
+
+08004584 <RME_Inv_Set>:
+
+ret_t RME_Inv_Set(cid_t Cap_Inv,
+                      ptr_t Entry,
+                      ptr_t Stack,
+                      ptr_t Is_Exc_Ret)
+{
+ 8004584:	e92d4800 	push	{fp, lr}
+ 8004588:	e28db004 	add	fp, sp, #4
+ 800458c:	e24dd010 	sub	sp, sp, #16
+ 8004590:	e50b0008 	str	r0, [fp, #-8]
+ 8004594:	e50b100c 	str	r1, [fp, #-12]
+ 8004598:	e50b2010 	str	r2, [fp, #-16]
+ 800459c:	e50b3014 	str	r3, [fp, #-20]	@ 0xffffffec
+    return RME_SVC(RME_SVC_INV_SET,
+ 80045a0:	e51b3014 	ldr	r3, [fp, #-20]	@ 0xffffffec
+ 80045a4:	e1a02803 	lsl	r2, r3, #16
+ 80045a8:	e51b3008 	ldr	r3, [fp, #-8]
+ 80045ac:	e6ff3073 	uxth	r3, r3
+ 80045b0:	e1821003 	orr	r1, r2, r3
+ 80045b4:	e51b3010 	ldr	r3, [fp, #-16]
+ 80045b8:	e51b200c 	ldr	r2, [fp, #-12]
+ 80045bc:	e3a00821 	mov	r0, #2162688	@ 0x210000
+ 80045c0:	ebfffe9a 	bl	8004030 <RME_Svc>
+ 80045c4:	e1a03000 	mov	r3, r0
+                   0U,
+                   RME_PARAM_D1(Is_Exc_Ret)|RME_PARAM_D0(Cap_Inv),
+                   Entry,
+                   Stack);
+}
+ 80045c8:	e1a00003 	mov	r0, r3
+ 80045cc:	e24bd004 	sub	sp, fp, #4
+ 80045d0:	e8bd8800 	pop	{fp, pc}
+
+080045d4 <RME_Inv_test_fuction>:
+	    	    USR_DBG_S("\r\nTest done!");
+	    	    while(1);
+}
+
+void RME_Inv_test_fuction()//迁移调用函数
+{
+ 80045d4:	e92d4800 	push	{fp, lr}
+ 80045d8:	e28db004 	add	fp, sp, #4
+	USR_DBG_S("\r\n inv fuction!");
+ 80045dc:	e3050030 	movw	r0, #20528	@ 0x5030
+ 80045e0:	e3400800 	movt	r0, #2048	@ 0x800
+ 80045e4:	ebffff5d 	bl	8004360 <USR_DBG_S>
+	//while(1)
+	//{
+		//同步迁移调用返回
+		RME_Inv_Ret(0);
+ 80045e8:	e3a00000 	mov	r0, #0
+ 80045ec:	ebfffe9d 	bl	8004068 <RME_Inv_Ret>
+		//USR_DBG_S("\r\n inv fuction return!");
+		//为什么每次都只是返回到这里
+	//}
+}
+ 80045f0:	e320f000 	nop	{0}
+ 80045f4:	e8bd8800 	pop	{fp, pc}
+
+080045f8 <RME_Diff_Inv_test>:
+
+void RME_Diff_Inv_test(void)
+{
+ 80045f8:	e92d4800 	push	{fp, lr}
+ 80045fc:	e28db004 	add	fp, sp, #4
+ 8004600:	e24dd020 	sub	sp, sp, #32
+
+	ret_t Retval;
+	ptr_t Count;
+	Cur_addr=RME_BOOT_BENCH_PGT_RADDR;
+ 8004604:	e3083000 	movw	r3, #32768	@ 0x8000
+ 8004608:	e3403800 	movt	r3, #2048	@ 0x800
+ 800460c:	e3a02806 	mov	r2, #393216	@ 0x60000
+ 8004610:	e5832000 	str	r2, [r3]
+	//创建添加页表
+	Retval=RME_Pgt_Crt(RME_BOOT_INIT_CPT,RME_BOOT_INIT_KOM,RME_BOOT_BENCH_PGT,
+ 8004614:	e3083000 	movw	r3, #32768	@ 0x8000
+ 8004618:	e3403800 	movt	r3, #2048	@ 0x800
+ 800461c:	e5933000 	ldr	r3, [r3]
+ 8004620:	e3a0200c 	mov	r2, #12
+ 8004624:	e58d200c 	str	r2, [sp, #12]
+ 8004628:	e3a02014 	mov	r2, #20
+ 800462c:	e58d2008 	str	r2, [sp, #8]
+ 8004630:	e3a02001 	mov	r2, #1
+ 8004634:	e58d2004 	str	r2, [sp, #4]
+ 8004638:	e3a02000 	mov	r2, #0
+ 800463c:	e58d2000 	str	r2, [sp]
+ 8004640:	e3a02009 	mov	r2, #9
+ 8004644:	e3a01005 	mov	r1, #5
+ 8004648:	e3a00000 	mov	r0, #0
+ 800464c:	ebffff7f 	bl	8004450 <RME_Pgt_Crt>
+ 8004650:	e50b0010 	str	r0, [fp, #-16]
+				    	   Cur_addr,0x00000000U,RME_PGT_TOP,RME_PGT_SIZE_1M,RME_PGT_NUM_4K);
+
+	USR_DBG_S("\r\ncreate benchmark page table  retval= ");
+ 8004654:	e3050040 	movw	r0, #20544	@ 0x5040
+ 8004658:	e3400800 	movt	r0, #2048	@ 0x800
+ 800465c:	ebffff3f 	bl	8004360 <USR_DBG_S>
+	USR_DBG_I(Retval);
+ 8004660:	e51b0010 	ldr	r0, [fp, #-16]
+ 8004664:	ebfffe9c 	bl	80040dc <USR_DBG_I>
+
+	// add page to benchmark pgt
+	for(Count=0U;Count<0x400U;Count++)
+ 8004668:	e3a03000 	mov	r3, #0
+ 800466c:	e50b3008 	str	r3, [fp, #-8]
+ 8004670:	ea00000c 	b	80046a8 <RME_Diff_Inv_test+0xb0>
+	{
+			Retval=RME_Pgt_Add(RME_BOOT_BENCH_PGT,Count,RME_PGT_ALL_DYN,
+ 8004674:	e3a03000 	mov	r3, #0
+ 8004678:	e58d3004 	str	r3, [sp, #4]
+ 800467c:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004680:	e58d3000 	str	r3, [sp]
+ 8004684:	e3a03001 	mov	r3, #1
+ 8004688:	e3a0201f 	mov	r2, #31
+ 800468c:	e51b1008 	ldr	r1, [fp, #-8]
+ 8004690:	e3a00009 	mov	r0, #9
+ 8004694:	ebffff8b 	bl	80044c8 <RME_Pgt_Add>
+ 8004698:	e50b0010 	str	r0, [fp, #-16]
+	for(Count=0U;Count<0x400U;Count++)
+ 800469c:	e51b3008 	ldr	r3, [fp, #-8]
+ 80046a0:	e2833001 	add	r3, r3, #1
+ 80046a4:	e50b3008 	str	r3, [fp, #-8]
+ 80046a8:	e51b3008 	ldr	r3, [fp, #-8]
+ 80046ac:	e3530b01 	cmp	r3, #1024	@ 0x400
+ 80046b0:	3affffef 	bcc	8004674 <RME_Diff_Inv_test+0x7c>
+											 0);
+			    /*USR_DBG_S("\r\nadd page to benchmark pgt  retval= ");
+				USR_DBG_I(Retval);*/
+	}
+			/* Device memory 1, 512MiB 0x40000000 -> 0x40000000 */
+	for(Count=0U;Count<0x200U;Count++)
+ 80046b4:	e3a03000 	mov	r3, #0
+ 80046b8:	e50b3008 	str	r3, [fp, #-8]
+ 80046bc:	ea00000e 	b	80046fc <RME_Diff_Inv_test+0x104>
+	{
+		    	Retval=RME_Pgt_Add(RME_BOOT_BENCH_PGT,(Count+0x400U),
+ 80046c0:	e51b3008 	ldr	r3, [fp, #-8]
+ 80046c4:	e2831b01 	add	r1, r3, #1024	@ 0x400
+ 80046c8:	e51b3008 	ldr	r3, [fp, #-8]
+ 80046cc:	e2833b01 	add	r3, r3, #1024	@ 0x400
+ 80046d0:	e3a02000 	mov	r2, #0
+ 80046d4:	e58d2004 	str	r2, [sp, #4]
+ 80046d8:	e58d3000 	str	r3, [sp]
+ 80046dc:	e3a03001 	mov	r3, #1
+ 80046e0:	e3a02003 	mov	r2, #3
+ 80046e4:	e3a00009 	mov	r0, #9
+ 80046e8:	ebffff76 	bl	80044c8 <RME_Pgt_Add>
+ 80046ec:	e50b0010 	str	r0, [fp, #-16]
+	for(Count=0U;Count<0x200U;Count++)
+ 80046f0:	e51b3008 	ldr	r3, [fp, #-8]
+ 80046f4:	e2833001 	add	r3, r3, #1
+ 80046f8:	e50b3008 	str	r3, [fp, #-8]
+ 80046fc:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004700:	e3530c02 	cmp	r3, #512	@ 0x200
+ 8004704:	3affffed 	bcc	80046c0 <RME_Diff_Inv_test+0xc8>
+				/*USR_DBG_S("\r\nadd page to benchmark pgt  retval= ");
+							USR_DBG_I(Retval);*/
+	}
+
+		    /* Device memory 2, 512MiB 0x60000000 -> 0xE0000000 */
+	for(Count=0U;Count<0x200U;Count++)
+ 8004708:	e3a03000 	mov	r3, #0
+ 800470c:	e50b3008 	str	r3, [fp, #-8]
+ 8004710:	ea00000e 	b	8004750 <RME_Diff_Inv_test+0x158>
+	{
+		    	Retval=RME_Pgt_Add(RME_BOOT_BENCH_PGT,(Count+0x600U),
+ 8004714:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004718:	e2831c06 	add	r1, r3, #1536	@ 0x600
+ 800471c:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004720:	e2833c06 	add	r3, r3, #1536	@ 0x600
+ 8004724:	e3a02000 	mov	r2, #0
+ 8004728:	e58d2004 	str	r2, [sp, #4]
+ 800472c:	e58d3000 	str	r3, [sp]
+ 8004730:	e3a03001 	mov	r3, #1
+ 8004734:	e3a02003 	mov	r2, #3
+ 8004738:	e3a00009 	mov	r0, #9
+ 800473c:	ebffff61 	bl	80044c8 <RME_Pgt_Add>
+ 8004740:	e50b0010 	str	r0, [fp, #-16]
+	for(Count=0U;Count<0x200U;Count++)
+ 8004744:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004748:	e2833001 	add	r3, r3, #1
+ 800474c:	e50b3008 	str	r3, [fp, #-8]
+ 8004750:	e51b3008 	ldr	r3, [fp, #-8]
+ 8004754:	e3530c02 	cmp	r3, #512	@ 0x200
+ 8004758:	3affffed 	bcc	8004714 <RME_Diff_Inv_test+0x11c>
+											 0);
+				/*USR_DBG_S("\r\nadd page to benchmark pgt  retval= ");
+										USR_DBG_I(Retval);*/
+	}
+
+	USR_DBG_S("\r\nFirst section's first entry ");
+ 800475c:	e3040ebc 	movw	r0, #20156	@ 0x4ebc
+ 8004760:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004764:	ebfffefd 	bl	8004360 <USR_DBG_S>
+	USR_DBG_H(RME_A7A_REG(Cur_addr+RME_KOM_VA_BASE));
+ 8004768:	e3083000 	movw	r3, #32768	@ 0x8000
+ 800476c:	e3403800 	movt	r3, #2048	@ 0x800
+ 8004770:	e5933000 	ldr	r3, [r3]
+ 8004774:	e2833481 	add	r3, r3, #-2130706432	@ 0x81000000
+ 8004778:	e5933000 	ldr	r3, [r3]
+ 800477c:	e1a00003 	mov	r0, r3
+ 8004780:	ebfffeb4 	bl	8004258 <USR_DBG_H>
+	USR_DBG_S(" @ ");
+ 8004784:	e3040edc 	movw	r0, #20188	@ 0x4edc
+ 8004788:	e3400800 	movt	r0, #2048	@ 0x800
+ 800478c:	ebfffef3 	bl	8004360 <USR_DBG_S>
+	USR_DBG_H(Cur_addr+RME_KOM_VA_BASE);
+ 8004790:	e3083000 	movw	r3, #32768	@ 0x8000
+ 8004794:	e3403800 	movt	r3, #2048	@ 0x800
+ 8004798:	e5933000 	ldr	r3, [r3]
+ 800479c:	e2833481 	add	r3, r3, #-2130706432	@ 0x81000000
+ 80047a0:	e1a00003 	mov	r0, r3
+ 80047a4:	ebfffeab 	bl	8004258 <USR_DBG_H>
+
+	USR_DBG_S("\r\nFirst section's 0x080th entry ");
+ 80047a8:	e3040ee0 	movw	r0, #20192	@ 0x4ee0
+ 80047ac:	e3400800 	movt	r0, #2048	@ 0x800
+ 80047b0:	ebfffeea 	bl	8004360 <USR_DBG_S>
+	USR_DBG_H(RME_A7A_REG(Cur_addr+0x080*RME_WORD_BYTE+RME_KOM_VA_BASE));
+ 80047b4:	e3083000 	movw	r3, #32768	@ 0x8000
+ 80047b8:	e3403800 	movt	r3, #2048	@ 0x800
+ 80047bc:	e5933000 	ldr	r3, [r3]
+ 80047c0:	e2833481 	add	r3, r3, #-2130706432	@ 0x81000000
+ 80047c4:	e2833c02 	add	r3, r3, #512	@ 0x200
+ 80047c8:	e5933000 	ldr	r3, [r3]
+ 80047cc:	e1a00003 	mov	r0, r3
+ 80047d0:	ebfffea0 	bl	8004258 <USR_DBG_H>
+	USR_DBG_S(" @ ");
+ 80047d4:	e3040edc 	movw	r0, #20188	@ 0x4edc
+ 80047d8:	e3400800 	movt	r0, #2048	@ 0x800
+ 80047dc:	ebfffedf 	bl	8004360 <USR_DBG_S>
+	USR_DBG_H(Cur_addr+0x080*RME_WORD_BYTE+RME_KOM_VA_BASE);
+ 80047e0:	e3083000 	movw	r3, #32768	@ 0x8000
+ 80047e4:	e3403800 	movt	r3, #2048	@ 0x800
+ 80047e8:	e5933000 	ldr	r3, [r3]
+ 80047ec:	e2833481 	add	r3, r3, #-2130706432	@ 0x81000000
+ 80047f0:	e2833c02 	add	r3, r3, #512	@ 0x200
+ 80047f4:	e1a00003 	mov	r0, r3
+ 80047f8:	ebfffe96 	bl	8004258 <USR_DBG_H>
+
+	USR_DBG_S("\r\nSecond section's first entry ");
+ 80047fc:	e3040f04 	movw	r0, #20228	@ 0x4f04
+ 8004800:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004804:	ebfffed5 	bl	8004360 <USR_DBG_S>
+	USR_DBG_H(RME_A7A_REG(Cur_addr+0x400*RME_WORD_BYTE+RME_KOM_VA_BASE));
+ 8004808:	e3083000 	movw	r3, #32768	@ 0x8000
+ 800480c:	e3403800 	movt	r3, #2048	@ 0x800
+ 8004810:	e5933000 	ldr	r3, [r3]
+ 8004814:	e2833481 	add	r3, r3, #-2130706432	@ 0x81000000
+ 8004818:	e2833a01 	add	r3, r3, #4096	@ 0x1000
+ 800481c:	e5933000 	ldr	r3, [r3]
+ 8004820:	e1a00003 	mov	r0, r3
+ 8004824:	ebfffe8b 	bl	8004258 <USR_DBG_H>
+	USR_DBG_S(" @ ");
+ 8004828:	e3040edc 	movw	r0, #20188	@ 0x4edc
+ 800482c:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004830:	ebfffeca 	bl	8004360 <USR_DBG_S>
+	USR_DBG_H(Cur_addr+0x400*RME_WORD_BYTE+RME_KOM_VA_BASE);
+ 8004834:	e3083000 	movw	r3, #32768	@ 0x8000
+ 8004838:	e3403800 	movt	r3, #2048	@ 0x800
+ 800483c:	e5933000 	ldr	r3, [r3]
+ 8004840:	e2833481 	add	r3, r3, #-2130706432	@ 0x81000000
+ 8004844:	e2833a01 	add	r3, r3, #4096	@ 0x1000
+ 8004848:	e1a00003 	mov	r0, r3
+ 800484c:	ebfffe81 	bl	8004258 <USR_DBG_H>
+
+	USR_DBG_S("\r\nThird section's first entry ");
+ 8004850:	e3040f24 	movw	r0, #20260	@ 0x4f24
+ 8004854:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004858:	ebfffec0 	bl	8004360 <USR_DBG_S>
+	USR_DBG_H(RME_A7A_REG(Cur_addr+0x600*RME_WORD_BYTE+RME_KOM_VA_BASE));
+ 800485c:	e3083000 	movw	r3, #32768	@ 0x8000
+ 8004860:	e3403800 	movt	r3, #2048	@ 0x800
+ 8004864:	e5933000 	ldr	r3, [r3]
+ 8004868:	e2833481 	add	r3, r3, #-2130706432	@ 0x81000000
+ 800486c:	e2833b06 	add	r3, r3, #6144	@ 0x1800
+ 8004870:	e5933000 	ldr	r3, [r3]
+ 8004874:	e1a00003 	mov	r0, r3
+ 8004878:	ebfffe76 	bl	8004258 <USR_DBG_H>
+	USR_DBG_S(" @ ");
+ 800487c:	e3040edc 	movw	r0, #20188	@ 0x4edc
+ 8004880:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004884:	ebfffeb5 	bl	8004360 <USR_DBG_S>
+	USR_DBG_H(Cur_addr+0x600*RME_WORD_BYTE+RME_KOM_VA_BASE);
+ 8004888:	e3083000 	movw	r3, #32768	@ 0x8000
+ 800488c:	e3403800 	movt	r3, #2048	@ 0x800
+ 8004890:	e5933000 	ldr	r3, [r3]
+ 8004894:	e2833481 	add	r3, r3, #-2130706432	@ 0x81000000
+ 8004898:	e2833b06 	add	r3, r3, #6144	@ 0x1800
+ 800489c:	e1a00003 	mov	r0, r3
+ 80048a0:	ebfffe6c 	bl	8004258 <USR_DBG_H>
+	USR_DBG_H(RME_A7A_REG(((ptr_t)(&__RME_A7A_Kern_Pgt))+0x080*RME_WORD_BYTE));
+	USR_DBG_S(" @ ");
+	USR_DBG_H(((ptr_t)(&__RME_A7A_Kern_Pgt))+0x080*RME_WORD_BYTE);*/
+
+	//创建测试进程
+	Retval=RME_Prc_Crt(RME_BOOT_INIT_CPT,RME_BOOT_BENCH_PRC,RME_BOOT_INIT_CPT,
+ 80048a4:	e3a03009 	mov	r3, #9
+ 80048a8:	e3a02000 	mov	r2, #0
+ 80048ac:	e3a01011 	mov	r1, #17
+ 80048b0:	e3a00000 	mov	r0, #0
+ 80048b4:	ebfffed4 	bl	800440c <RME_Prc_Crt>
+ 80048b8:	e50b0010 	str	r0, [fp, #-16]
+		    			RME_BOOT_BENCH_PGT);
+	USR_DBG_S("\r\n create benchmark prc  retval= ");
+ 80048bc:	e3040f44 	movw	r0, #20292	@ 0x4f44
+ 80048c0:	e3400800 	movt	r0, #2048	@ 0x800
+ 80048c4:	ebfffea5 	bl	8004360 <USR_DBG_S>
+	USR_DBG_I(Retval);
+ 80048c8:	e51b0010 	ldr	r0, [fp, #-16]
+ 80048cc:	ebfffe02 	bl	80040dc <USR_DBG_I>
+
+
+	//创建同步迁移调用
+	//0x00009000U
+	Retval=RME_Inv_Crt(RME_BOOT_INIT_CPT,
+ 80048d0:	e3a03a09 	mov	r3, #36864	@ 0x9000
+ 80048d4:	e58d3000 	str	r3, [sp]
+ 80048d8:	e3a03011 	mov	r3, #17
+ 80048dc:	e3a02012 	mov	r2, #18
+ 80048e0:	e3a01005 	mov	r1, #5
+ 80048e4:	e3a00000 	mov	r0, #0
+ 80048e8:	ebffff10 	bl	8004530 <RME_Inv_Crt>
+ 80048ec:	e50b0010 	str	r0, [fp, #-16]
+			           RME_BOOT_INIT_KOM,
+					   RME_BOOT_BENCH_INV,
+					   RME_BOOT_BENCH_PRC,
+					   0x00009000U);
+	USR_DBG_S("\r\n create benchmark thd  retval= ");
+ 80048f0:	e3050068 	movw	r0, #20584	@ 0x5068
+ 80048f4:	e3400800 	movt	r0, #2048	@ 0x800
+ 80048f8:	ebfffe98 	bl	8004360 <USR_DBG_S>
+	USR_DBG_I(Retval);
+ 80048fc:	e51b0010 	ldr	r0, [fp, #-16]
+ 8004900:	ebfffdf5 	bl	80040dc <USR_DBG_I>
+	//设置同步迁移调用
+	Retval=RME_Inv_Set(RME_BOOT_BENCH_INV,
+ 8004904:	e30415d4 	movw	r1, #17876	@ 0x45d4
+ 8004908:	e3401800 	movt	r1, #2048	@ 0x800
+ 800490c:	e59f2108 	ldr	r2, [pc, #264]	@ 8004a1c <RME_Diff_Inv_test+0x424>
+ 8004910:	e3a03000 	mov	r3, #0
+ 8004914:	e3a00012 	mov	r0, #18
+ 8004918:	ebffff19 	bl	8004584 <RME_Inv_Set>
+ 800491c:	e50b0010 	str	r0, [fp, #-16]
+					    (ptr_t)&RME_Inv_test_fuction,
+						(ptr_t)&RME_Stack4[2000],
+						0);
+	USR_DBG_S("\r\n create benchmark INV  retval= ");
+ 8004920:	e305008c 	movw	r0, #20620	@ 0x508c
+ 8004924:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004928:	ebfffe8c 	bl	8004360 <USR_DBG_S>
+	USR_DBG_I(Retval);
+ 800492c:	e51b0010 	ldr	r0, [fp, #-16]
+ 8004930:	ebfffde9 	bl	80040dc <USR_DBG_I>
+	start=get_time();
+ 8004934:	ebfffea8 	bl	80043dc <get_time>
+ 8004938:	e1a02000 	mov	r2, r0
+ 800493c:	e3083004 	movw	r3, #32772	@ 0x8004
+ 8004940:	e3403800 	movt	r3, #2048	@ 0x800
+ 8004944:	e5832000 	str	r2, [r3]
+	for(int Count=0;Count<10;Count++)
+ 8004948:	e3a03000 	mov	r3, #0
+ 800494c:	e50b300c 	str	r3, [fp, #-12]
+ 8004950:	ea00000c 	b	8004988 <RME_Diff_Inv_test+0x390>
+	{
+		//迁移调用
+		Retval=RME_Inv_Act(RME_BOOT_BENCH_INV,0,0);
+ 8004954:	e3a02000 	mov	r2, #0
+ 8004958:	e3a01000 	mov	r1, #0
+ 800495c:	e3a00012 	mov	r0, #18
+ 8004960:	ebfffdb5 	bl	800403c <RME_Inv_Act>
+ 8004964:	e50b0010 	str	r0, [fp, #-16]
+		USR_DBG_S("\r\n  RME_Inv_Act  retval= ");
+ 8004968:	e30500b0 	movw	r0, #20656	@ 0x50b0
+ 800496c:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004970:	ebfffe7a 	bl	8004360 <USR_DBG_S>
+		USR_DBG_I(Retval);
+ 8004974:	e51b0010 	ldr	r0, [fp, #-16]
+ 8004978:	ebfffdd7 	bl	80040dc <USR_DBG_I>
+	for(int Count=0;Count<10;Count++)
+ 800497c:	e51b300c 	ldr	r3, [fp, #-12]
+ 8004980:	e2833001 	add	r3, r3, #1
+ 8004984:	e50b300c 	str	r3, [fp, #-12]
+ 8004988:	e51b300c 	ldr	r3, [fp, #-12]
+ 800498c:	e3530009 	cmp	r3, #9
+ 8004990:	daffffef 	ble	8004954 <RME_Diff_Inv_test+0x35c>
+	}
+	end=get_time();
+ 8004994:	ebfffe90 	bl	80043dc <get_time>
+ 8004998:	e1a02000 	mov	r2, r0
+ 800499c:	e3083008 	movw	r3, #32776	@ 0x8008
+ 80049a0:	e3403800 	movt	r3, #2048	@ 0x800
+ 80049a4:	e5832000 	str	r2, [r3]
+	USR_DBG_S("\r\n inv 10000 time  = ");
+ 80049a8:	e30500cc 	movw	r0, #20684	@ 0x50cc
+ 80049ac:	e3400800 	movt	r0, #2048	@ 0x800
+ 80049b0:	ebfffe6a 	bl	8004360 <USR_DBG_S>
+	USR_DBG_I(end-start);
+ 80049b4:	e3083008 	movw	r3, #32776	@ 0x8008
+ 80049b8:	e3403800 	movt	r3, #2048	@ 0x800
+ 80049bc:	e5932000 	ldr	r2, [r3]
+ 80049c0:	e3083004 	movw	r3, #32772	@ 0x8004
+ 80049c4:	e3403800 	movt	r3, #2048	@ 0x800
+ 80049c8:	e5933000 	ldr	r3, [r3]
+ 80049cc:	e0423003 	sub	r3, r2, r3
+ 80049d0:	e1a00003 	mov	r0, r3
+ 80049d4:	ebfffdc0 	bl	80040dc <USR_DBG_I>
+	USR_DBG_S("\r\n inv 10000 time avg = ");
+ 80049d8:	e30500e4 	movw	r0, #20708	@ 0x50e4
+ 80049dc:	e3400800 	movt	r0, #2048	@ 0x800
+ 80049e0:	ebfffe5e 	bl	8004360 <USR_DBG_S>
+	USR_DBG_I((end-start)/10000);
+ 80049e4:	e3083008 	movw	r3, #32776	@ 0x8008
+ 80049e8:	e3403800 	movt	r3, #2048	@ 0x800
+ 80049ec:	e5932000 	ldr	r2, [r3]
+ 80049f0:	e3083004 	movw	r3, #32772	@ 0x8004
+ 80049f4:	e3403800 	movt	r3, #2048	@ 0x800
+ 80049f8:	e5933000 	ldr	r3, [r3]
+ 80049fc:	e0422003 	sub	r2, r2, r3
+ 8004a00:	e3013759 	movw	r3, #5977	@ 0x1759
+ 8004a04:	e34d31b7 	movt	r3, #53687	@ 0xd1b7
+ 8004a08:	e0832293 	umull	r2, r3, r3, r2
+ 8004a0c:	e1a036a3 	lsr	r3, r3, #13
+ 8004a10:	e1a00003 	mov	r0, r3
+ 8004a14:	ebfffdb0 	bl	80040dc <USR_DBG_I>
+	while(1);
+ 8004a18:	eafffffe 	b	8004a18 <RME_Diff_Inv_test+0x420>
+ 8004a1c:	08007f40 	.word	0x08007f40
+
+08004a20 <RME_Benchmark>:
+Input       : None.
+Output      : None.
+Return      : None.
+******************************************************************************/
+void RME_Benchmark(void)
+{
+ 8004a20:	e92d4800 	push	{fp, lr}
+ 8004a24:	e28db004 	add	fp, sp, #4
+	Cur_addr=RME_BOOT_BENCH_KOM_FRONTIER;
+ 8004a28:	e3083000 	movw	r3, #32768	@ 0x8000
+ 8004a2c:	e3403800 	movt	r3, #2048	@ 0x800
+ 8004a30:	e3a02902 	mov	r2, #32768	@ 0x8000
+ 8004a34:	e5832000 	str	r2, [r3]
+    USR_DBG_S("\r\nhello this is User level!");
+ 8004a38:	e3050100 	movw	r0, #20736	@ 0x5100
+ 8004a3c:	e3400800 	movt	r0, #2048	@ 0x800
+ 8004a40:	ebfffe46 	bl	8004360 <USR_DBG_S>
+
+    //RME_Same_Prc_Thd_Sig_Testinit();
+    //RME_Diff_Prc_Thd_Sig_Testinit();
+    RME_Diff_Inv_test();
+ 8004a44:	ebfffeeb 	bl	80045f8 <RME_Diff_Inv_test>
+    //RME_Same_Prc_Thd_Switch_Test();
+    //RME_Diff_Prc_Switch_Test();
+    //USR_DBG_S("\r\nTest done!");
+    while(1);
+ 8004a48:	eafffffe 	b	8004a48 <RME_Benchmark+0x28>
+ 8004a4c:	00000000 	andeq	r0, r0, r0
+
+08004a50 <__divsi3>:
+ 8004a50:	2900      	cmp	r1, #0
+ 8004a52:	f000 813e 	beq.w	8004cd2 <.divsi3_skip_div0_test+0x27c>
+
+08004a56 <.divsi3_skip_div0_test>:
+ 8004a56:	ea80 0c01 	eor.w	ip, r0, r1
+ 8004a5a:	bf48      	it	mi
+ 8004a5c:	4249      	negmi	r1, r1
+ 8004a5e:	1e4a      	subs	r2, r1, #1
+ 8004a60:	f000 811f 	beq.w	8004ca2 <.divsi3_skip_div0_test+0x24c>
+ 8004a64:	0003      	movs	r3, r0
+ 8004a66:	bf48      	it	mi
+ 8004a68:	4243      	negmi	r3, r0
+ 8004a6a:	428b      	cmp	r3, r1
+ 8004a6c:	f240 811e 	bls.w	8004cac <.divsi3_skip_div0_test+0x256>
+ 8004a70:	4211      	tst	r1, r2
+ 8004a72:	f000 8123 	beq.w	8004cbc <.divsi3_skip_div0_test+0x266>
+ 8004a76:	fab3 f283 	clz	r2, r3
+ 8004a7a:	fab1 f081 	clz	r0, r1
+ 8004a7e:	eba0 0202 	sub.w	r2, r0, r2
+ 8004a82:	f1c2 021f 	rsb	r2, r2, #31
+ 8004a86:	a004      	add	r0, pc, #16	@ (adr r0, 8004a98 <.divsi3_skip_div0_test+0x42>)
+ 8004a88:	eb00 1202 	add.w	r2, r0, r2, lsl #4
+ 8004a8c:	f04f 0000 	mov.w	r0, #0
+ 8004a90:	4697      	mov	pc, r2
+ 8004a92:	bf00      	nop
+ 8004a94:	f3af 8000 	nop.w
+ 8004a98:	ebb3 7fc1 	cmp.w	r3, r1, lsl #31
+ 8004a9c:	bf00      	nop
+ 8004a9e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004aa2:	bf28      	it	cs
+ 8004aa4:	eba3 73c1 	subcs.w	r3, r3, r1, lsl #31
+ 8004aa8:	ebb3 7f81 	cmp.w	r3, r1, lsl #30
+ 8004aac:	bf00      	nop
+ 8004aae:	eb40 0000 	adc.w	r0, r0, r0
+ 8004ab2:	bf28      	it	cs
+ 8004ab4:	eba3 7381 	subcs.w	r3, r3, r1, lsl #30
+ 8004ab8:	ebb3 7f41 	cmp.w	r3, r1, lsl #29
+ 8004abc:	bf00      	nop
+ 8004abe:	eb40 0000 	adc.w	r0, r0, r0
+ 8004ac2:	bf28      	it	cs
+ 8004ac4:	eba3 7341 	subcs.w	r3, r3, r1, lsl #29
+ 8004ac8:	ebb3 7f01 	cmp.w	r3, r1, lsl #28
+ 8004acc:	bf00      	nop
+ 8004ace:	eb40 0000 	adc.w	r0, r0, r0
+ 8004ad2:	bf28      	it	cs
+ 8004ad4:	eba3 7301 	subcs.w	r3, r3, r1, lsl #28
+ 8004ad8:	ebb3 6fc1 	cmp.w	r3, r1, lsl #27
+ 8004adc:	bf00      	nop
+ 8004ade:	eb40 0000 	adc.w	r0, r0, r0
+ 8004ae2:	bf28      	it	cs
+ 8004ae4:	eba3 63c1 	subcs.w	r3, r3, r1, lsl #27
+ 8004ae8:	ebb3 6f81 	cmp.w	r3, r1, lsl #26
+ 8004aec:	bf00      	nop
+ 8004aee:	eb40 0000 	adc.w	r0, r0, r0
+ 8004af2:	bf28      	it	cs
+ 8004af4:	eba3 6381 	subcs.w	r3, r3, r1, lsl #26
+ 8004af8:	ebb3 6f41 	cmp.w	r3, r1, lsl #25
+ 8004afc:	bf00      	nop
+ 8004afe:	eb40 0000 	adc.w	r0, r0, r0
+ 8004b02:	bf28      	it	cs
+ 8004b04:	eba3 6341 	subcs.w	r3, r3, r1, lsl #25
+ 8004b08:	ebb3 6f01 	cmp.w	r3, r1, lsl #24
+ 8004b0c:	bf00      	nop
+ 8004b0e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004b12:	bf28      	it	cs
+ 8004b14:	eba3 6301 	subcs.w	r3, r3, r1, lsl #24
+ 8004b18:	ebb3 5fc1 	cmp.w	r3, r1, lsl #23
+ 8004b1c:	bf00      	nop
+ 8004b1e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004b22:	bf28      	it	cs
+ 8004b24:	eba3 53c1 	subcs.w	r3, r3, r1, lsl #23
+ 8004b28:	ebb3 5f81 	cmp.w	r3, r1, lsl #22
+ 8004b2c:	bf00      	nop
+ 8004b2e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004b32:	bf28      	it	cs
+ 8004b34:	eba3 5381 	subcs.w	r3, r3, r1, lsl #22
+ 8004b38:	ebb3 5f41 	cmp.w	r3, r1, lsl #21
+ 8004b3c:	bf00      	nop
+ 8004b3e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004b42:	bf28      	it	cs
+ 8004b44:	eba3 5341 	subcs.w	r3, r3, r1, lsl #21
+ 8004b48:	ebb3 5f01 	cmp.w	r3, r1, lsl #20
+ 8004b4c:	bf00      	nop
+ 8004b4e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004b52:	bf28      	it	cs
+ 8004b54:	eba3 5301 	subcs.w	r3, r3, r1, lsl #20
+ 8004b58:	ebb3 4fc1 	cmp.w	r3, r1, lsl #19
+ 8004b5c:	bf00      	nop
+ 8004b5e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004b62:	bf28      	it	cs
+ 8004b64:	eba3 43c1 	subcs.w	r3, r3, r1, lsl #19
+ 8004b68:	ebb3 4f81 	cmp.w	r3, r1, lsl #18
+ 8004b6c:	bf00      	nop
+ 8004b6e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004b72:	bf28      	it	cs
+ 8004b74:	eba3 4381 	subcs.w	r3, r3, r1, lsl #18
+ 8004b78:	ebb3 4f41 	cmp.w	r3, r1, lsl #17
+ 8004b7c:	bf00      	nop
+ 8004b7e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004b82:	bf28      	it	cs
+ 8004b84:	eba3 4341 	subcs.w	r3, r3, r1, lsl #17
+ 8004b88:	ebb3 4f01 	cmp.w	r3, r1, lsl #16
+ 8004b8c:	bf00      	nop
+ 8004b8e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004b92:	bf28      	it	cs
+ 8004b94:	eba3 4301 	subcs.w	r3, r3, r1, lsl #16
+ 8004b98:	ebb3 3fc1 	cmp.w	r3, r1, lsl #15
+ 8004b9c:	bf00      	nop
+ 8004b9e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004ba2:	bf28      	it	cs
+ 8004ba4:	eba3 33c1 	subcs.w	r3, r3, r1, lsl #15
+ 8004ba8:	ebb3 3f81 	cmp.w	r3, r1, lsl #14
+ 8004bac:	bf00      	nop
+ 8004bae:	eb40 0000 	adc.w	r0, r0, r0
+ 8004bb2:	bf28      	it	cs
+ 8004bb4:	eba3 3381 	subcs.w	r3, r3, r1, lsl #14
+ 8004bb8:	ebb3 3f41 	cmp.w	r3, r1, lsl #13
+ 8004bbc:	bf00      	nop
+ 8004bbe:	eb40 0000 	adc.w	r0, r0, r0
+ 8004bc2:	bf28      	it	cs
+ 8004bc4:	eba3 3341 	subcs.w	r3, r3, r1, lsl #13
+ 8004bc8:	ebb3 3f01 	cmp.w	r3, r1, lsl #12
+ 8004bcc:	bf00      	nop
+ 8004bce:	eb40 0000 	adc.w	r0, r0, r0
+ 8004bd2:	bf28      	it	cs
+ 8004bd4:	eba3 3301 	subcs.w	r3, r3, r1, lsl #12
+ 8004bd8:	ebb3 2fc1 	cmp.w	r3, r1, lsl #11
+ 8004bdc:	bf00      	nop
+ 8004bde:	eb40 0000 	adc.w	r0, r0, r0
+ 8004be2:	bf28      	it	cs
+ 8004be4:	eba3 23c1 	subcs.w	r3, r3, r1, lsl #11
+ 8004be8:	ebb3 2f81 	cmp.w	r3, r1, lsl #10
+ 8004bec:	bf00      	nop
+ 8004bee:	eb40 0000 	adc.w	r0, r0, r0
+ 8004bf2:	bf28      	it	cs
+ 8004bf4:	eba3 2381 	subcs.w	r3, r3, r1, lsl #10
+ 8004bf8:	ebb3 2f41 	cmp.w	r3, r1, lsl #9
+ 8004bfc:	bf00      	nop
+ 8004bfe:	eb40 0000 	adc.w	r0, r0, r0
+ 8004c02:	bf28      	it	cs
+ 8004c04:	eba3 2341 	subcs.w	r3, r3, r1, lsl #9
+ 8004c08:	ebb3 2f01 	cmp.w	r3, r1, lsl #8
+ 8004c0c:	bf00      	nop
+ 8004c0e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004c12:	bf28      	it	cs
+ 8004c14:	eba3 2301 	subcs.w	r3, r3, r1, lsl #8
+ 8004c18:	ebb3 1fc1 	cmp.w	r3, r1, lsl #7
+ 8004c1c:	bf00      	nop
+ 8004c1e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004c22:	bf28      	it	cs
+ 8004c24:	eba3 13c1 	subcs.w	r3, r3, r1, lsl #7
+ 8004c28:	ebb3 1f81 	cmp.w	r3, r1, lsl #6
+ 8004c2c:	bf00      	nop
+ 8004c2e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004c32:	bf28      	it	cs
+ 8004c34:	eba3 1381 	subcs.w	r3, r3, r1, lsl #6
+ 8004c38:	ebb3 1f41 	cmp.w	r3, r1, lsl #5
+ 8004c3c:	bf00      	nop
+ 8004c3e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004c42:	bf28      	it	cs
+ 8004c44:	eba3 1341 	subcs.w	r3, r3, r1, lsl #5
+ 8004c48:	ebb3 1f01 	cmp.w	r3, r1, lsl #4
+ 8004c4c:	bf00      	nop
+ 8004c4e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004c52:	bf28      	it	cs
+ 8004c54:	eba3 1301 	subcs.w	r3, r3, r1, lsl #4
+ 8004c58:	ebb3 0fc1 	cmp.w	r3, r1, lsl #3
+ 8004c5c:	bf00      	nop
+ 8004c5e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004c62:	bf28      	it	cs
+ 8004c64:	eba3 03c1 	subcs.w	r3, r3, r1, lsl #3
+ 8004c68:	ebb3 0f81 	cmp.w	r3, r1, lsl #2
+ 8004c6c:	bf00      	nop
+ 8004c6e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004c72:	bf28      	it	cs
+ 8004c74:	eba3 0381 	subcs.w	r3, r3, r1, lsl #2
+ 8004c78:	ebb3 0f41 	cmp.w	r3, r1, lsl #1
+ 8004c7c:	bf00      	nop
+ 8004c7e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004c82:	bf28      	it	cs
+ 8004c84:	eba3 0341 	subcs.w	r3, r3, r1, lsl #1
+ 8004c88:	ebb3 0f01 	cmp.w	r3, r1
+ 8004c8c:	bf00      	nop
+ 8004c8e:	eb40 0000 	adc.w	r0, r0, r0
+ 8004c92:	bf28      	it	cs
+ 8004c94:	eba3 0301 	subcs.w	r3, r3, r1
+ 8004c98:	f1bc 0f00 	cmp.w	ip, #0
+ 8004c9c:	bf48      	it	mi
+ 8004c9e:	4240      	negmi	r0, r0
+ 8004ca0:	4770      	bx	lr
+ 8004ca2:	ea9c 0f00 	teq	ip, r0
+ 8004ca6:	bf48      	it	mi
+ 8004ca8:	4240      	negmi	r0, r0
+ 8004caa:	4770      	bx	lr
+ 8004cac:	bf38      	it	cc
+ 8004cae:	2000      	movcc	r0, #0
+ 8004cb0:	bf04      	itt	eq
+ 8004cb2:	ea4f 70ec 	moveq.w	r0, ip, asr #31
+ 8004cb6:	f040 0001 	orreq.w	r0, r0, #1
+ 8004cba:	4770      	bx	lr
+ 8004cbc:	fab1 f281 	clz	r2, r1
+ 8004cc0:	f1c2 021f 	rsb	r2, r2, #31
+ 8004cc4:	f1bc 0f00 	cmp.w	ip, #0
+ 8004cc8:	fa23 f002 	lsr.w	r0, r3, r2
+ 8004ccc:	bf48      	it	mi
+ 8004cce:	4240      	negmi	r0, r0
+ 8004cd0:	4770      	bx	lr
+ 8004cd2:	2800      	cmp	r0, #0
+ 8004cd4:	bfc8      	it	gt
+ 8004cd6:	f06f 4000 	mvngt.w	r0, #2147483648	@ 0x80000000
+ 8004cda:	bfb8      	it	lt
+ 8004cdc:	f04f 4000 	movlt.w	r0, #2147483648	@ 0x80000000
+ 8004ce0:	f000 b80e 	b.w	8004d00 <__aeabi_idiv0>
+
+08004ce4 <__aeabi_idivmod>:
+ 8004ce4:	2900      	cmp	r1, #0
+ 8004ce6:	d0f4      	beq.n	8004cd2 <.divsi3_skip_div0_test+0x27c>
+ 8004ce8:	e92d 4003 	stmdb	sp!, {r0, r1, lr}
+ 8004cec:	f7ff feb3 	bl	8004a56 <.divsi3_skip_div0_test>
+ 8004cf0:	e8bd 4006 	ldmia.w	sp!, {r1, r2, lr}
+ 8004cf4:	fb02 f300 	mul.w	r3, r2, r0
+ 8004cf8:	eba1 0103 	sub.w	r1, r1, r3
+ 8004cfc:	4770      	bx	lr
+ 8004cfe:	bf00      	nop
+
+08004d00 <__aeabi_idiv0>:
+ 8004d00:	4770      	bx	lr
+ 8004d02:	bf00      	nop
