@@ -14,7 +14,7 @@ TARGET=BENCHMARK
 CPU=-mcpu=cortex-a9 -mfloat-abi=softfp -mfpu=neon-fp16 -mno-thumb-interwork
 CDEFS=
 
-CFLAGS=-O0 -specs=nano.specs -fsigned-char -fno-common -fno-strict-aliasing -fdata-sections -ffunction-sections -ffreestanding
+CFLAGS=-O3 -specs=nano.specs -fsigned-char -fno-common -fno-strict-aliasing -fdata-sections -ffunction-sections -ffreestanding
 AFLAGS=-fdata-sections -ffunction-sections  
 WFLAGS=-Wall -Wno-strict-aliasing
 DFLAGS=-g3

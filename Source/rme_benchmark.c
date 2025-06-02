@@ -628,9 +628,9 @@ void RME_Diff_Prc_Switch_Test(void)
 	    		start=get_time();
 	    		for(Count=0;Count<10000;Count++)
 	    		    {
-	    				start=get_time();
+	    				//start=get_time();
 	    				Retval=RME_Thd_Swt(RME_BOOT_BENCH_THD,0);
-	    				end=get_time();
+	    				/*end=get_time();
 	    				USR_DBG_S("\r\n switch to new prc time= ");
 	    				USR_DBG_I(end-start);
 	    				/*USR_DBG_S("\r\n swt benchmark prc  retval= ");
@@ -651,14 +651,10 @@ void RME_Diff_Prc_Switch_Test(void)
 
 void RME_Inv_test_fuction(int param)//迁移调用函数
 {
-	USR_DBG_S("\r\n inv fuction!");
-	//while(1)
-	//{
+	//USR_DBG_S("\r\n inv fuction!");
 		//同步迁移调用返回
 		RME_Inv_Ret(param);
-		//USR_DBG_S("\r\n inv fuction return!");
-		//为什么每次都只是返回到这里
-	//}
+
 }
 
 void RME_Deadloop(void);
@@ -710,7 +706,7 @@ void RME_Diff_Inv_test(void)
 										USR_DBG_I(Retval);*/
 	}
 
-	USR_DBG_S("\r\nFirst section's first entry ");
+	/*USR_DBG_S("\r\nFirst section's first entry ");
 	USR_DBG_H(RME_A7A_REG(Cur_addr+RME_KOM_VA_BASE));
 	USR_DBG_S(" @ ");
 	USR_DBG_H(Cur_addr+RME_KOM_VA_BASE);
@@ -759,12 +755,12 @@ void RME_Diff_Inv_test(void)
 	USR_DBG_S("\r\n create benchmark INV  retval= ");
 	USR_DBG_I(Retval);
 	start=get_time();
-	for(int Count=0;Count<10;Count++)
+	for(int Count=0;Count<10000;Count++)
 	{
 		//迁移调用
 		Retval=RME_Inv_Act(RME_BOOT_BENCH_INV,0,0);
-		USR_DBG_S("\r\n  RME_Inv_Act  retval= ");
-		USR_DBG_I(Retval);
+		/*USR_DBG_S("\r\n  RME_Inv_Act  retval= ");
+		USR_DBG_I(Retval);*/
 	}
 	end=get_time();
 	USR_DBG_S("\r\n inv 10000 time  = ");
@@ -783,7 +779,7 @@ Return      : None.
 void RME_Benchmark(void)
 {
 	Cur_addr=RME_BOOT_BENCH_KOM_FRONTIER;
-    USR_DBG_S("\r\nhello this is User level!");
+    //USR_DBG_S("\r\nhello this is User level!");
 
     //RME_Same_Prc_Thd_Sig_Testinit();
     RME_Diff_Prc_Thd_Sig_Testinit();

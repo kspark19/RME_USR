@@ -229,7 +229,7 @@ ret_t RME_Sig_Snd(cid_t Cap_Sig)
     return RME_SVC(RME_SVC_SIG_SND,
                    0U,
                    Cap_Sig,
-                   0U,
+                   1U,
                    0U);
 }
 /* End Function:RME_Sig_Snd **************************************************/
